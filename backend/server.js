@@ -58,6 +58,13 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🚀 Mune's Kitchen Backend running on http://localhost:${PORT}`);
-});
+
+// Only start local server when running directly (not on Vercel)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Mune's Kitchen Backend running on http://localhost:${PORT}`);
+    });
+}
+
+// Export for Vercel serverless
+module.exports = app;
