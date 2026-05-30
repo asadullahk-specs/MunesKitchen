@@ -49,7 +49,7 @@ const CheckoutPage = () => {
         }
     }, [deliveryAreaId, deliveryAreas])
 
-    const deliveryCharge = selectedArea ? Number(selectedArea.delivery_charge) : 0
+    const deliveryCharge = selectedArea ? Number(selectedArea.charge) : 0
     const total = cartSubtotal + deliveryCharge
 
     const handleSubmit = async () => {
