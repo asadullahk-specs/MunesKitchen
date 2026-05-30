@@ -19,6 +19,7 @@ const app = express();
 const allowedOrigins = [
     process.env.FRONTEND_URL,
     'http://localhost:5173',
+    'https://munes-kitchen-frontend.vercel.app',
     'https://munes-kitchen-i1s.vercel.app',
     'https://munes-kitchen.vercel.app'
 ].filter(Boolean);
