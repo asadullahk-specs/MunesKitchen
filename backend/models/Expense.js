@@ -1,13 +1,26 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const Expense = sequelize.define('Expense', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    expense_category_id: { type: DataTypes.INTEGER, allowNull: false },
-    title: { type: DataTypes.STRING(200), allowNull: false },
-    amount: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-    note: { type: DataTypes.TEXT },
-    date: { type: DataTypes.DATEONLY, allowNull: false },
-}, { tableName: 'expenses', timestamps: true, createdAt: 'created_at', updatedAt: false });
+const expenseSchema = new mongoose.Schema({
+    expense_category_id: { type: mongoose.Schema.Types.ObjectId, ref: 'ExpenseCategory', required: true },
+    title: { type: String, required: true },
+    amount: { type: Number, required: true },
+    note: { type: String },
+    date: { type: Date, required: true }
+}, {
+    timestamps: { createdAt: 'created_at', updatedAt: false }
+});
 
-module.exports = Expense;
+expenseSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id.toString();
+        if (ret.expense_category_id && ret.expense_category_id instanceof mongoose.Types.ObjectId) {
+            ret.expense_category_id = ret.expense_category_id.toString();
+        }
+        delete ret._id;
+    }
+});
+expenseSchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('Expense', expenseSchema);

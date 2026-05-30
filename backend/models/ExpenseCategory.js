@@ -1,10 +1,20 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const ExpenseCategory = sequelize.define('ExpenseCategory', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING(100), allowNull: false },
-    color: { type: DataTypes.STRING(20), defaultValue: '#ef4444' },
-}, { tableName: 'expense_categories', timestamps: false });
+const expenseCategorySchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    color: { type: String, default: '#ef4444' }
+}, {
+    timestamps: false
+});
 
-module.exports = ExpenseCategory;
+expenseCategorySchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+    }
+});
+expenseCategorySchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('ExpenseCategory', expenseCategorySchema);

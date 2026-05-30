@@ -1,15 +1,12 @@
-const DeliveryArea = require('../models/DeliveryArea');
+const { DeliveryArea } = require('../models');
 
 // Get all delivery areas
 const getDeliveryAreas = async (req, res) => {
     try {
-        const areas = await DeliveryArea.findAll({
-            order: [['name', 'ASC']]
-        });
-
+        const areas = await DeliveryArea.find().sort({ name: 1 });
         res.json({
             success: true,
-            areas: areas // Return the raw records directly
+            areas: areas
         });
     } catch (error) {
         console.error("Backend Error:", error);
@@ -34,9 +31,7 @@ const createDeliveryArea = async (req, res) => {
 // Delete a delivery area
 const deleteDeliveryArea = async (req, res) => {
     try {
-        const result = await DeliveryArea.destroy({
-            where: { id: req.params.id }
-        });
+        const result = await DeliveryArea.findByIdAndDelete(req.params.id);
         if (!result) {
             return res.status(404).json({ success: false, message: 'Area not found' });
         }

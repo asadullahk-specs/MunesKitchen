@@ -473,7 +473,7 @@ const AdminOrders = () => {
                                         <div>
                                             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">Shipping Address</p>
                                             <p className="font-semibold text-sm flex items-start gap-1" style={{ color: 'var(--text-main)' }}>
-                                                <FiMapPin size={14} className="mt-0.5 shrink-0 text-red-500" />
+                                                <FiMapPin size={14} className="mt-0.5 shrink-0" style={{ color: 'var(--primary)' }} />
                                                 {selectedOrder.address || selectedOrder.shipping_address || 'Counter Pickup'}
                                             </p>
                                         </div>
@@ -490,7 +490,7 @@ const AdminOrders = () => {
                                 {selectedOrder.notes && (
                                     <div className="p-3.5 rounded-xl border border-amber-200/40 bg-amber-500/5 text-amber-600 dark:text-amber-400">
                                         <h5 className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 mb-1">
-                                            ⚠️ Special Kitchen Request:
+                                            Special Kitchen Request:
                                         </h5>
                                         <p className="text-xs font-medium italic">
                                             "{selectedOrder.notes}"

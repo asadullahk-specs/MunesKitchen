@@ -1,11 +1,21 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const Customer = sequelize.define('Customer', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    full_name: { type: DataTypes.STRING(150), allowNull: false },
-    phone: { type: DataTypes.STRING(20), allowNull: false },
-    email: { type: DataTypes.STRING(150) },
-}, { tableName: 'customers', timestamps: true, createdAt: 'created_at', updatedAt: false });
+const customerSchema = new mongoose.Schema({
+    full_name: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String }
+}, {
+    timestamps: { createdAt: 'created_at', updatedAt: false }
+});
 
-module.exports = Customer;
+customerSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+    }
+});
+customerSchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('Customer', customerSchema);

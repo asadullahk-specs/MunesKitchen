@@ -70,7 +70,7 @@ const Navbar = () => {
                         </div>
                         <div className="leading-tight">
                             <span className="font-bold text-base" style={{ color: 'var(--text-main)', fontFamily: 'Poppins' }}>
-                                Mune's <span className="text-red-500">Kitchen</span>
+                                Mune's <span style={{ color: 'var(--primary)' }}>Kitchen</span>
                             </span>
                         </div>
                     </Link>
@@ -88,7 +88,7 @@ const Navbar = () => {
                                 }}
                             >
                                 {link.label}
-                                <span className={`absolute -bottom-1 left-0 h-0.5 rounded-full bg-red-500 transition-all duration-300 ${isActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                                <span className={`absolute -bottom-1 left-0 h-0.5 rounded-full transition-all duration-300 ${isActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ background: 'var(--primary)' }} />
                             </Link>
                         ))}
                     </div>
@@ -96,19 +96,20 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center gap-2">
                         <button
                             onClick={toggleTheme}
-                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all hover:bg-red-50 dark:hover:bg-red-900/10"
+                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
                             style={{ color: 'var(--text-muted)' }}
                         >
                             {isDark ? <FiSun size={17} className="text-yellow-400" /> : <FiMoon size={17} />}
                         </button>
-                        <Link to="/cart" className="relative w-9 h-9 rounded-xl flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/10 transition-all">
+                        <Link to="/cart" className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: 'transparent' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                             <FiShoppingCart size={18} style={{ color: 'var(--text-main)' }} />
                             {cartCount > 0 && (
                                 <motion.span
                                     key={cartCount}
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center"
+                                    className="absolute -top-1 -right-1 w-5 h-5 text-white text-xs font-bold rounded-full flex items-center justify-center"
+                                    style={{ background: 'var(--primary)' }}
                                 >
                                     {cartCount > 99 ? '99+' : cartCount}
                                 </motion.span>
@@ -123,7 +124,7 @@ const Navbar = () => {
                         <Link to="/cart" className="relative w-9 h-9 flex items-center justify-center rounded-xl">
                             <FiShoppingCart size={18} style={{ color: 'var(--text-main)' }} />
                             {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                <span className="absolute -top-1 -right-1 w-4 h-4 text-white text-xs font-bold rounded-full flex items-center justify-center" style={{ background: 'var(--primary)' }}>
                                     {cartCount}
                                 </span>
                             )}
@@ -164,7 +165,7 @@ const Navbar = () => {
                         >
                             <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
                                 <span className="font-bold text-base" style={{ color: 'var(--text-main)', fontFamily: 'Poppins' }}>
-                                    Mune's <span className="text-red-500">Kitchen</span>
+                                    Mune's <span style={{ color: 'var(--primary)' }}>Kitchen</span>
                                 </span>
                                 <button onClick={() => setIsOpen(false)} style={{ color: 'var(--text-muted)' }}>
                                     <FiX size={20} />
@@ -202,7 +203,7 @@ const Navbar = () => {
 
                             <div className="mt-auto p-5 border-t" style={{ borderColor: 'var(--border)' }}>
                                 <p className="text-xs text-center font-medium" style={{ color: 'var(--text-muted)' }}>
-                                    📞 +92 303 2683689
+                                    +92 303 2683689
                                 </p>
                             </div>
                         </motion.div>

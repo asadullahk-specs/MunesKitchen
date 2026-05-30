@@ -58,7 +58,7 @@ const ProductModal = ({ product, onClose }) => {
                         {product.hot_selling && (
                             <div className="absolute top-4 left-4">
                                 <span className="badge-hot flex items-center gap-1">
-                                    <FiStar size={11} fill="currentColor" /> Top Selling
+                                    Top Selling
                                 </span>
                             </div>
                         )}

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from 'react-icons/fi'
 import { useCart } from '../context/CartContext'
-
 const BACKEND = 'http://localhost:5000'
 
 const CartPage = () => {
@@ -14,7 +13,12 @@ const CartPage = () => {
         return (
             <div className="page-enter min-h-screen flex items-center justify-center px-4">
                 <div className="text-center">
-                    <div className="text-7xl mb-5">🛒</div>
+                    <div
+                        className="flex justify-center mb-5"
+                        style={{ color: 'var(--primary)' }}
+                    >
+                        <FiShoppingBag size={72} />
+                    </div>
                     <h2 className="font-bold text-2xl mb-2" style={{ color: 'var(--text-main)' }}>
                         Your cart is empty
                     </h2>

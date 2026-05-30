@@ -85,7 +85,7 @@ const CheckoutPage = () => {
             const { data } = await API.post('/orders', payload)
 
             if (data.success) {
-                toast.success('Order placed successfully! 🎉')
+                toast.success('Order placed successfully!')
 
                 // 1. Clear out the global basket context items
                 clearCart()
@@ -107,7 +107,7 @@ const CheckoutPage = () => {
         return (
             <div className="page-enter min-h-screen flex items-center justify-center px-4">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">🛒</div>
+                    <div className="flex justify-center mb-4" style={{ color: 'var(--primary)' }}><FiShoppingBag size={64} /></div>
                     <p className="font-bold text-xl mb-2" style={{ color: 'var(--text-main)' }}>
                         Your cart is empty
                     </p>
@@ -210,9 +210,9 @@ const CheckoutPage = () => {
                             </h2>
                             <div className="grid grid-cols-3 gap-3">
                                 {[
-                                    { value: 'cash_on_delivery', label: 'Cash on Delivery', icon: '💵' },
-                                    { value: 'easypaisa', label: 'Easypaisa', icon: '📱' },
-                                    { value: 'bank_transfer', label: 'Bank Transfer', icon: '🏦' },
+                                    { value: 'cash_on_delivery', label: 'Cash on Delivery' },
+                                    { value: 'easypaisa', label: 'Easypaisa' },
+                                    { value: 'bank_transfer', label: 'Bank Transfer' },
                                 ].map((method) => (
                                     <button key={method.value} onClick={() => setPaymentMethod(method.value)}
                                         className="p-3 rounded-xl text-center transition-all"
@@ -222,7 +222,6 @@ const CheckoutPage = () => {
                                             background: paymentMethod === method.value
                                                 ? 'var(--primary-glow)' : 'var(--bg-card)',
                                         }}>
-                                        <div className="text-xl mb-1">{method.icon}</div>
                                         <p className="text-xs font-semibold leading-tight"
                                             style={{
                                                 color: paymentMethod === method.value

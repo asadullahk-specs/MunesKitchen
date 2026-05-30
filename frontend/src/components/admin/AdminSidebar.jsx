@@ -14,6 +14,7 @@ const navItems = [
     { label: 'Dashboard', href: '/admin/dashboard', icon: <FiGrid />, exact: true },
     { label: 'Orders', href: '/admin/orders', icon: <FiShoppingBag /> },
     { label: 'Menu', href: '/admin/menu', icon: <FiList /> },
+    { label: 'Food Costing', href: '/admin/costing', icon: <FiDollarSign /> },
     { label: 'Customers', href: '/admin/customers', icon: <FiUsers /> },
     { label: 'Expenses', href: '/admin/expenses', icon: <FiDollarSign /> },
     { label: 'Reviews', href: '/admin/reviews', icon: <FiStar /> }, // New Tab

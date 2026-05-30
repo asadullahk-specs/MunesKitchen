@@ -13,6 +13,7 @@ const LINKS = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: FiHome },
     { to: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
     { to: '/admin/menu', label: 'Menu', icon: FiGrid },
+    { to: '/admin/costing', label: 'Food Costing', icon: FiDollarSign },
     { to: '/admin/reviews', label: 'Reviews', icon: FiStar },
     { to: '/admin/customers', label: 'Customers', icon: FiUsers },
     { to: '/admin/expenses', label: 'Expenses', icon: FiDollarSign },

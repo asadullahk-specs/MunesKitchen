@@ -122,10 +122,10 @@ const OrderTrackingPage = () => {
             pdf.addImage(imgData, 'PNG', marginMm, marginMm, printableWidthMm, printableHeightMm);
 
             pdf.save(`Receipt-${order?.order_number || 'MK'}.pdf`);
-            toast.success('Professional receipt downloaded successfully!');
+            toast.success('Receipt downloaded successfully!');
         } catch (error) {
-            console.error("PDF generation failed:", error);
-            toast.error('Could not generate receipt PDF.');
+            console.error("Download failed:", error);
+            toast.error('Could not generate receipt.');
         }
     };
 
@@ -156,7 +156,7 @@ const OrderTrackingPage = () => {
                             onClick={downloadPDF}
                             className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-xl shadow-md"
                         >
-                            Ref. 📥 Download Receipt PDF
+                            Download Receipt
                         </button>
                     </div>
                 )}
@@ -177,7 +177,7 @@ const OrderTrackingPage = () => {
                         <div className="flex justify-between items-center border-b pb-4" style={{ borderColor: 'var(--border)' }}>
                             <div>
                                 <p className="text-xs uppercase text-gray-400 font-bold tracking-wider">Order Reference</p>
-                                <h3 className="text-2xl font-black text-red-600 mt-0.5">#{order.order_number}</h3>
+                                <h3 className="text-2xl font-black mt-0.5" style={{ color: 'var(--primary)' }}>#{order.order_number}</h3>
                             </div>
                             <div className="text-right">
                                 <p className="text-xs uppercase text-gray-400 font-bold tracking-wider mb-1">Status</p>
@@ -286,7 +286,7 @@ const OrderTrackingPage = () => {
                             {/* Grand Total now reflects Subtotal only */}
                             <div className="flex justify-between items-center font-bold text-lg border-t pt-3 mt-2" style={{ borderColor: 'var(--border)' }}>
                                 <span style={{ color: 'var(--text-main)' }}>Grand Total:</span>
-                                <span className="text-2xl font-black text-red-600">
+                                <span className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
                                     Rs. {Number(order.subtotal || 0).toLocaleString()}
                                 </span>
                             </div>
@@ -337,7 +337,7 @@ const OrderTrackingPage = () => {
 
                         <div style={{ margin: '25px 0', padding: '20px', backgroundColor: '#fef2f2', borderLeft: '4px solid #990000', borderRadius: '8px' }}>
                             <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#990000' }}>
-                                🎉 Thank You for Your Order!
+                                Thank You for Your Order!
                             </h3>
                             <p style={{ margin: '5px 0 0 0', fontSize: '12px', color: '#7f1d1d', lineHeight: '1.5' }}>
                                 We appreciate your preference for Mune's Kitchen. Your order has been registered securely and our kitchen team is currently preparing it using fresh ingredients.
@@ -460,7 +460,7 @@ const OrderTrackingPage = () => {
                                 </div>
                                 <div style={{ textAlign: 'center', backgroundColor: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                                     {trackQrImage && <img src={trackQrImage} alt="Track Order QR" style={{ width: '65px', height: '65px' }} />}
-                                    <span style={{ display: 'block', fontSize: '9px', fontWeight: '800', color: '#ef4444', marginTop: '4px', textTransform: 'uppercase' }}>Track Live</span>
+                                    <span style={{ display: 'block', fontSize: '9px', fontWeight: '800', color: '#990000', marginTop: '4px', textTransform: 'uppercase' }}>Track Live</span>
                                 </div>
                             </div>
                         </div>

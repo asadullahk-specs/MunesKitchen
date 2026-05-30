@@ -17,7 +17,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Email and password are required.' })
         }
 
-        const admin = await Admin.findOne({ where: { email } })
+        const admin = await Admin.findOne({ email })
         if (!admin) {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' })
         }
@@ -57,7 +57,7 @@ exports.logout = async (req, res) => {
 exports.changePassword = async (req, res) => {
     try {
         const { currentPassword, newPassword } = req.body
-        const admin = await Admin.findByPk(req.admin.id)
+        const admin = await Admin.findById(req.admin.id)
 
         const isMatch = await bcrypt.compare(currentPassword, admin.password)
         if (!isMatch) {
@@ -65,7 +65,7 @@ exports.changePassword = async (req, res) => {
         }
 
         const hashed = await bcrypt.hash(newPassword, 10)
-        await admin.update({ password: hashed })
+        await admin.updateOne({ password: hashed })
 
         res.json({ success: true, message: 'Password updated successfully.' })
     } catch (error) {

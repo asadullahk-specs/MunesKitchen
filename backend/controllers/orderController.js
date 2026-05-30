@@ -1,167 +1,122 @@
-const sequelize = require('../config/database')
+const mongoose = require('mongoose');
+const { Order, Customer, DeliveryArea } = require('../models');
 
 const generateOrderNumber = () => {
-    const num = Math.floor(1000 + Math.random() * 9000)
-    return `MK-${num}`
-}
+    const num = Math.floor(1000 + Math.random() * 9000);
+    return `MK-${num}`;
+};
 
 const createOrder = async (req, res) => {
     const {
         full_name, phone, email, delivery_area_id, address,
         additional_instructions, payment_method, items, subtotal, delivery_charge, total
-    } = req.body
+    } = req.body;
 
     if (!full_name || !full_name.trim()) {
-        return res.status(400).json({ success: false, message: 'Full name is required' })
+        return res.status(400).json({ success: false, message: 'Full name is required' });
     }
     if (!phone || !phone.trim()) {
-        return res.status(400).json({ success: false, message: 'Phone is required' })
+        return res.status(400).json({ success: false, message: 'Phone is required' });
     }
     if (!address || !address.trim()) {
-        return res.status(400).json({ success: false, message: 'Address is required' })
+        return res.status(400).json({ success: false, message: 'Address is required' });
     }
     if (!items || !Array.isArray(items) || items.length === 0) {
-        return res.status(400).json({ success: false, message: 'Order items are required' })
+        return res.status(400).json({ success: false, message: 'Order items are required' });
     }
-
-    const t = await sequelize.transaction()
 
     try {
         // Find or create customer
-        let customerId
-        const [existing] = await sequelize.query(
-            'SELECT id FROM customers WHERE phone = ? LIMIT 1',
-            { replacements: [phone.trim()], transaction: t }
-        )
-
-        if (existing.length > 0) {
-            customerId = existing[0].id
-            await sequelize.query(
-                'UPDATE customers SET full_name = ?, email = ? WHERE id = ?',
-                { replacements: [full_name.trim(), email || null, customerId], transaction: t }
-            )
+        let customer = await Customer.findOne({ phone: phone.trim() });
+        if (customer) {
+            customer.full_name = full_name.trim();
+            if (email) customer.email = email;
+            await customer.save();
         } else {
-            const [result] = await sequelize.query(
-                'INSERT INTO customers (full_name, phone, email) VALUES (?, ?, ?)',
-                { replacements: [full_name.trim(), phone.trim(), email || null], transaction: t }
-            )
-            customerId = result
+            customer = await Customer.create({
+                full_name: full_name.trim(),
+                phone: phone.trim(),
+                email: email || null
+            });
         }
 
         // Generate unique order number
-        let orderNumber = generateOrderNumber()
-        const [existing2] = await sequelize.query(
-            'SELECT id FROM orders WHERE order_number = ?',
-            { replacements: [orderNumber], transaction: t }
-        )
-        if (existing2.length > 0) {
-            orderNumber = generateOrderNumber() + Math.floor(Math.random() * 10)
+        let orderNumber = generateOrderNumber();
+        const existingOrder = await Order.findOne({ order_number: orderNumber });
+        if (existingOrder) {
+            orderNumber = generateOrderNumber() + Math.floor(Math.random() * 10);
         }
 
-        const actualDeliveryCharge = delivery_charge || 0
-        const actualTotal = Number(subtotal) + Number(actualDeliveryCharge)
+        const actualDeliveryCharge = Number(delivery_charge || 0);
+        const actualTotal = Number(subtotal) + actualDeliveryCharge;
 
-        const [orderResult] = await sequelize.query(
-            `INSERT INTO orders
-        (order_number, customer_id, delivery_area_id, address, additional_instructions,
-         payment_method, status, subtotal, delivery_charge, total)
-       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
-            {
-                replacements: [
-                    orderNumber,
-                    customerId,
-                    delivery_area_id ? Number(delivery_area_id) : null,
-                    address.trim(),
-                    additional_instructions || null,
-                    payment_method || 'cash_on_delivery',
-                    Number(subtotal),
-                    Number(actualDeliveryCharge),
-                    actualTotal
-                ],
-                transaction: t
+        const orderItems = items.map(item => ({
+            product_id: item.product_id && mongoose.Types.ObjectId.isValid(item.product_id) ? item.product_id : null,
+            product_name: item.name,
+            quantity: Number(item.quantity),
+            unit_price: Number(item.price),
+            total_price: Number(item.price) * Number(item.quantity)
+        }));
+
+        const newOrder = await Order.create({
+            order_number: orderNumber,
+            customer_id: customer._id,
+            delivery_area_id: delivery_area_id && mongoose.Types.ObjectId.isValid(delivery_area_id) ? delivery_area_id : null,
+            address: address.trim(),
+            additional_instructions: additional_instructions || null,
+            payment_method: payment_method || 'cash_on_delivery',
+            status: 'pending',
+            subtotal: Number(subtotal),
+            delivery_charge: actualDeliveryCharge,
+            total: actualTotal,
+            items: orderItems,
+            payment: {
+                method: payment_method || 'cash_on_delivery',
+                status: 'pending'
             }
-        )
-
-        const orderId = orderResult
-
-        // Insert order items
-        for (const item of items) {
-            await sequelize.query(
-                `INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, total_price)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-                {
-                    replacements: [
-                        orderId,
-                        item.product_id || null,
-                        item.name,
-                        item.quantity,
-                        Number(item.price),
-                        Number(item.price) * Number(item.quantity)
-                    ],
-                    transaction: t
-                }
-            )
-        }
-
-        // Insert payment record
-        await sequelize.query(
-            `INSERT INTO payments (order_id, method, status) VALUES (?, ?, 'pending')`,
-            {
-                replacements: [orderId, payment_method || 'cash_on_delivery'],
-                transaction: t
-            }
-        )
-
-        await t.commit()
+        });
 
         res.status(201).json({
             success: true,
             message: 'Order placed successfully',
             orderNumber,
-            orderId
-        })
+            orderId: newOrder.id
+        });
     } catch (error) {
-        await t.rollback()
-        console.error('Order creation error:', error)
-        res.status(500).json({ success: false, message: error.message })
+        console.error('Order creation error:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 const trackOrder = async (req, res) => {
     try {
         const { orderNumber } = req.params;
-
-        // Clean up the input string
         const searchInput = orderNumber ? orderNumber.trim() : '';
 
-        // If the user entered a raw number, we can check 'id', otherwise we check 'order_number'
-        const isNumericId = /^\d+$/.test(searchInput);
+        const isObjectId = mongoose.Types.ObjectId.isValid(searchInput);
+        const query = isObjectId 
+            ? { $or: [{ order_number: searchInput }, { _id: searchInput }] }
+            : { order_number: searchInput };
 
-        const [orders] = await sequelize.query(`
-    SELECT o.*, c.full_name, c.phone, c.email,
-           da.name AS delivery_area_name
-    FROM orders o
-    LEFT JOIN customers c ON o.customer_id = c.id
-    LEFT JOIN delivery_areas da ON o.delivery_area_id = da.id
-    WHERE o.order_number = ? ${isNumericId ? 'OR o.id = ?' : ''}
-`, {
-            replacements: isNumericId ? [searchInput, parseInt(searchInput)] : [searchInput]
-        });
+        const order = await Order.findOne(query)
+            .populate('customer_id')
+            .populate('delivery_area_id');
 
-        if (!orders.length) {
+        if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const order = orders[0];
+        const orderObj = order.toJSON();
+        if (order.customer_id) {
+            orderObj.full_name = order.customer_id.full_name;
+            orderObj.phone = order.customer_id.phone;
+            orderObj.email = order.customer_id.email;
+        }
+        if (order.delivery_area_id) {
+            orderObj.delivery_area_name = order.delivery_area_id.name;
+        }
 
-        // Fetch matching order items
-        const [items] = await sequelize.query(
-            'SELECT * FROM order_items WHERE order_id = ?',
-            { replacements: [order.id] }
-        );
-        order.items = items;
-
-        res.json({ success: true, order });
+        res.json({ success: true, order: orderObj });
     } catch (error) {
         console.error("❌ Track Order Error:", error.message);
         res.status(500).json({ success: false, message: error.message });
@@ -169,167 +124,192 @@ const trackOrder = async (req, res) => {
 };
 
 const getAllOrders = async (req, res) => {
-    const { status, page = 1, limit = 10 } = req.query
-    const offset = (parseInt(page) - 1) * parseInt(limit)
+    const { status, page = 1, limit = 10 } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
     try {
-        let whereClause = ''
-        const replacements = []
-
+        const query = {};
         if (status && status !== 'all') {
-            whereClause = 'WHERE o.status = ?'
-            replacements.push(status)
+            query.status = status;
         }
 
-        // 1. Get the orders
-        const [orders] = await sequelize.query(`
-    SELECT o.*,
-           c.full_name AS customer_name, c.phone AS customer_phone, c.email AS customer_email,
-           da.name AS delivery_area_name
-    FROM orders o
-    LEFT JOIN customers c ON o.customer_id = c.id
-    LEFT JOIN delivery_areas da ON o.delivery_area_id = da.id
-    ${whereClause}
-    ORDER BY o.created_at DESC
-    LIMIT ? OFFSET ?
-`, { replacements: [...replacements, parseInt(limit), parseInt(offset)] })
+        const orders = await Order.find(query)
+            .populate('customer_id')
+            .populate('delivery_area_id')
+            .sort({ created_at: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
 
-        // 2. Attach items
-        for (const order of orders) {
-            const [items] = await sequelize.query(
-                'SELECT * FROM order_items WHERE order_id = ?',
-                { replacements: [order.id] }
-            )
-            order.items = items
-            order.customer = {
-                full_name: order.customer_name,
-                phone: order.customer_phone,
-                email: order.customer_email
+        const total = await Order.countDocuments(query);
+
+        const ordersWithDetails = orders.map(order => {
+            const ordObj = order.toJSON();
+            if (order.customer_id) {
+                ordObj.customer_name = order.customer_id.full_name;
+                ordObj.customer_phone = order.customer_id.phone;
+                ordObj.customer_email = order.customer_id.email;
+                ordObj.customer = {
+                    full_name: order.customer_id.full_name,
+                    phone: order.customer_id.phone,
+                    email: order.customer_id.email
+                };
             }
-        }
-
-        // 3. SAFE COUNT: Fetch total count without risky destructuring
-        const countResult = await sequelize.query(
-            `SELECT COUNT(*) AS total FROM orders o ${whereClause}`,
-            { replacements }
-        )
-        // Correct way to get total from raw query result
-        const total = countResult[0][0].total || 0;
+            if (order.delivery_area_id) {
+                ordObj.delivery_area_name = order.delivery_area_id.name;
+            }
+            return ordObj;
+        });
 
         res.json({
             success: true,
-            data: orders,
-            total: parseInt(total),
+            data: ordersWithDetails,
+            total,
             page: parseInt(page),
-            pages: Math.ceil(parseInt(total) / parseInt(limit))
-        })
+            pages: Math.ceil(total / parseInt(limit))
+        });
     } catch (error) {
-        console.error("Order Fetch Error:", error); // Check this in terminal
-        res.status(500).json({ success: false, message: error.message })
+        console.error("Order Fetch Error:", error);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 const updateOrderStatus = async (req, res) => {
-    const { status } = req.body
-    const valid = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'paid']
+    const { status } = req.body;
+    const valid = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'paid'];
 
     if (!valid.includes(status)) {
-        return res.status(400).json({ success: false, message: 'Invalid status' })
+        return res.status(400).json({ success: false, message: 'Invalid status' });
     }
 
     try {
-        await sequelize.query(
-            'UPDATE orders SET status = ? WHERE id = ?',
-            { replacements: [status, req.params.id] }
-        )
-        res.json({ success: true, message: 'Status updated' })
+        await Order.findByIdAndUpdate(req.params.id, { status });
+        res.json({ success: true, message: 'Status updated' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 const getOrderById = async (req, res) => {
     try {
-        const [orders] = await sequelize.query(`
-      SELECT o.*,
-             c.full_name AS customer_name, c.phone AS customer_phone, c.email AS customer_email,
-             da.name AS delivery_area_name, da.charge AS delivery_area_charge
-      FROM orders o
-      LEFT JOIN customers c ON o.customer_id = c.id
-      LEFT JOIN delivery_areas da ON o.delivery_area_id = da.id
-      WHERE o.id = ?
-    `, { replacements: [req.params.id] })
+        const order = await Order.findById(req.params.id)
+            .populate('customer_id')
+            .populate('delivery_area_id');
 
-        if (!orders.length) {
-            return res.status(404).json({ success: false, message: 'Order not found' })
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
         }
 
-        const order = orders[0]
-        const [items] = await sequelize.query(
-            'SELECT * FROM order_items WHERE order_id = ?',
-            { replacements: [order.id] }
-        )
-        order.items = items
+        const ordObj = order.toJSON();
+        if (order.customer_id) {
+            ordObj.customer_name = order.customer_id.full_name;
+            ordObj.customer_phone = order.customer_id.phone;
+            ordObj.customer_email = order.customer_id.email;
+            ordObj.customer = {
+                full_name: order.customer_id.full_name,
+                phone: order.customer_id.phone,
+                email: order.customer_id.email
+            };
+        }
+        if (order.delivery_area_id) {
+            ordObj.delivery_area_name = order.delivery_area_id.name;
+            ordObj.delivery_area_charge = order.delivery_area_id.charge;
+        }
 
-        res.json({ success: true, order })
+        res.json({ success: true, order: ordObj });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 const getDashboardStats = async (req, res) => {
     try {
-        const [[orderStats]] = await sequelize.query(`
-      SELECT
-        COUNT(*) AS totalOrders,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pendingOrders,
-        SUM(CASE WHEN status = 'delivered' THEN 1 ELSE 0 END) AS deliveredOrders,
-        COALESCE(SUM(CASE WHEN status = 'delivered' THEN total ELSE 0 END), 0) AS totalRevenue
-      FROM orders
-    `)
+        const stats = await Order.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalOrders: { $sum: 1 },
+                    pendingOrders: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } },
+                    deliveredOrders: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] } },
+                    totalRevenue: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, '$total', 0] } }
+                }
+            }
+        ]);
 
-        const [[custStats]] = await sequelize.query(
-            'SELECT COUNT(*) AS totalCustomers FROM customers'
-        )
+        const orderStats = stats[0] || {
+            totalOrders: 0,
+            pendingOrders: 0,
+            deliveredOrders: 0,
+            totalRevenue: 0
+        };
 
-        const [monthlyRevenue] = await sequelize.query(`
-      SELECT
-        DATE_FORMAT(created_at, '%b') AS month,
-        COALESCE(SUM(total), 0) AS revenue,
-        COUNT(*) AS orders
-      FROM orders
-      WHERE created_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
-      GROUP BY DATE_FORMAT(created_at, '%Y-%m'), DATE_FORMAT(created_at, '%b')
-      ORDER BY MIN(created_at) ASC
-    `)
+        const totalCustomers = await Customer.countDocuments({});
 
-        const [topProducts] = await sequelize.query(`
-      SELECT
-        oi.product_name AS name,
-        SUM(oi.quantity) AS total_sold,
-        SUM(oi.total_price) AS revenue
-      FROM order_items oi
-      GROUP BY oi.product_name
-      ORDER BY total_sold DESC
-      LIMIT 5
-    `)
+        // Monthly revenue aggregates for past 6 months
+        const monthlyRevenue = await Order.aggregate([
+            {
+                $match: {
+                    created_at: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) }
+                }
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m", date: "$created_at" } },
+                    month: { $first: { $dateToString: { format: "%b", date: "$created_at" } } },
+                    revenue: { $sum: "$total" },
+                    orders: { $sum: 1 },
+                    rawDate: { $min: "$created_at" }
+                }
+            },
+            { $sort: { rawDate: 1 } },
+            {
+                $project: {
+                    _id: 0,
+                    month: 1,
+                    revenue: 1,
+                    orders: 1
+                }
+            }
+        ]);
+
+        // Top 5 products by quantity sold
+        const topProducts = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.product_name",
+                    name: { $first: "$items.product_name" },
+                    total_sold: { $sum: "$items.quantity" },
+                    revenue: { $sum: "$items.total_price" }
+                }
+            },
+            { $sort: { total_sold: -1 } },
+            { $limit: 5 },
+            {
+                $project: {
+                    _id: 0,
+                    name: 1,
+                    total_sold: 1,
+                    revenue: 1
+                }
+            }
+        ]);
 
         res.json({
             success: true,
             data: {
-                totalOrders: Number(orderStats.totalOrders) || 0,
-                pendingOrders: Number(orderStats.pendingOrders) || 0,
-                deliveredOrders: Number(orderStats.deliveredOrders) || 0,
-                totalRevenue: Number(orderStats.totalRevenue) || 0,
-                totalCustomers: Number(custStats.totalCustomers) || 0,
+                totalOrders: Number(orderStats.totalOrders),
+                pendingOrders: Number(orderStats.pendingOrders),
+                deliveredOrders: Number(orderStats.deliveredOrders),
+                totalRevenue: Number(orderStats.totalRevenue),
+                totalCustomers: Number(totalCustomers),
                 monthlyRevenue: monthlyRevenue || [],
                 topProducts: topProducts || []
             }
-        })
+        });
     } catch (error) {
-        console.error('Dashboard stats error:', error.message)
-        res.status(500).json({ success: false, message: error.message })
+        console.error('Dashboard stats error:', error.message);
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
-module.exports = { createOrder, trackOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats }
+module.exports = { createOrder, trackOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats };

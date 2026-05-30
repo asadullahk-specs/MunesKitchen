@@ -24,6 +24,7 @@ import AdminMenu from './pages/admin/AdminMenu'
 import AdminCustomers from './pages/admin/AdminCustomers'
 import AdminExpenses from './pages/admin/AdminExpenses'
 import AdminReviews from './pages/admin/AdminReviews';
+import AdminCosting from './pages/admin/AdminCosting';
 
 const PublicLayout = ({ children }) => (
   <div>
@@ -63,6 +64,7 @@ function App() {
                 <Route path="orders" element={<AdminOrders />} />
                 <Route path="reviews" element={<AdminReviews />} />
                 <Route path="menu" element={<AdminMenu />} />
+                <Route path="costing" element={<AdminCosting />} />
                 <Route path="customers" element={<AdminCustomers />} />
                 <Route path="expenses" element={<AdminExpenses />} />
                 {/* <Route path="contacts" element={<AdminContacts />} /> */}

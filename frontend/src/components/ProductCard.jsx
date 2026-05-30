@@ -25,7 +25,7 @@ const ProductCard = ({ product, onViewDetails }) => {
             whileHover={{ y: -4 }}
         >
             {/* Image */}
-            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-red-50 to-orange-50 dark:from-gray-800 dark:to-gray-900">
+            <div className="relative h-48 overflow-hidden" style={{ background: 'var(--primary-glow)' }}>
                 {imageUrl ? (
                     <img
                         src={imageUrl}
@@ -43,7 +43,7 @@ const ProductCard = ({ product, onViewDetails }) => {
                 {product.hot_selling && (
                     <div className="absolute top-3 left-3">
                         <span className="badge-hot flex items-center gap-1">
-                            <FiStar size={11} fill="currentColor" /> Top Selling
+                            Top Selling
                         </span>
                     </div>
                 )}
@@ -81,8 +81,10 @@ const ProductCard = ({ product, onViewDetails }) => {
                         style={{ border: '1.5px solid var(--border)' }}>
                         <button
                             onClick={() => setQty((q) => Math.max(1, q - 1))}
-                            className="w-9 h-9 flex items-center justify-center transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="w-9 h-9 flex items-center justify-center transition-colors"
                             style={{ color: 'var(--text-muted)' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
                             <FiMinus size={14} />
                         </button>
@@ -91,8 +93,10 @@ const ProductCard = ({ product, onViewDetails }) => {
                         </span>
                         <button
                             onClick={() => setQty((q) => q + 1)}
-                            className="w-9 h-9 flex items-center justify-center transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
+                            className="w-9 h-9 flex items-center justify-center transition-colors"
                             style={{ color: 'var(--primary)' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                         >
                             <FiPlus size={14} />
                         </button>

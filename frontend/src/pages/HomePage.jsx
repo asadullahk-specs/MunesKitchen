@@ -86,7 +86,7 @@ const ReviewCard = ({ review }) => {
                 </div>
 
                 {/* Fixed: Accessing product_name directly from review object */}
-                <p className="text-xs font-medium text-red-600 bg-red-50 px-2 py-1 rounded w-fit">
+                <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
                     {review.product_name || 'General Review'}
                 </p>
 

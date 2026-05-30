@@ -1,14 +1,20 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const mongoose = require('mongoose');
 
-const DeliveryArea = sequelize.define('DeliveryArea', {
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    name: { type: DataTypes.STRING(150), allowNull: false }
+const deliveryAreaSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    charge: { type: Number, default: 0 }
 }, {
-    tableName: 'delivery_areas',
-    timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: false
+    timestamps: { createdAt: 'created_at', updatedAt: false }
 });
 
-module.exports = DeliveryArea;
+deliveryAreaSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id.toString();
+        delete ret._id;
+    }
+});
+deliveryAreaSchema.set('toObject', { virtuals: true });
+
+module.exports = mongoose.model('DeliveryArea', deliveryAreaSchema);

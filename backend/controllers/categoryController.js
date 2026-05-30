@@ -1,58 +1,46 @@
-const sequelize = require('../config/database')
+const { Category, Product } = require('../models');
 
 exports.getAll = async (req, res) => {
     try {
-        const [categories] = await sequelize.query(
-            'SELECT * FROM categories ORDER BY name ASC'
-        )
-        for (const cat of categories) {
-            const [[{ count }]] = await sequelize.query(
-                'SELECT COUNT(*) AS count FROM products WHERE category_id = ?',
-                { replacements: [cat.id] }
-            )
-            cat.products = { length: Number(count) }
-        }
-        res.json({ success: true, data: categories })
+        const categories = await Category.find().sort({ name: 1 });
+        const categoriesWithProductCount = await Promise.all(categories.map(async (cat) => {
+            const count = await Product.countDocuments({ category_id: cat._id });
+            const catObj = cat.toObject();
+            catObj.products = { length: count };
+            return catObj;
+        }));
+        res.json({ success: true, data: categoriesWithProductCount });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 exports.create = async (req, res) => {
     try {
-        const { name, icon } = req.body
-        const slug = name.toLowerCase().replace(/\s+/g, '-')
-        await sequelize.query(
-            'INSERT INTO categories (name, slug, icon) VALUES (?, ?, ?)',
-            { replacements: [name, slug, icon || null] }
-        )
-        res.status(201).json({ success: true, message: 'Category created' })
+        const { name, icon } = req.body;
+        const slug = name.toLowerCase().replace(/\s+/g, '-');
+        await Category.create({ name, slug, icon: icon || null });
+        res.status(201).json({ success: true, message: 'Category created' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 exports.update = async (req, res) => {
     try {
-        const { name, icon } = req.body
-        await sequelize.query(
-            'UPDATE categories SET name = ?, icon = ? WHERE id = ?',
-            { replacements: [name, icon || null, req.params.id] }
-        )
-        res.json({ success: true, message: 'Category updated' })
+        const { name, icon } = req.body;
+        await Category.findByIdAndUpdate(req.params.id, { name, icon: icon || null });
+        res.json({ success: true, message: 'Category updated' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};
 
 exports.remove = async (req, res) => {
     try {
-        await sequelize.query(
-            'DELETE FROM categories WHERE id = ?',
-            { replacements: [req.params.id] }
-        )
-        res.json({ success: true, message: 'Category deleted' })
+        await Category.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: 'Category deleted' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message })
+        res.status(500).json({ success: false, message: error.message });
     }
-}
+};

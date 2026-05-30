@@ -23,9 +23,7 @@ const protect = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         // Fetch the admin using your Sequelize Admin model
-        const admin = await Admin.findByPk(decoded.id, {
-            attributes: { exclude: ['password'] } // Don't pass the password hash down the line
-        });
+        const admin = await Admin.findById(decoded.id).select('-password');
 
         if (!admin) {
             return res.status(401).json({ success: false, message: 'Not authorized, admin user not found.' });

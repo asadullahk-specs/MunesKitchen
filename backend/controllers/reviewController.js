@@ -1,4 +1,4 @@
-const sequelize = require('../config/database');
+const { Review } = require('../models');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -24,36 +24,33 @@ const upload = multer({
     limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// ── Ensure special_instructions column exists ────────────────────────────────
-(async () => {
-    try {
-        await sequelize.query("ALTER TABLE reviews ADD COLUMN special_instructions TEXT NULL");
-    } catch (_) { /* Column already exists — ignore */ }
-})();
-
-// ── GET /reviews  (filter by status via ?status=) ───────────────────────────
+// ── GET /reviews (filter by status via ?status=) ───────────────────────────
 exports.getAll = async (req, res) => {
     try {
         const { status } = req.query;
-        let query = `
-            SELECT r.*, p.name AS product_name, p.image AS product_image
-            FROM reviews r
-            LEFT JOIN products p ON r.product_id = p.id
-        `;
-        const replacements = [];
+        const query = {};
 
         if (status && status !== 'all') {
-            query += ` WHERE r.status = ?`;
-            replacements.push(status);
+            query.status = status;
         }
 
-        query += ` ORDER BY r.created_at DESC`;
+        const reviews = await Review.find(query)
+            .populate('product_id')
+            .sort({ created_at: -1 });
 
-        const [reviews] = await sequelize.query(query, { replacements });
+        const mappedReviews = reviews.map(r => {
+            const rObj = r.toJSON();
+            if (r.product_id) {
+                rObj.product_name = r.product_id.name;
+                rObj.product_image = r.product_id.image;
+            }
+            return rObj;
+        });
 
         // Compute stats from approved reviews for homepage
-        const approvedReviews = reviews.filter(r => r.status === 'approved' || !status || status === 'all');
-        const statsSource = status === 'approved' ? reviews : reviews.filter(r => r.status === 'approved');
+        const statsSource = status === 'approved' 
+            ? mappedReviews 
+            : mappedReviews.filter(r => r.status === 'approved');
 
         const total = statsSource.length;
         const avgRating = total > 0
@@ -65,7 +62,7 @@ exports.getAll = async (req, res) => {
             count: statsSource.filter(r => Number(r.rating) === star).length,
         }));
 
-        res.json({ success: true, data: reviews, avgRating, total, breakdown });
+        res.json({ success: true, data: mappedReviews, avgRating, total, breakdown });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -74,20 +71,26 @@ exports.getAll = async (req, res) => {
 // ── GET /reviews/pending (admin) ────────────────────────────────────────────
 exports.getPending = async (req, res) => {
     try {
-        const [reviews] = await sequelize.query(
-            `SELECT r.*, p.name AS product_name, p.image AS product_image
-             FROM reviews r
-             LEFT JOIN products p ON r.product_id = p.id
-             WHERE r.status = 'pending'
-             ORDER BY r.created_at DESC`
-        );
-        res.json({ success: true, data: reviews });
+        const reviews = await Review.find({ status: 'pending' })
+            .populate('product_id')
+            .sort({ created_at: -1 });
+
+        const mapped = reviews.map(r => {
+            const rObj = r.toJSON();
+            if (r.product_id) {
+                rObj.product_name = r.product_id.name;
+                rObj.product_image = r.product_id.image;
+            }
+            return rObj;
+        });
+
+        res.json({ success: true, data: mapped });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// ── PUT /reviews/:id/status (admin) — FIXED ─────────────────────────────────
+// ── PUT /reviews/:id/status (admin) ─────────────────────────────────────────
 exports.updateStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -95,10 +98,7 @@ exports.updateStatus = async (req, res) => {
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status value' });
         }
-        await sequelize.query(
-            'UPDATE reviews SET status = ? WHERE id = ?',
-            { replacements: [status, req.params.id] }
-        );
+        await Review.findByIdAndUpdate(req.params.id, { status });
         res.json({ success: true, message: `Review ${status} successfully.` });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -112,21 +112,14 @@ exports.create = [
         try {
             const imagePaths = req.files ? req.files.map(f => `uploads/reviews/${f.filename}`) : [];
 
-            const sql = `
-                INSERT INTO reviews
-                    (customer_name, product_id, rating, message, special_instructions, status, images, created_at)
-                VALUES (?, ?, ?, ?, ?, 'pending', ?, NOW())
-            `;
-
-            await sequelize.query(sql, {
-                replacements: [
-                    req.body.customer_name,
-                    req.body.product_id || null,
-                    req.body.rating,
-                    req.body.message,
-                    req.body.instructions || null,
-                    JSON.stringify(imagePaths),
-                ],
+            await Review.create({
+                customer_name: req.body.customer_name,
+                product_id: req.body.product_id || null,
+                rating: Number(req.body.rating),
+                message: req.body.message,
+                special_instructions: req.body.instructions || null,
+                images: JSON.stringify(imagePaths),
+                status: 'pending'
             });
 
             res.status(201).json({ success: true, message: 'Review submitted! It will appear after approval.' });
@@ -140,9 +133,7 @@ exports.create = [
 // ── DELETE /reviews/:id (admin) ──────────────────────────────────────────────
 exports.remove = async (req, res) => {
     try {
-        const [[review]] = await sequelize.query('SELECT images FROM reviews WHERE id = ?', {
-            replacements: [req.params.id],
-        });
+        const review = await Review.findById(req.params.id);
         if (review?.images) {
             try {
                 JSON.parse(review.images).forEach(p => {
@@ -151,7 +142,7 @@ exports.remove = async (req, res) => {
                 });
             } catch (_) { /* ignore parse errors */ }
         }
-        await sequelize.query('DELETE FROM reviews WHERE id = ?', { replacements: [req.params.id] });
+        await Review.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: 'Review deleted successfully.' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

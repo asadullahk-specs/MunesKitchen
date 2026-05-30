@@ -220,7 +220,9 @@ const AdminMenu = () => {
                                     : null
                                 return (
                                     <tr key={p.id} style={{ borderBottom: '1px solid var(--border)' }}
-                                        className="transition-colors hover:bg-red-50 dark:hover:bg-red-900/10">
+                                        className="transition-colors"
+                                        onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                         <td className="px-4 py-3">
                                             <div className="w-10 h-10 rounded-lg overflow-hidden"
                                                 style={{ background: 'var(--primary-glow)' }}>
