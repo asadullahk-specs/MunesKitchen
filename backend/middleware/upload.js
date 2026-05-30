@@ -1,7 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
-const storage = multer.diskStorage({
+// Vercel has a read-only filesystem, use memory storage in production
+const isProduction = process.env.NODE_ENV === 'production';
+
+const diskStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/');
     },
@@ -10,6 +13,8 @@ const storage = multer.diskStorage({
         cb(null, 'product-' + uniqueSuffix + path.extname(file.originalname));
     },
 });
+
+const memoryStorage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp/;
@@ -23,7 +28,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-    storage,
+    storage: isProduction ? memoryStorage : diskStorage,
     fileFilter,
     limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });

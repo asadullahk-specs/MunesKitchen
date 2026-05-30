@@ -3,17 +3,26 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// ── Multer: diskStorage ──────────────────────────────────────────────────────
-const reviewsUploadDir = path.join(__dirname, '..', 'uploads', 'reviews');
-if (!fs.existsSync(reviewsUploadDir)) fs.mkdirSync(reviewsUploadDir, { recursive: true });
+// ── Multer config (memory in production for Vercel, disk locally) ────────────
+const isProduction = process.env.NODE_ENV === 'production';
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, reviewsUploadDir),
-    filename: (req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
-        cb(null, `review-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-    },
-});
+let storage;
+if (isProduction) {
+    storage = multer.memoryStorage();
+} else {
+    const reviewsUploadDir = path.join(__dirname, '..', 'uploads', 'reviews');
+    try {
+        if (!fs.existsSync(reviewsUploadDir)) fs.mkdirSync(reviewsUploadDir, { recursive: true });
+    } catch (e) { /* ignore in serverless */ }
+
+    storage = multer.diskStorage({
+        destination: (req, file, cb) => cb(null, reviewsUploadDir),
+        filename: (req, file, cb) => {
+            const ext = path.extname(file.originalname).toLowerCase();
+            cb(null, `review-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+        },
+    });
+}
 
 const upload = multer({
     storage,
@@ -110,7 +119,16 @@ exports.create = [
     upload.array('images', 5),
     async (req, res) => {
         try {
-            const imagePaths = req.files ? req.files.map(f => `uploads/reviews/${f.filename}`) : [];
+            let imagePaths = [];
+            if (req.files) {
+                if (isProduction) {
+                    // On Vercel, files are in memory — store as empty array for now
+                    // In a full setup, you'd upload to Cloudinary here
+                    imagePaths = [];
+                } else {
+                    imagePaths = req.files.map(f => `uploads/reviews/${f.filename}`);
+                }
+            }
 
             await Review.create({
                 customer_name: req.body.customer_name,
@@ -134,7 +152,7 @@ exports.create = [
 exports.remove = async (req, res) => {
     try {
         const review = await Review.findById(req.params.id);
-        if (review?.images) {
+        if (!isProduction && review?.images) {
             try {
                 JSON.parse(review.images).forEach(p => {
                     const fullPath = path.join(__dirname, '..', p);
