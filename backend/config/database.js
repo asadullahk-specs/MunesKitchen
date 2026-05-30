@@ -1,12 +1,19 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-require('dotenv').config();
+
+// Cache the connection for serverless environments (Vercel)
+let isConnected = false;
 
 const connectDB = async () => {
+    if (isConnected) return;
+
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/munes_kitchen');
+        const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/munes_kitchen', {
+            bufferCommands: false,
+        });
+        isConnected = conn.connections[0].readyState === 1;
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-        
+
         // Auto-seed default admin account if none exists
         const Admin = require('../models/Admin');
         const adminCount = await Admin.countDocuments({});
@@ -17,11 +24,11 @@ const connectDB = async () => {
                 email: 'admin@muneskitchen.com',
                 password: hashedPassword
             });
-            console.log('✨ Default admin user seeded successfully in MongoDB (email: admin@muneskitchen.com, password: admin123).');
+            console.log('✨ Default admin user seeded.');
         }
     } catch (error) {
         console.error(`❌ MongoDB connection failed: ${error.message}`);
-        console.log('👉 Please ensure MongoDB is running locally or specify a valid MONGODB_URI in your backend/.env file.');
+        isConnected = false;
     }
 };
 
