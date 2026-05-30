@@ -1,35 +1,20 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { FiPhone, FiMail, FiMapPin, FiLinkedin, FiGlobe, FiGithub } from 'react-icons/fi';
+import API from '../api/axios';
 
 const Footer = () => {
     const currentYear = new Date().getFullYear();
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        API.get('/categories')
+            .then((r) => setCategories(r.data.categories || r.data.data || []))
+            .catch(() => {}); // Silent fail — footer still renders without categories
+    }, []);
 
     return (
         <footer style={{ background: 'var(--bg-deep)', borderTop: '1px solid var(--border)' }}>
-            {/* Top CTA */}
-            {/* <div style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }} className="py-12 px-4">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-3">
-                        Ready to Order?
-                    </h2>
-                    <p className="text-red-100 mb-6 font-accent italic text-lg">
-                        Fresh frozen. Delivered to your door.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link to="/menu"
-                            className="px-8 py-3 rounded-xl font-semibold text-red-600 transition-all hover:scale-105"
-                            style={{ background: 'white' }}>
-                            Browse Menu
-                        </Link>
-                        <a href="https://wa.me/923032683689" target="_blank" rel="noreferrer"
-                            className="px-8 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 flex items-center justify-center gap-2"
-                            style={{ background: 'rgba(255,255,255,0.2)', border: '2px solid rgba(255,255,255,0.5)' }}>
-                            <FiMessageCircle /> WhatsApp Us
-                        </a>
-                    </div>
-                </div>
-            </div> */}
-
             {/* Main Footer */}
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -38,11 +23,7 @@ const Footer = () => {
                     <div className="lg:col-span-1">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl overflow-hidden">
-                                <img
-                                    src="/logo.png"
-                                    alt="Logo"
-                                    className="w-full h-full object-cover"
-                                />
+                                <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                             </div>
                             <div>
                                 <div className="font-display font-bold text-lg" style={{ color: 'var(--text-main)' }}>Mune's Kitchen</div>
@@ -69,7 +50,6 @@ const Footer = () => {
                     </div>
 
                     {/* Quick Links */}
-                    {/* Quick Links */}
                     <div>
                         <h3 className="font-display font-semibold mb-4" style={{ color: 'var(--text-main)' }}>Quick Links</h3>
                         <ul className="space-y-2">
@@ -82,7 +62,7 @@ const Footer = () => {
                                 <li key={href}>
                                     <Link
                                         to={href}
-                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} // FORCE RESET HERE
+                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                                         className="text-sm transition-colors"
                                         onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
                                         onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
@@ -95,25 +75,30 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Menu Categories */}
-                    {/* Menu Categories */}
+                    {/* Menu Categories — Dynamic from API */}
                     <div>
                         <h3 className="font-display font-semibold mb-4" style={{ color: 'var(--text-main)' }}>Our Menu</h3>
                         <ul className="space-y-2">
-                            {['Snacks', 'Kababs', 'Chats'].map((item) => (
-                                <li key={item}>
+                            {categories.length > 0 ? categories.map((cat) => (
+                                <li key={cat.id || cat._id}>
                                     <Link
-                                        to="/menu"
-                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} // FORCE RESET HERE
+                                        to={`/menu?category=${cat.id || cat._id}`}
+                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                                         className="text-sm transition-colors"
                                         onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
                                         onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
                                         style={{ color: 'var(--text-muted)' }}
                                     >
-                                        {item}
+                                        {cat.name}
                                     </Link>
                                 </li>
-                            ))}
+                            )) : (
+                                <li>
+                                    <Link to="/menu" className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                        View Full Menu
+                                    </Link>
+                                </li>
+                            )}
                         </ul>
                     </div>
 
@@ -123,8 +108,7 @@ const Footer = () => {
                         <ul className="space-y-3">
                             <li className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                                 <FiPhone className="mt-0.5 flex-shrink-0" style={{ color: 'var(--primary)' }} />
-                                <a href="tel:+923032683689"
-                                    className="transition-colors"
+                                <a href="tel:+923032683689" className="transition-colors"
                                     onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
                                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
                                 >+92 303 2683689</a>
@@ -148,7 +132,6 @@ const Footer = () => {
                         © {currentYear} Mune's Kitchen. All rights reserved.
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
-                        {/* Order 3 hours in advance 🔥 */}
                         Created by Sameer Khan
                     </p>
                 </div>

@@ -70,6 +70,14 @@ const OrderTrackingPage = () => {
         fetchOrderDetails(searchInput);
     };
 
+    const formatStatus = (status) => {
+        if (!status) return 'Pending';
+        return status
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    };
+
     const formatPaymentMethod = (method) => {
         if (!method) return 'N/A';
         return method
@@ -181,8 +189,8 @@ const OrderTrackingPage = () => {
                             </div>
                             <div className="text-right">
                                 <p className="text-xs uppercase text-gray-400 font-bold tracking-wider mb-1">Status</p>
-                                <span className="status-badge status-pending">
-                                    {order.status || 'Pending'}
+                                <span className={`status-badge status-${order.status || 'pending'}`}>
+                                    {formatStatus(order.status)}
                                 </span>
                             </div>
                         </div>
