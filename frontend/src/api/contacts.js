@@ -7,5 +7,5 @@ export const createContact = (contactData) => {
     return api.post('/contacts', contactData);
 };
 
-export const markContactRead = (id) => api.put(`/contacts/${id}/read`);
+export const markContactRead = (id, isRead = true) => api.put(`/contacts/${id}/read`, { is_read: isRead });
 export const deleteContact = (id) => api.delete(`/contacts/${id}`);

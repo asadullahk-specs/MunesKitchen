@@ -57,7 +57,7 @@ const ReviewCard = ({ review }) => {
     if (!review) return null;
 
     return (
-        <div className="card p-5 flex flex-col h-full bg-white shadow-sm border border-gray-100 rounded-xl">
+        <div className="card p-5 flex flex-col h-full" style={{ border: '1px solid var(--border)', borderRadius: '1rem' }}>
             {/* Image Slider */}
             {displayImages.length > 0 && (
                 <div className="review-img-slider mb-4 relative overflow-hidden h-48 rounded-lg">
@@ -90,7 +90,7 @@ const ReviewCard = ({ review }) => {
             {/* Structured Details */}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-gray-900">{review.customer_name || 'Anonymous'}</h3>
+                    <h3 className="font-bold" style={{ color: 'var(--text-main)' }}>{review.customer_name || 'Anonymous'}</h3>
                     <div className="flex text-amber-400">
                         {[...Array(5)].map((_, i) => (
                             <FiStar key={i} size={14} fill={i < (review.rating || 0) ? "currentColor" : "none"} />
@@ -105,7 +105,7 @@ const ReviewCard = ({ review }) => {
                     </p>
                 )}
 
-                <p className="text-sm text-gray-600 italic mt-1">"{review.message || ''}"</p>
+                <p className="text-sm italic mt-1" style={{ color: 'var(--text-muted)' }}>"{review.message || ''}"</p>
             </div>
         </div>
     );

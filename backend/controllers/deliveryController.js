@@ -16,13 +16,33 @@ const getDeliveryAreas = async (req, res) => {
 
 // Create a delivery area
 const createDeliveryArea = async (req, res) => {
-    const { name } = req.body;
+    const { name, charge } = req.body;
     if (!name) {
         return res.status(400).json({ success: false, message: 'Area name is required' });
     }
     try {
-        const newArea = await DeliveryArea.create({ name });
+        const newArea = await DeliveryArea.create({ name, charge: Number(charge || 0) });
         res.status(201).json({ success: true, message: 'Delivery area added', data: newArea });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+// Update a delivery area
+const updateDeliveryArea = async (req, res) => {
+    const { name, charge } = req.body;
+    if (!name) {
+        return res.status(400).json({ success: false, message: 'Area name is required' });
+    }
+    try {
+        const result = await DeliveryArea.findByIdAndUpdate(req.params.id, {
+            name,
+            charge: Number(charge || 0)
+        }, { new: true });
+        if (!result) {
+            return res.status(404).json({ success: false, message: 'Area not found' });
+        }
+        res.json({ success: true, message: 'Delivery area updated successfully', data: result });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
@@ -41,4 +61,4 @@ const deleteDeliveryArea = async (req, res) => {
     }
 };
 
-module.exports = { getDeliveryAreas, createDeliveryArea, deleteDeliveryArea };
+module.exports = { getDeliveryAreas, createDeliveryArea, updateDeliveryArea, deleteDeliveryArea };

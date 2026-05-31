@@ -49,8 +49,8 @@ const CheckoutPage = () => {
         }
     }, [deliveryAreaId, deliveryAreas])
 
-    const deliveryCharge = 0
-    const total = cartSubtotal
+    const deliveryCharge = selectedArea ? Number(selectedArea.charge || 0) : 0
+    const total = cartSubtotal + deliveryCharge
 
     const handleSubmit = async () => {
         if (!fullName.trim()) { toast.error('Full name is required'); return }

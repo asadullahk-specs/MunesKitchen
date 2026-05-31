@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
     FiHome, FiShoppingBag, FiGrid, FiUsers,
     FiDollarSign, FiLogOut, FiMenu, FiX,
-    FiExternalLink, FiSun, FiMoon, FiStar
+    FiExternalLink, FiSun, FiMoon, FiStar,
+    FiSettings, FiMessageSquare
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -17,7 +18,8 @@ const LINKS = [
     { to: '/admin/reviews', label: 'Reviews', icon: FiStar },
     { to: '/admin/customers', label: 'Customers', icon: FiUsers },
     { to: '/admin/expenses', label: 'Expenses', icon: FiDollarSign },
-    // { to: '/admin/security', label: 'security', icon: FiGrid },
+    { to: '/admin/messages', label: 'Messages', icon: FiMessageSquare },
+    { to: '/admin/settings', label: 'Settings', icon: FiSettings },
 ]
 
 const SidebarContent = ({ onClose }) => {

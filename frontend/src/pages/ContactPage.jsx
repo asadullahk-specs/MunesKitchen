@@ -6,21 +6,35 @@ import API from '../api/axios'
 const ContactPage = () => {
 
     const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
     const [phone, setPhone] = useState('')
+    const [subject, setSubject] = useState('')
     const [message, setMessage] = useState('')
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async () => {
-        if (!name.trim() || !phone.trim()) {
-            toast.error('Name and phone number are required')
+        if (!name.trim()) {
+            toast.error('Name is required')
+            return
+        }
+        if (!message.trim()) {
+            toast.error('Message is required')
             return
         }
         setLoading(true)
         try {
-            await API.post('/contacts', { name, phone, message })
+            await API.post('/contacts', {
+                name,
+                email: email.trim() || null,
+                phone: phone.trim() || null,
+                subject: subject.trim() || null,
+                message
+            })
             toast.success('Message sent! We will contact you soon.')
             setName('')
+            setEmail('')
             setPhone('')
+            setSubject('')
             setMessage('')
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to send message')
@@ -128,12 +142,24 @@ const ContactPage = () => {
                         <div className="space-y-4">
 
                             <div>
-                                <label className="form-label">Your Name</label>
+                                <label className="form-label">Your Name *</label>
                                 <input
                                     className="form-input"
                                     placeholder="Enter your name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="form-label">Email Address</label>
+                                <input
+                                    className="form-input"
+                                    type="email"
+                                    placeholder="yourname@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
 
@@ -148,13 +174,24 @@ const ContactPage = () => {
                             </div>
 
                             <div>
-                                <label className="form-label">Message</label>
+                                <label className="form-label">Subject</label>
+                                <input
+                                    className="form-input"
+                                    placeholder="How can we help you?"
+                                    value={subject}
+                                    onChange={(e) => setSubject(e.target.value)}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="form-label">Message *</label>
                                 <textarea
                                     className="form-input"
-                                    rows={5}
+                                    rows={4}
                                     placeholder="Type your message here..."
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
+                                    required
                                 />
                             </div>
 

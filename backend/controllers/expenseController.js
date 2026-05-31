@@ -112,9 +112,59 @@ const getExpenseCategories = async (req, res) => {
     }
 };
 
+const createExpenseCategory = async (req, res) => {
+    const { name, color } = req.body;
+    if (!name || !name.trim()) {
+        return res.status(400).json({ success: false, message: 'Category name is required' });
+    }
+    try {
+        const newCat = await ExpenseCategory.create({
+            name: name.trim(),
+            color: color || '#ef4444'
+        });
+        res.status(201).json({ success: true, message: 'Expense category created', data: newCat });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const updateExpenseCategory = async (req, res) => {
+    const { name, color } = req.body;
+    if (!name || !name.trim()) {
+        return res.status(400).json({ success: false, message: 'Category name is required' });
+    }
+    try {
+        const updatedCat = await ExpenseCategory.findByIdAndUpdate(req.params.id, {
+            name: name.trim(),
+            color: color || '#ef4444'
+        }, { new: true });
+        if (!updatedCat) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+        res.json({ success: true, message: 'Expense category updated', data: updatedCat });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+const deleteExpenseCategory = async (req, res) => {
+    try {
+        const deleted = await ExpenseCategory.findByIdAndDelete(req.params.id);
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: 'Category not found' });
+        }
+        res.json({ success: true, message: 'Expense category deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 module.exports = {
     getExpenses,
     createExpense,
     deleteExpense,
-    getExpenseCategories
+    getExpenseCategories,
+    createExpenseCategory,
+    updateExpenseCategory,
+    deleteExpenseCategory
 };

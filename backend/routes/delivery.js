@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { getDeliveryAreas, createDeliveryArea, deleteDeliveryArea } = require('../controllers/deliveryController');
+const { getDeliveryAreas, createDeliveryArea, updateDeliveryArea, deleteDeliveryArea } = require('../controllers/deliveryController');
+const { protect } = require('../middleware/auth');
 
-// Map the root GET request directly to the controller method
 router.get('/', getDeliveryAreas);
-router.post('/', createDeliveryArea);
-router.delete('/:id', deleteDeliveryArea);
+router.post('/', protect, createDeliveryArea);
+router.put('/:id', protect, updateDeliveryArea);
+router.delete('/:id', protect, deleteDeliveryArea);
 
 module.exports = router;
 

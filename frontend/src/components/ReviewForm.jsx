@@ -56,21 +56,45 @@ const ReviewForm = ({ onSuccess }) => {
 
         setLoading(true);
         try {
-            // Convert all selected image files to base64 data URLs
-            const toBase64 = (file) => new Promise((resolve, reject) => {
+            // Compress images to max 400px and 0.45 JPEG quality to stay under Vercel's 4.5MB body limit
+            const compressImage = (file) => new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        const maxDim = 400;
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = Math.round((height * maxDim) / width);
+                                width = maxDim;
+                            } else {
+                                width = Math.round((width * maxDim) / height);
+                                height = maxDim;
+                            }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.45));
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
-            const images_base64 = await Promise.all(images.map(toBase64));
+            const images_base64 = await Promise.all(images.map(compressImage));
 
             const payload = {
                 customer_name: form.customer_name,
-                product_id: form.product_id,
+                product_id: form.product_id || null,
                 rating: form.rating,
                 message: form.message,
-                instructions: form.instructions,
+                instructions: form.instructions || '',
                 images_base64,
             };
 
