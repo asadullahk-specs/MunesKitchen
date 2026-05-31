@@ -54,17 +54,27 @@ const ReviewForm = ({ onSuccess }) => {
         if (form.rating === 0) { toast.error('Please select a rating.'); return; }
         if (!form.message.trim()) { toast.error('Please write a message.'); return; }
 
-        const formData = new FormData();
-        formData.append('customer_name', form.customer_name);
-        formData.append('product_id', form.product_id);
-        formData.append('rating', form.rating);
-        formData.append('message', form.message);
-        formData.append('instructions', form.instructions);
-        images.forEach(file => formData.append('images', file));
-
         setLoading(true);
         try {
-            const res = await createReview(formData);
+            // Convert all selected image files to base64 data URLs
+            const toBase64 = (file) => new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+            const images_base64 = await Promise.all(images.map(toBase64));
+
+            const payload = {
+                customer_name: form.customer_name,
+                product_id: form.product_id,
+                rating: form.rating,
+                message: form.message,
+                instructions: form.instructions,
+                images_base64,
+            };
+
+            const res = await createReview(payload);
             toast.success('Thank you! Your review will appear after approval.');
             onSuccess && onSuccess(res.data.data);
             setForm({ customer_name: '', product_id: '', rating: 0, message: '' });

@@ -1,37 +1,5 @@
 const { Review } = require('../models');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 
-// ── Multer config (memory in production for Vercel, disk locally) ────────────
-const isProduction = process.env.NODE_ENV === 'production';
-
-let storage;
-if (isProduction) {
-    storage = multer.memoryStorage();
-} else {
-    const reviewsUploadDir = path.join(__dirname, '..', 'uploads', 'reviews');
-    try {
-        if (!fs.existsSync(reviewsUploadDir)) fs.mkdirSync(reviewsUploadDir, { recursive: true });
-    } catch (e) { /* ignore in serverless */ }
-
-    storage = multer.diskStorage({
-        destination: (req, file, cb) => cb(null, reviewsUploadDir),
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname).toLowerCase();
-            cb(null, `review-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
-        },
-    });
-}
-
-const upload = multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype.startsWith('image/')) cb(null, true);
-        else cb(new Error('Only image files are allowed'), false);
-    },
-    limits: { fileSize: 5 * 1024 * 1024 },
-});
 
 // ── GET /reviews (filter by status via ?status=) ───────────────────────────
 exports.getAll = async (req, res) => {
@@ -115,51 +83,38 @@ exports.updateStatus = async (req, res) => {
 };
 
 // ── POST /reviews ────────────────────────────────────────────────────────────
-exports.create = [
-    upload.array('images', 5),
-    async (req, res) => {
-        try {
-            let imagePaths = [];
-            if (req.files) {
-                if (isProduction) {
-                    // On Vercel, files are in memory — store as empty array for now
-                    // In a full setup, you'd upload to Cloudinary here
-                    imagePaths = [];
-                } else {
-                    imagePaths = req.files.map(f => `uploads/reviews/${f.filename}`);
-                }
-            }
+exports.create = async (req, res) => {
+    try {
+        const { customer_name, product_id, rating, message, instructions, images_base64 } = req.body;
 
-            await Review.create({
-                customer_name: req.body.customer_name,
-                product_id: req.body.product_id || null,
-                rating: Number(req.body.rating),
-                message: req.body.message,
-                special_instructions: req.body.instructions || null,
-                images: JSON.stringify(imagePaths),
-                status: 'pending'
-            });
-
-            res.status(201).json({ success: true, message: 'Review submitted! It will appear after approval.' });
-        } catch (error) {
-            console.error('Review create error:', error);
-            res.status(500).json({ success: false, message: error.message });
+        // Accept up to 5 base64 image strings sent from the frontend
+        let imagePaths = [];
+        if (Array.isArray(images_base64) && images_base64.length > 0) {
+            imagePaths = images_base64.slice(0, 5).filter(img =>
+                typeof img === 'string' && img.startsWith('data:image/')
+            );
         }
-    },
-];
+
+        await Review.create({
+            customer_name,
+            product_id: product_id || null,
+            rating: Number(rating),
+            message,
+            special_instructions: instructions || null,
+            images: JSON.stringify(imagePaths),
+            status: 'pending'
+        });
+
+        res.status(201).json({ success: true, message: 'Review submitted! It will appear after approval.' });
+    } catch (error) {
+        console.error('Review create error:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 // ── DELETE /reviews/:id (admin) ──────────────────────────────────────────────
 exports.remove = async (req, res) => {
     try {
-        const review = await Review.findById(req.params.id);
-        if (!isProduction && review?.images) {
-            try {
-                JSON.parse(review.images).forEach(p => {
-                    const fullPath = path.join(__dirname, '..', p);
-                    if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
-                });
-            } catch (_) { /* ignore parse errors */ }
-        }
         await Review.findByIdAndDelete(req.params.id);
         res.json({ success: true, message: 'Review deleted successfully.' });
     } catch (error) {

@@ -29,11 +29,24 @@ const ReviewCard = ({ review }) => {
     const [imgIdx, setImgIdx] = useState(0);
     const [direction, setDirection] = useState(0);
 
-    // 3. Fallback logic: 
-    // Uses uploaded images, otherwise uses the product image from the database
-    const displayImages = images.length > 0
-        ? images.map(img => img.startsWith('http') ? img : `${BACKEND}/${img.replace(/^\//, '')}`)
-        : (review.product_image ? [review.product_image] : []);
+    // 3. Fallback logic:
+    // Uses uploaded images (http URLs or base64 data URLs), otherwise uses the product image
+    const displayImages = (() => {
+        if (images.length > 0) {
+            return images.map(img => {
+                // base64 data URLs and absolute http URLs are used as-is
+                if (img.startsWith('data:') || img.startsWith('http')) return img;
+                return `${BACKEND}/${img.replace(/^\//, '')}`;
+            });
+        }
+        if (review.product_image) {
+            return [review.product_image.startsWith('http')
+                ? review.product_image
+                : `${BACKEND}/${review.product_image.replace(/^\//, '')}`
+            ];
+        }
+        return [];
+    })();
 
     const paginate = (newDirection) => {
         setDirection(newDirection);
@@ -86,9 +99,11 @@ const ReviewCard = ({ review }) => {
                 </div>
 
                 {/* Fixed: Accessing product_name directly from review object */}
-                <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
-                    {review.product_name || 'General Review'}
-                </p>
+                {review.product_name && (
+                    <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
+                        {review.product_name}
+                    </p>
+                )}
 
                 <p className="text-sm text-gray-600 italic mt-1">"{review.message || ''}"</p>
             </div>
@@ -152,7 +167,7 @@ const HomePage = () => {
     return (
         <div>
             {/* ===== HERO SECTION ===== */}
-            <section className="relative flex items-center justify-center overflow-hidden py-12 md:py-20">
+            <section className="relative flex items-center justify-center overflow-hidden py-6 md:py-12">
                 <div className="absolute inset-0 pattern-bg" />
                 <div className="absolute inset-0"
                     style={{ background: 'radial-gradient(ellipse at 70% 50%, rgba(239,68,68,0.08) 0%, transparent 60%)' }} />
@@ -236,9 +251,9 @@ const HomePage = () => {
             </section>
 
             {/* ===== ABOUT SECTION ===== */}
-            <section className="py-20 px-4">
+            <section className="py-6 md:py-10 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8">
                         <h2 className="section-title mb-4">About Mune's Kitchen</h2>
                         <p className="section-subtitle max-w-2xl mx-auto">
                             Where tradition meets modern freezing technology
@@ -272,9 +287,9 @@ const HomePage = () => {
             </section>
 
             {/* ===== CATEGORIES SECTION ===== */}
-            <section className="py-16 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
+            <section className="py-6 md:py-10 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-10">
+                    <div className="text-center mb-8">
                         <h2 className="section-title mb-2">Explore Categories</h2>
                         <p className="section-subtitle">Pick your favorite</p>
                     </div>
@@ -310,9 +325,9 @@ const HomePage = () => {
             </section>
 
             {/* ===== TOP PRODUCTS ===== */}
-            <section className="py-20 px-4">
+            <section className="py-6 md:py-10 px-4">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8">
                         <h2 className="section-title mb-3">Top Products</h2>
                         <p className="section-subtitle">Our best-selling frozen favorites</p>
                     </div>
@@ -336,9 +351,9 @@ const HomePage = () => {
             </section>
 
             {/* ===== TESTIMONIALS ===== */}
-            <section className="py-20 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
+            <section className="py-6 md:py-10 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-12">
+                    <div className="text-center mb-8">
                         <h2 className="section-title mb-3">CUSTOMERS FEEDBACK</h2>
                         <p className="section-subtitle">Real feedback from people who ordered from Mune's Kitchen</p>
                     </div>
@@ -384,7 +399,7 @@ const HomePage = () => {
                     </div>
 
                     {/* ===== REVIEWS: grid (≤3) or carousel (>3) ===== */}
-                    <div className="mb-12">
+                    <div className="mb-8">
                         {reviews.length === 0 ? (
                             <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
                                 No reviews yet. Be the first to share your experience!
@@ -476,9 +491,9 @@ const HomePage = () => {
             </section>
 
             {/* ===== CONTACT SECTION ===== */}
-            <section className="py-20 px-4">
+            <section className="py-6 md:py-10 px-4">
                 <div className="max-w-2xl mx-auto">
-                    <div className="text-center mb-10">
+                    <div className="text-center mb-8">
                         <h2 className="section-title mb-3">Get in Touch</h2>
                         <p className="section-subtitle">We'd love to hear from you</p>
                     </div>

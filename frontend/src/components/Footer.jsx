@@ -10,17 +10,17 @@ const Footer = () => {
     useEffect(() => {
         API.get('/categories')
             .then((r) => setCategories(r.data.categories || r.data.data || []))
-            .catch(() => {}); // Silent fail — footer still renders without categories
+            .catch(() => { }); // Silent fail — footer still renders without categories
     }, []);
 
     return (
         <footer style={{ background: 'var(--bg-deep)', borderTop: '1px solid var(--border)' }}>
             {/* Main Footer */}
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
 
                     {/* Brand */}
-                    <div className="lg:col-span-1">
+                    <div className="col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl overflow-hidden">
                                 <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
@@ -30,7 +30,7 @@ const Footer = () => {
                                 <div className="text-xs font-accent italic" style={{ color: 'var(--primary)' }}>Frozen Freshness</div>
                             </div>
                         </div>
-                        <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-muted)' }}>
                             Premium frozen foods made with fresh ingredients and secret spices.
                             Taste the mystery, savor the excellence.
                         </p>
@@ -49,61 +49,66 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="font-display font-semibold mb-4" style={{ color: 'var(--text-main)' }}>Quick Links</h3>
-                        <ul className="space-y-2">
-                            {[
-                                { label: 'Home', href: '/' },
-                                { label: 'Our Menu', href: '/menu' },
-                                { label: 'Track Order', href: '/track' },
-                                { label: 'Contact Us', href: '/contact' },
-                            ].map(({ label, href }) => (
-                                <li key={href}>
-                                    <Link
-                                        to={href}
-                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
-                                        className="text-sm transition-colors"
-                                        onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
-                                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-                                        style={{ color: 'var(--text-muted)' }}
-                                    >
-                                        {label}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {/* Quick Links + Our Menu — always 2 columns side-by-side */}
+                    <div className="col-span-2 lg:col-span-2">
+                        <div className="grid grid-cols-2 gap-4">
+                            {/* Quick Links */}
+                            <div>
+                                <h3 className="font-display font-semibold mb-3" style={{ color: 'var(--text-main)' }}>Quick Links</h3>
+                                <ul className="space-y-2">
+                                    {[
+                                        { label: 'Home', href: '/' },
+                                        { label: 'Our Menu', href: '/menu' },
+                                        { label: 'Track Order', href: '/track' },
+                                        { label: 'Contact Us', href: '/contact' },
+                                    ].map(({ label, href }) => (
+                                        <li key={href}>
+                                            <Link
+                                                to={href}
+                                                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+                                                className="text-sm transition-colors"
+                                                onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
+                                                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                                                style={{ color: 'var(--text-muted)' }}
+                                            >
+                                                {label}
+                                            </Link>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
 
-                    {/* Menu Categories — Dynamic from API */}
-                    <div>
-                        <h3 className="font-display font-semibold mb-4" style={{ color: 'var(--text-main)' }}>Our Menu</h3>
-                        <ul className="space-y-2">
-                            {categories.length > 0 ? categories.map((cat) => (
-                                <li key={cat.id || cat._id}>
-                                    <Link
-                                        to={`/menu?category=${cat.id || cat._id}`}
-                                        onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
-                                        className="text-sm transition-colors"
-                                        onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
-                                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-                                        style={{ color: 'var(--text-muted)' }}
-                                    >
-                                        {cat.name}
-                                    </Link>
-                                </li>
-                            )) : (
-                                <li>
-                                    <Link to="/menu" className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                                        View Full Menu
-                                    </Link>
-                                </li>
-                            )}
-                        </ul>
+                            {/* Menu Categories — Dynamic from API */}
+                            <div>
+                                <h3 className="font-display font-semibold mb-3" style={{ color: 'var(--text-main)' }}>Our Menu</h3>
+                                <ul className="space-y-2">
+                                    {categories.length > 0 ? categories.map((cat) => (
+                                        <li key={cat.id || cat._id}>
+                                            <Link
+                                                to={`/menu?category=${cat.id || cat._id}`}
+                                                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+                                                className="text-sm transition-colors"
+                                                onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
+                                                onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                                                style={{ color: 'var(--text-muted)' }}
+                                            >
+                                                {cat.name}
+                                            </Link>
+                                        </li>
+                                    )) : (
+                                        <li>
+                                            <Link to="/menu" className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                                View Full Menu
+                                            </Link>
+                                        </li>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Contact */}
-                    <div>
+                    <div className="col-span-2 lg:col-span-1">
                         <h3 className="font-display font-semibold mb-4" style={{ color: 'var(--text-main)' }}>Contact</h3>
                         <ul className="space-y-3">
                             <li className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
@@ -126,7 +131,7 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+                <div className="mt-5 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3"
                     style={{ borderTop: '1px solid var(--border)' }}>
                     <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
                         © {currentYear} Mune's Kitchen. All rights reserved.

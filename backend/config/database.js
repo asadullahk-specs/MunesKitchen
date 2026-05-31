@@ -14,17 +14,31 @@ const connectDB = async () => {
         isConnected = conn.connections[0].readyState === 1;
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
 
-        // Auto-seed default admin account if none exists
+        // Auto-seed default admin accounts
         const Admin = require('../models/Admin');
-        const adminCount = await Admin.countDocuments({});
-        if (adminCount === 0) {
-            const hashedPassword = await bcrypt.hash('admin123', 10);
-            await Admin.create({
-                name: 'Mune Admin',
-                email: 'admin@muneskitchen.com',
-                password: hashedPassword
-            });
-            console.log('✨ Default admin user seeded.');
+        
+        // Remove old admin account completely
+        await Admin.deleteMany({ email: 'admin@muneskitchen.com' });
+        
+        const defaultAdmins = [
+            { name: 'Asadullah K', email: 'asadullahk@admin1.muneskitchen', password: 'admin#1@kitchen' },
+            { name: 'Sameer K', email: 'sameerk@admin2.muneskitchen', password: 'admin#2@kitchen' },
+            { name: 'Munes', email: 'munes@admin3.muneskitchen', password: 'admin#3@kitchen' }
+        ];
+
+        for (const adminData of defaultAdmins) {
+            const existing = await Admin.findOne({ email: adminData.email });
+            const hashedPassword = await bcrypt.hash(adminData.password, 10);
+            if (!existing) {
+                await Admin.create({
+                    name: adminData.name,
+                    email: adminData.email,
+                    password: hashedPassword
+                });
+                console.log(`✨ Admin user seeded: ${adminData.email}`);
+            } else {
+                await Admin.updateOne({ email: adminData.email }, { password: hashedPassword });
+            }
         }
     } catch (error) {
         console.error(`❌ MongoDB connection failed: ${error.message}`);

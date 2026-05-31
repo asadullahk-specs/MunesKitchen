@@ -57,11 +57,11 @@ const Navbar = () => {
             >
                 <div className="h-full flex items-center justify-between px-5 sm:px-7">
 
-                    <Link to="/" className="flex items-center gap-3 group">
+                    <Link to="/" className="flex items-center gap-3 group flex-nowrap flex-shrink-0">
                         {/* <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                             <span className="text-white font-bold text-base">M</span>
                         </div> */}
-                        <div className="w-12 h-12 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform">
                             <img
                                 src="/logo.png"
                                 alt="Logo"
@@ -69,7 +69,7 @@ const Navbar = () => {
                             />
                         </div>
                         <div className="leading-tight">
-                            <span className="font-bold text-base" style={{ color: 'var(--text-main)', fontFamily: 'Poppins' }}>
+                            <span className="font-bold text-base whitespace-nowrap" style={{ color: 'var(--text-main)', fontFamily: 'Poppins' }}>
                                 Mune's <span style={{ color: 'var(--primary)' }}>Kitchen</span>
                             </span>
                         </div>
@@ -121,14 +121,6 @@ const Navbar = () => {
                         <button onClick={toggleTheme} className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ color: 'var(--text-muted)' }}>
                             {isDark ? <FiSun size={17} className="text-yellow-400" /> : <FiMoon size={17} />}
                         </button>
-                        <Link to="/cart" className="relative w-9 h-9 flex items-center justify-center rounded-xl">
-                            <FiShoppingCart size={18} style={{ color: 'var(--text-main)' }} />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-1 -right-1 w-4 h-4 text-white text-xs font-bold rounded-full flex items-center justify-center" style={{ background: 'var(--primary)' }}>
-                                    {cartCount}
-                                </span>
-                            )}
-                        </Link>
                         <button
                             onClick={() => setIsOpen(prev => !prev)}
                             className="w-9 h-9 flex items-center justify-center rounded-xl"
@@ -164,7 +156,7 @@ const Navbar = () => {
                             }}
                         >
                             <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
-                                <span className="font-bold text-base" style={{ color: 'var(--text-main)', fontFamily: 'Poppins' }}>
+                                <span className="font-bold text-sm sm:text-base whitespace-nowrap" style={{ color: 'var(--text-main)', fontFamily: 'Poppins', display: 'block', lineHeight: '1.2' }}>
                                     Mune's <span style={{ color: 'var(--primary)' }}>Kitchen</span>
                                 </span>
                                 <button onClick={() => setIsOpen(false)} style={{ color: 'var(--text-muted)' }}>
@@ -199,6 +191,36 @@ const Navbar = () => {
                                         </Link>
                                     </motion.div>
                                 ))}
+                                <motion.div
+                                    initial={{ opacity: 0, x: 20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: 20 }}
+                                    transition={{ delay: navLinks.length * 0.06 }}
+                                >
+                                    <Link
+                                        to="/cart"
+                                        onClick={() => {
+                                            setIsOpen(false);
+                                            window.scrollTo({ top: 0, behavior: 'instant' });
+                                        }}
+                                        className="flex items-center justify-between py-3 px-4 rounded-xl text-sm font-medium transition-all"
+                                        style={{
+                                            background: isActive('/cart') ? 'var(--primary-glow)' : 'transparent',
+                                            color: isActive('/cart') ? 'var(--primary)' : 'var(--text-main)',
+                                            fontFamily: 'Poppins'
+                                        }}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <FiShoppingCart size={17} />
+                                            <span>Cart</span>
+                                        </div>
+                                        {cartCount > 0 && (
+                                            <span className="w-5 h-5 text-white text-xs font-bold rounded-full flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                                                {cartCount > 99 ? '99+' : cartCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </motion.div>
                             </div>
 
                             <div className="mt-auto p-5 border-t" style={{ borderColor: 'var(--border)' }}>

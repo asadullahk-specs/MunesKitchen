@@ -9,8 +9,6 @@ export const updateReviewStatus = (id, newStatus) =>
 export const deleteReview = (id) => api.delete(`/reviews/${id}`);
 
 export const createReview = (data) =>
-    api.post('/reviews', data, {
-        headers: { 'Content-Type': undefined },
-    });
+    api.post('/reviews', data);
 
 export const getPendingReviews = () => api.get('/reviews/pending');

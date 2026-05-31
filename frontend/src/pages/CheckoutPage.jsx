@@ -208,21 +208,21 @@ const CheckoutPage = () => {
                             <h2 className="font-bold text-lg mb-5" style={{ color: 'var(--text-main)' }}>
                                 Payment Method
                             </h2>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 {[
                                     { value: 'cash_on_delivery', label: 'Cash on Delivery' },
                                     { value: 'easypaisa', label: 'Easypaisa' },
                                     { value: 'bank_transfer', label: 'Bank Transfer' },
                                 ].map((method) => (
                                     <button key={method.value} onClick={() => setPaymentMethod(method.value)}
-                                        className="p-3 rounded-xl text-center transition-all"
+                                        className="p-4 sm:p-3 rounded-xl text-center transition-all"
                                         style={{
                                             border: paymentMethod === method.value
                                                 ? '2px solid var(--primary)' : '2px solid var(--border)',
                                             background: paymentMethod === method.value
                                                 ? 'var(--primary-glow)' : 'var(--bg-card)',
                                         }}>
-                                        <p className="text-xs font-semibold leading-tight"
+                                        <p className="text-sm sm:text-xs font-semibold leading-tight"
                                             style={{
                                                 color: paymentMethod === method.value
                                                     ? 'var(--primary)' : 'var(--text-main)',

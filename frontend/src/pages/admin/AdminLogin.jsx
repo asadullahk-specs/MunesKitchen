@@ -50,10 +50,13 @@ const AdminLogin = () => {
             >
                 <div className="text-center mb-8">
                     <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
-                        style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}
+                        className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-lg"
                     >
-                        <span className="text-white font-bold text-2xl">M</span>
+                        <img
+                            src="/logo.png"
+                            alt="Logo"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
                     <h1 className="font-bold text-2xl mb-1" style={{ color: 'var(--text-main)' }}>
                         Admin Panel
@@ -70,7 +73,7 @@ const AdminLogin = () => {
                         <input
                             className="form-input"
                             type="email"
-                            placeholder="admin@muneskitchen.com"
+                            placeholder="e.g. asadullahk@admin1.muneskitchen"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
