@@ -286,7 +286,7 @@ const OrderTrackingPage = () => {
                             <div className="flex justify-between items-center text-gray-500">
                                 <span>Delivery Charges:</span>
                                 <span className="font-semibold" style={{ color: 'var(--text-main)' }}>
-                                    {Number(order.delivery_charge || 0) > 0 ? `Rs. ${Number(order.delivery_charge).toLocaleString()}` : 'Free'}
+                                    Rs. {Number(order.delivery_charge || 0).toLocaleString()}
                                 </span>
                             </div>
 
@@ -442,7 +442,7 @@ const OrderTrackingPage = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#475569', marginBottom: '8px' }}>
                                 <span>Delivery Fee:</span>
                                 <span style={{ fontWeight: '600', color: '#0f172a' }}>
-                                    {Number(order.delivery_charge || 0) > 0 ? `Rs. ${Number(order.delivery_charge).toLocaleString()}` : 'Free'}
+                                    Rs. {Number(order.delivery_charge || 0).toLocaleString()}
                                 </span>
                             </div>
 

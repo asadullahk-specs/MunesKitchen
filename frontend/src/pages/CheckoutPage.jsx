@@ -42,7 +42,7 @@ const CheckoutPage = () => {
     // Track chosen delivery area details
     useEffect(() => {
         if (deliveryAreaId && deliveryAreas.length > 0) {
-            const area = deliveryAreas.find((a) => String(a.id) === String(deliveryAreaId))
+            const area = deliveryAreas.find((a) => String(a.id || a._id) === String(deliveryAreaId))
             setSelectedArea(area || null)
         } else {
             setSelectedArea(null)
@@ -175,7 +175,7 @@ const CheckoutPage = () => {
                                                     : 'Select your area'}
                                         </option>
                                         {deliveryAreas.map((area) => (
-                                            <option key={area.id} value={area.id}>
+                                            <option key={area.id || area._id} value={area.id || area._id}>
                                                 {area.name} (Rs. {Number(area.charge || 0).toLocaleString()})
                                             </option>
                                         ))}

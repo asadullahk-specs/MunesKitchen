@@ -47,13 +47,19 @@ const AdminSettings = () => {
     const handleDeliverySubmit = async (e) => {
         e.preventDefault();
         if (!deliveryForm.name.trim()) { toast.error('Name is required'); return; }
-        
+
+        const rawCharge = String(deliveryForm.charge).trim();
+        const chargeValue = rawCharge === '' ? 0 : Number(rawCharge);
+        if (isNaN(chargeValue)) { toast.error('Delivery charge must be a valid number'); return; }
+
         setSubmitting(true);
         try {
             const payload = {
                 name: deliveryForm.name.trim(),
-                charge: deliveryForm.charge === '' ? 0 : parseFloat(deliveryForm.charge)
+                charge: chargeValue
             };
+
+            console.log('Saving delivery area:', payload);
 
             if (deliveryForm.id) {
                 await updateDeliveryArea(deliveryForm.id, payload);
@@ -64,8 +70,9 @@ const AdminSettings = () => {
             }
             setDeliveryForm({ id: null, name: '', charge: '' });
             fetchData();
-        } catch {
-            toast.error('Failed to save delivery area');
+        } catch (err) {
+            console.error("Save Area Error:", err);
+            toast.error(err.response?.data?.message || 'Failed to save delivery area');
         } finally {
             setSubmitting(false);
         }
@@ -77,8 +84,8 @@ const AdminSettings = () => {
             await deleteDeliveryArea(id);
             toast.success('Delivery area deleted');
             fetchData();
-        } catch {
-            toast.error('Failed to delete delivery area');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to delete delivery area');
         }
     };
 
@@ -102,8 +109,8 @@ const AdminSettings = () => {
             }
             setFoodForm({ id: null, name: '' });
             fetchData();
-        } catch {
-            toast.error('Failed to save food category');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to save food category');
         } finally {
             setSubmitting(false);
         }
@@ -115,8 +122,8 @@ const AdminSettings = () => {
             await deleteCategory(id);
             toast.success('Food category deleted');
             fetchData();
-        } catch {
-            toast.error('Failed to delete food category');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to delete food category');
         }
     };
 
@@ -141,8 +148,9 @@ const AdminSettings = () => {
             }
             setExpenseForm({ id: null, name: '', color: '#ef4444' });
             fetchData();
-        } catch {
-            toast.error('Failed to save expense category');
+        } catch (err) {
+            console.error("Save Expense Cat Error:", err);
+            toast.error(err.response?.data?.message || 'Failed to save expense category');
         } finally {
             setSubmitting(false);
         }
@@ -154,8 +162,8 @@ const AdminSettings = () => {
             await deleteExpenseCategory(id);
             toast.success('Expense category deleted');
             fetchData();
-        } catch {
-            toast.error('Failed to delete expense category');
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to delete expense category');
         }
     };
 
@@ -355,7 +363,7 @@ const AdminSettings = () => {
                                         </div>
                                     ) : (
                                         deliveryAreas.map((area) => (
-                                            <div key={area.id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                            <div key={area.id || area._id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <div>
                                                     <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{area.name}</p>
                                                     <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -364,14 +372,14 @@ const AdminSettings = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => setDeliveryForm({ id: area.id, name: area.name, charge: area.charge || '' })}
+                                                        onClick={() => setDeliveryForm({ id: area.id || area._id, name: area.name, charge: area.charge || '' })}
                                                         className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDeliveryDelete(area.id)}
+                                                        onClick={() => handleDeliveryDelete(area.id || area._id)}
                                                         className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >
@@ -400,7 +408,7 @@ const AdminSettings = () => {
                                         </div>
                                     ) : (
                                         foodCategories.map((cat) => (
-                                            <div key={cat.id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                            <div key={cat.id || cat._id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <div className="flex items-center gap-3">
                                                     <div>
                                                         <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{cat.name}</p>
@@ -411,14 +419,14 @@ const AdminSettings = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => setFoodForm({ id: cat.id, name: cat.name })}
+                                                        onClick={() => setFoodForm({ id: cat.id || cat._id, name: cat.name })}
                                                         className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleFoodDelete(cat.id)}
+                                                        onClick={() => handleFoodDelete(cat.id || cat._id)}
                                                         className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >
@@ -447,7 +455,7 @@ const AdminSettings = () => {
                                         </div>
                                     ) : (
                                         expenseCategories.map((cat) => (
-                                            <div key={cat.id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                                            <div key={cat.id || cat._id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-4 h-4 rounded-full border border-black/10 shrink-0" style={{ background: cat.color || '#ef4444' }} />
                                                     <div>
@@ -459,14 +467,14 @@ const AdminSettings = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => setExpenseForm({ id: cat.id, name: cat.name, color: cat.color || '#ef4444' })}
+                                                        onClick={() => setExpenseForm({ id: cat.id || cat._id, name: cat.name, color: cat.color || '#ef4444' })}
                                                         className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleExpenseDelete(cat.id)}
+                                                        onClick={() => handleExpenseDelete(cat.id || cat._id)}
                                                         className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >

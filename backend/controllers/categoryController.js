@@ -17,9 +17,16 @@ exports.getAll = async (req, res) => {
 
 exports.create = async (req, res) => {
     try {
-        const { name, icon } = req.body;
-        const slug = name.toLowerCase().replace(/\s+/g, '-');
-        await Category.create({ name, slug, icon: icon || null });
+        const { name } = req.body;
+        if (!name || !name.trim()) {
+            return res.status(400).json({ success: false, message: 'Category name is required' });
+        }
+        const slug = name.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        const existing = await Category.findOne({ slug });
+        if (existing) {
+            return res.status(400).json({ success: false, message: 'A category with this name already exists' });
+        }
+        await Category.create({ name: name.trim(), slug });
         res.status(201).json({ success: true, message: 'Category created' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -28,8 +35,12 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
-        const { name, icon } = req.body;
-        await Category.findByIdAndUpdate(req.params.id, { name, icon: icon || null });
+        const { name } = req.body;
+        if (!name || !name.trim()) {
+            return res.status(400).json({ success: false, message: 'Category name is required' });
+        }
+        const slug = name.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        await Category.findByIdAndUpdate(req.params.id, { name: name.trim(), slug, icon: null }, { new: true });
         res.json({ success: true, message: 'Category updated' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

@@ -21,7 +21,10 @@ const createDeliveryArea = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Area name is required' });
     }
     try {
-        const newArea = await DeliveryArea.create({ name, charge: Number(charge || 0) });
+        const parsedCharge = parseFloat(charge);
+        const safeCharge = isNaN(parsedCharge) ? 0 : parsedCharge;
+        console.log(`Creating delivery area: ${name}, charge: ${safeCharge} (raw: ${charge})`);
+        const newArea = await DeliveryArea.create({ name: name.trim(), charge: safeCharge });
         res.status(201).json({ success: true, message: 'Delivery area added', data: newArea });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -35,9 +38,12 @@ const updateDeliveryArea = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Area name is required' });
     }
     try {
+        const parsedCharge = parseFloat(charge);
+        const safeCharge = isNaN(parsedCharge) ? 0 : parsedCharge;
+        console.log(`Updating delivery area ${req.params.id}: ${name}, charge: ${safeCharge} (raw: ${charge})`);
         const result = await DeliveryArea.findByIdAndUpdate(req.params.id, {
-            name,
-            charge: Number(charge || 0)
+            name: name.trim(),
+            charge: safeCharge
         }, { new: true });
         if (!result) {
             return res.status(404).json({ success: false, message: 'Area not found' });

@@ -15,92 +15,101 @@ const BACKEND = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace('/api', '')
     : 'http://localhost:5000';
 
-// ─── ReviewCard: single review with optional image mini-slider ────────────────
+// ─── ReviewCard: single review with image display logic ──────────────────────
 const ReviewCard = ({ review }) => {
-    // 1. Safe parsing of images (Handles arrays, NULL or invalid JSON)
-    const images = (() => {
+    // 1. Safe parse of stored images (JSON string of base64 data: URLs)
+    const userImages = (() => {
         try {
-            if (Array.isArray(review.images)) return review.images;
-            return (review.images && review.images !== 'NULL') ? JSON.parse(review.images) : [];
-        }
-        catch { return []; }
+            if (!review.images) return [];
+            if (Array.isArray(review.images)) return review.images.filter(Boolean);
+            if (review.images === 'NULL' || review.images === '[]') return [];
+            const parsed = JSON.parse(review.images);
+            return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+        } catch { return []; }
     })();
 
-    // 2. State for the image slider
-    const [imgIdx, setImgIdx] = useState(0);
-    const [direction, setDirection] = useState(0);
-
-    // 3. Fallback logic:
-    // Uses uploaded images (http URLs or base64 data URLs), otherwise uses the product image
+    // 2. Build the final display list:
+    //    → user images if any
+    //    → else product image if linked
+    //    → else empty (we'll show a placeholder box)
     const displayImages = (() => {
-        if (images.length > 0) {
-            return images.map(img => {
-                // base64 data URLs and absolute http URLs are used as-is
-                if (img.startsWith('data:') || img.startsWith('http')) return img;
-                return `${BACKEND}/${img.replace(/^\//, '')}`;
-            });
-        }
-        const prodImg = review.product_image || review.product_id?.image;
+        if (userImages.length > 0) return userImages; // base64 data URLs
+        const prodImg = review.product_image;
         if (prodImg) {
-            return [prodImg.startsWith('http')
+            // absolute URLs are used as-is; relative paths get the backend prefix
+            const src = prodImg.startsWith('http')
                 ? prodImg
-                : `${BACKEND}/${prodImg.replace(/^\//, '')}`
-            ];
+                : `${BACKEND}/${prodImg.replace(/^\//, '')}`;
+            return [src];
         }
         return [];
     })();
 
-    const paginate = (newDirection) => {
-        setDirection(newDirection);
-        setImgIdx((prev) => (prev + newDirection + displayImages.length) % displayImages.length);
+    // 3. Slider state
+    const [imgIdx, setImgIdx] = useState(0);
+
+    const prev = (e) => {
+        e.stopPropagation();
+        setImgIdx((i) => (i - 1 + displayImages.length) % displayImages.length);
+    };
+    const next = (e) => {
+        e.stopPropagation();
+        setImgIdx((i) => (i + 1) % displayImages.length);
     };
 
-    // 4. Guard Clause: prevents crash if review object is missing
     if (!review) return null;
 
     return (
         <div className="card p-5 flex flex-col h-full" style={{ border: '1px solid var(--border)', borderRadius: '1rem' }}>
-            {/* Image Slider */}
-            {displayImages.length > 0 && (
-                <div className="review-img-slider mb-4 relative overflow-hidden h-48 rounded-lg">
-                    <AnimatePresence initial={false} custom={direction}>
-                        <motion.img
-                            key={imgIdx}
-                            src={displayImages[imgIdx]}
-                            custom={direction}
-                            initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: direction < 0 ? 100 : -100 }}
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                            className="review-img-slide w-full h-full object-cover"
-                        />
-                    </AnimatePresence>
+            {/* Image area */}
+            {displayImages.length > 0 ? (
+                <div className="review-img-slider mb-4">
+                    {/* Show current image */}
+                    <img
+                        src={displayImages[imgIdx]}
+                        alt={`Review photo ${imgIdx + 1}`}
+                        className="review-img-slide"
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                    />
 
+                    {/* Arrow navigation — only when multiple images */}
                     {displayImages.length > 1 && (
                         <>
-                            <button 
-                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-black/80 hover:bg-white p-1.5 rounded-full shadow transition-all" 
-                                style={{ color: 'var(--text-main)', border: '1px solid var(--border)' }}
-                                onClick={(e) => { e.preventDefault(); paginate(-1); }}
-                            >
-                                <FiChevronLeft size={16} />
+                            <button className="review-img-arrow review-img-prev" onClick={prev} aria-label="Previous image">
+                                <FiChevronLeft size={14} />
                             </button>
-                            <button 
-                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-black/80 hover:bg-white p-1.5 rounded-full shadow transition-all" 
-                                style={{ color: 'var(--text-main)', border: '1px solid var(--border)' }}
-                                onClick={(e) => { e.preventDefault(); paginate(1); }}
-                            >
-                                <FiChevronRight size={16} />
+                            <button className="review-img-arrow review-img-next" onClick={next} aria-label="Next image">
+                                <FiChevronRight size={14} />
                             </button>
+
+                            {/* Dot indicators */}
+                            <div className="review-img-dots">
+                                {displayImages.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        className={`review-img-dot${i === imgIdx ? ' active' : ''}`}
+                                        onClick={(e) => { e.stopPropagation(); setImgIdx(i); }}
+                                        aria-label={`Go to image ${i + 1}`}
+                                    />
+                                ))}
+                            </div>
                         </>
                     )}
                 </div>
+            ) : (
+                /* No images at all — show a neutral placeholder */
+                <div className="mb-4 flex items-center justify-center rounded-xl" style={{ height: 100, background: 'var(--primary-glow)', borderRadius: 12 }}>
+                    <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.5 }} />
+                </div>
             )}
 
-            {/* Structured Details */}
-            <div className="flex flex-col gap-2">
+            {/* Review content */}
+            <div className="flex flex-col gap-2 flex-1">
                 <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{review.customer_name || 'Anonymous'}</h3>
+                    <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>
+                        {review.customer_name || 'Anonymous'}
+                    </h3>
                     <div className="flex text-amber-400">
                         {[...Array(5)].map((_, i) => (
                             <FiStar key={i} size={14} fill={i < (review.rating || 0) ? "currentColor" : "none"} />
@@ -108,7 +117,6 @@ const ReviewCard = ({ review }) => {
                     </div>
                 </div>
 
-                {/* Fixed: Accessing product_name directly from review object */}
                 {(review.product_name || review.product_id?.name) && (
                     <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
                         {review.product_name || review.product_id?.name}
@@ -120,8 +128,6 @@ const ReviewCard = ({ review }) => {
         </div>
     );
 };
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 const HomePage = () => {
     const [products, setProducts] = useState([]);

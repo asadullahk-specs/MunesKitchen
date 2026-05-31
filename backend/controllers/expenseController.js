@@ -118,12 +118,14 @@ const createExpenseCategory = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Category name is required' });
     }
     try {
+        console.log('Creating expense category:', { name: name.trim(), color });
         const newCat = await ExpenseCategory.create({
             name: name.trim(),
             color: color || '#ef4444'
         });
         res.status(201).json({ success: true, message: 'Expense category created', data: newCat });
     } catch (error) {
+        console.error('createExpenseCategory error:', error.message);
         res.status(500).json({ success: false, message: error.message });
     }
 };
