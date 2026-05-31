@@ -176,15 +176,9 @@ const CheckoutPage = () => {
                                         </option>
                                         {deliveryAreas.map((area) => (
                                             <option key={area.id} value={area.id}>
-                                                {area.name}
+                                                {area.name} (Rs. {Number(area.charge || 0).toLocaleString()})
                                             </option>
                                         ))}
-
-                                        {/* In your Order Summary section */}
-                                        <div className="flex justify-between text-sm">
-                                            <span style={{ color: 'var(--text-muted)' }}>Delivery</span>
-                                            <span style={{ color: 'var(--text-main)' }}>Free</span>
-                                        </div>
                                     </select>
                                 </div>
 

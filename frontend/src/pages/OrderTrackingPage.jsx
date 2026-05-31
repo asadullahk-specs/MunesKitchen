@@ -283,11 +283,10 @@ const OrderTrackingPage = () => {
                                 </span>
                             </div>
 
-                            {/* Delivery Charges display removed/updated to indicate free */}
                             <div className="flex justify-between items-center text-gray-500">
                                 <span>Delivery Charges:</span>
-                                <span className="font-semibold text-gray-700">
-                                    As per distance
+                                <span className="font-semibold" style={{ color: 'var(--text-main)' }}>
+                                    {Number(order.delivery_charge || 0) > 0 ? `Rs. ${Number(order.delivery_charge).toLocaleString()}` : 'Free'}
                                 </span>
                             </div>
 
@@ -295,7 +294,7 @@ const OrderTrackingPage = () => {
                             <div className="flex justify-between items-center font-bold text-lg border-t pt-3 mt-2" style={{ borderColor: 'var(--border)' }}>
                                 <span style={{ color: 'var(--text-main)' }}>Grand Total:</span>
                                 <span className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
-                                    Rs. {Number(order.subtotal || 0).toLocaleString()}
+                                    Rs. {Number(order.total || (Number(order.subtotal || 0) + Number(order.delivery_charge || 0))).toLocaleString()}
                                 </span>
                             </div>
                         </div>
@@ -440,16 +439,18 @@ const OrderTrackingPage = () => {
                                 <span style={{ fontWeight: '600', color: '#0f172a' }}>Rs. {Number(order.subtotal || 0).toLocaleString()}</span>
                             </div>
 
-                            {/* Delivery Fee updated to Free */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#475569', marginBottom: '8px' }}>
                                 <span>Delivery Fee:</span>
-                                <span style={{ fontWeight: '600', color: '#0f172a' }}>As per distance</span>
+                                <span style={{ fontWeight: '600', color: '#0f172a' }}>
+                                    {Number(order.delivery_charge || 0) > 0 ? `Rs. ${Number(order.delivery_charge).toLocaleString()}` : 'Free'}
+                                </span>
                             </div>
 
-                            {/* Grand Total updated to match Subtotal */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '800', borderTop: '1px dashed #cbd5e1', paddingTop: '10px' }}>
                                 <span style={{ color: '#0f172a' }}>Grand Total:</span>
-                                <span style={{ color: '#990000', fontSize: '18px' }}>Rs. {Number(order.subtotal || 0).toLocaleString()}</span>
+                                <span style={{ color: '#990000', fontSize: '18px' }}>
+                                    Rs. {Number(order.total || (Number(order.subtotal || 0) + Number(order.delivery_charge || 0))).toLocaleString()}
+                                </span>
                             </div>
                         </div>
 

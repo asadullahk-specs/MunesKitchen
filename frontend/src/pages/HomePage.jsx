@@ -17,9 +17,10 @@ const BACKEND = import.meta.env.VITE_API_URL
 
 // ─── ReviewCard: single review with optional image mini-slider ────────────────
 const ReviewCard = ({ review }) => {
-    // 1. Safe parsing of images (Handles NULL or invalid JSON)
+    // 1. Safe parsing of images (Handles arrays, NULL or invalid JSON)
     const images = (() => {
         try {
+            if (Array.isArray(review.images)) return review.images;
             return (review.images && review.images !== 'NULL') ? JSON.parse(review.images) : [];
         }
         catch { return []; }
@@ -39,10 +40,11 @@ const ReviewCard = ({ review }) => {
                 return `${BACKEND}/${img.replace(/^\//, '')}`;
             });
         }
-        if (review.product_image) {
-            return [review.product_image.startsWith('http')
-                ? review.product_image
-                : `${BACKEND}/${review.product_image.replace(/^\//, '')}`
+        const prodImg = review.product_image || review.product_id?.image;
+        if (prodImg) {
+            return [prodImg.startsWith('http')
+                ? prodImg
+                : `${BACKEND}/${prodImg.replace(/^\//, '')}`
             ];
         }
         return [];
@@ -76,11 +78,19 @@ const ReviewCard = ({ review }) => {
 
                     {displayImages.length > 1 && (
                         <>
-                            <button className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow" onClick={() => paginate(-1)}>
-                                <FiChevronLeft />
+                            <button 
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-black/80 hover:bg-white p-1.5 rounded-full shadow transition-all" 
+                                style={{ color: 'var(--text-main)', border: '1px solid var(--border)' }}
+                                onClick={(e) => { e.preventDefault(); paginate(-1); }}
+                            >
+                                <FiChevronLeft size={16} />
                             </button>
-                            <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-1 rounded-full shadow" onClick={() => paginate(1)}>
-                                <FiChevronRight />
+                            <button 
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-black/80 hover:bg-white p-1.5 rounded-full shadow transition-all" 
+                                style={{ color: 'var(--text-main)', border: '1px solid var(--border)' }}
+                                onClick={(e) => { e.preventDefault(); paginate(1); }}
+                            >
+                                <FiChevronRight size={16} />
                             </button>
                         </>
                     )}
@@ -90,7 +100,7 @@ const ReviewCard = ({ review }) => {
             {/* Structured Details */}
             <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-start">
-                    <h3 className="font-bold" style={{ color: 'var(--text-main)' }}>{review.customer_name || 'Anonymous'}</h3>
+                    <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{review.customer_name || 'Anonymous'}</h3>
                     <div className="flex text-amber-400">
                         {[...Array(5)].map((_, i) => (
                             <FiStar key={i} size={14} fill={i < (review.rating || 0) ? "currentColor" : "none"} />
@@ -99,9 +109,9 @@ const ReviewCard = ({ review }) => {
                 </div>
 
                 {/* Fixed: Accessing product_name directly from review object */}
-                {review.product_name && (
+                {(review.product_name || review.product_id?.name) && (
                     <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
-                        {review.product_name}
+                        {review.product_name || review.product_id?.name}
                     </p>
                 )}
 

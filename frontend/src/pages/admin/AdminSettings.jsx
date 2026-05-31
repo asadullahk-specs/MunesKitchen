@@ -17,7 +17,7 @@ const AdminSettings = () => {
 
     // Form States
     const [deliveryForm, setDeliveryForm] = useState({ id: null, name: '', charge: '' });
-    const [foodForm, setFoodForm] = useState({ id: null, name: '', icon: '' });
+    const [foodForm, setFoodForm] = useState({ id: null, name: '' });
     const [expenseForm, setExpenseForm] = useState({ id: null, name: '', color: '#ef4444' });
 
     const fetchData = async () => {
@@ -52,7 +52,7 @@ const AdminSettings = () => {
         try {
             const payload = {
                 name: deliveryForm.name.trim(),
-                charge: Number(deliveryForm.charge || 0)
+                charge: deliveryForm.charge === '' ? 0 : parseFloat(deliveryForm.charge)
             };
 
             if (deliveryForm.id) {
@@ -90,8 +90,7 @@ const AdminSettings = () => {
         setSubmitting(true);
         try {
             const payload = {
-                name: foodForm.name.trim(),
-                icon: foodForm.icon.trim() || '🍔'
+                name: foodForm.name.trim()
             };
 
             if (foodForm.id) {
@@ -101,7 +100,7 @@ const AdminSettings = () => {
                 await createCategory(payload);
                 toast.success('Food category created successfully');
             }
-            setFoodForm({ id: null, name: '', icon: '' });
+            setFoodForm({ id: null, name: '' });
             fetchData();
         } catch {
             toast.error('Failed to save food category');
@@ -267,15 +266,6 @@ const AdminSettings = () => {
                                             required
                                         />
                                     </div>
-                                    <div>
-                                        <label className="form-label">Category Emoji / Icon</label>
-                                        <input
-                                            className="form-input"
-                                            placeholder="e.g. 🌯 or 🍢"
-                                            value={foodForm.icon}
-                                            onChange={(e) => setFoodForm({ ...foodForm, icon: e.target.value })}
-                                        />
-                                    </div>
                                     <div className="flex gap-2">
                                         <button type="submit" disabled={submitting} className="btn-primary flex-1 justify-center">
                                             {submitting ? 'Saving...' : foodForm.id ? 'Update Category' : 'Add Category'}
@@ -283,7 +273,7 @@ const AdminSettings = () => {
                                         {foodForm.id && (
                                             <button
                                                 type="button"
-                                                onClick={() => setFoodForm({ id: null, name: '', icon: '' })}
+                                                onClick={() => setFoodForm({ id: null, name: '' })}
                                                 className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
                                                 style={{ color: 'var(--text-main)' }}
                                             >
@@ -412,7 +402,6 @@ const AdminSettings = () => {
                                         foodCategories.map((cat) => (
                                             <div key={cat.id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-2xl">{cat.icon || '🍔'}</span>
                                                     <div>
                                                         <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{cat.name}</p>
                                                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -422,7 +411,7 @@ const AdminSettings = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => setFoodForm({ id: cat.id, name: cat.name, icon: cat.icon || '' })}
+                                                        onClick={() => setFoodForm({ id: cat.id, name: cat.name })}
                                                         className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
