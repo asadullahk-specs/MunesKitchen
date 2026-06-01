@@ -226,7 +226,7 @@ const MenuPage = () => {
                                         </div>
 
                                         {/* Product Swiper Box */}
-                                        <div className="relative flex items-center justify-center px-12 sm:px-14">
+                                        <div className="relative flex items-center justify-center px-6 sm:px-14">
                                             {/* Left Arrow Button */}
                                             {group.products.length > 1 && (
                                                 <button
@@ -234,19 +234,30 @@ const MenuPage = () => {
                                                     className="swiper-nav-btn reviews-prev"
                                                     style={{
                                                         position: 'absolute',
-                                                        left: 0,
+                                                        left: '-6px',
                                                         top: '50%',
                                                         transform: 'translateY(-50%)',
-                                                        zIndex: 10
+                                                        zIndex: 10,
+                                                        width: 36,
+                                                        height: 36,
+                                                        borderRadius: '50%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)',
+                                                        border: '1.5px solid var(--border)',
+                                                        boxShadow: 'var(--shadow-sm)',
+                                                        cursor: 'pointer',
+                                                        color: 'var(--text-main)'
                                                     }}
                                                     aria-label="Previous Product"
                                                 >
-                                                    <FiChevronLeft size={20} />
+                                                    <FiChevronLeft size={18} />
                                                 </button>
                                             )}
 
                                             {/* Product Card Container with Framer Motion slide transition */}
-                                            <div className="w-full max-w-[320px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
+                                            <div className="w-full max-w-[340px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
                                                 <AnimatePresence initial={false} custom={direction} mode="wait">
                                                     <motion.div
                                                         key={`${group.id}-${activeIdx}`}
@@ -291,14 +302,25 @@ const MenuPage = () => {
                                                     className="swiper-nav-btn reviews-next"
                                                     style={{
                                                         position: 'absolute',
-                                                        right: 0,
+                                                        right: '-6px',
                                                         top: '50%',
                                                         transform: 'translateY(-50%)',
-                                                        zIndex: 10
+                                                        zIndex: 10,
+                                                        width: 36,
+                                                        height: 36,
+                                                        borderRadius: '50%',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)',
+                                                        border: '1.5px solid var(--border)',
+                                                        boxShadow: 'var(--shadow-sm)',
+                                                        cursor: 'pointer',
+                                                        color: 'var(--text-main)'
                                                     }}
                                                     aria-label="Next Product"
                                                 >
-                                                    <FiChevronRight size={20} />
+                                                    <FiChevronRight size={18} />
                                                 </button>
                                             )}
                                         </div>
