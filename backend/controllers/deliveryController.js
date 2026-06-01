@@ -4,9 +4,10 @@ const { DeliveryArea } = require('../models');
 const getDeliveryAreas = async (req, res) => {
     try {
         const areas = await DeliveryArea.find().sort({ name: 1 });
+        // Call .toJSON() on each doc so the id virtual is included in the response
         res.json({
             success: true,
-            areas: areas
+            areas: areas.map(a => a.toJSON())
         });
     } catch (error) {
         console.error("Backend Error:", error);

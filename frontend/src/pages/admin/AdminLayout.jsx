@@ -155,18 +155,10 @@ const AdminLayout = () => {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload)
     }, [])
 
-    // ── 2. VISIBILITY PROTECTION ─────────────────────────────────────────────
-    useEffect(() => {
-        const handleVisibility = () => {
-            if (document.hidden) {
-                doLogout()
-            }
-        }
-        document.addEventListener('visibilitychange', handleVisibility)
-        return () => document.removeEventListener('visibilitychange', handleVisibility)
-    }, [])
-
-    // ── 3. INACTIVITY AUTO-LOGOUT (5 minutes) ───────────────────────────────
+    // ── 2. INACTIVITY AUTO-LOGOUT (5 minutes) ───────────────────────────────
+    // NOTE: visibilitychange logout was intentionally removed — it was triggering
+    // logout any time the admin switched browser tabs or windows during normal use.
+    // Logout is now only triggered by: 5-min inactivity, refresh, close, or explicit logout.
     useEffect(() => {
         const resetTimer = () => {
             if (inactivityTimer.current) clearTimeout(inactivityTimer.current)

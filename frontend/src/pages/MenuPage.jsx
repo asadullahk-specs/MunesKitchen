@@ -52,9 +52,10 @@ const MenuPage = () => {
     };
 
     // Group items category-wise in frontend
+    // Use .id (virtual set by Mongoose toJSON transform) — NOT ._id which is deleted
     const groupedProducts = categories.map(cat => {
         const catProds = products.filter(p => {
-            const pCatId = p.category_id?._id || p.category_id;
+            const pCatId = p.category_id?.id || p.category?.id;
             const targetCatId = cat.id || cat._id;
             return String(pCatId) === String(targetCatId);
         });

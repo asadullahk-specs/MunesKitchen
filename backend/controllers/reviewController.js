@@ -25,8 +25,8 @@ exports.getAll = async (req, res) => {
         });
 
         // Compute stats from approved reviews for homepage
-        const statsSource = status === 'approved' 
-            ? mappedReviews 
+        const statsSource = status === 'approved'
+            ? mappedReviews
             : mappedReviews.filter(r => r.status === 'approved');
 
         const total = statsSource.length;
@@ -71,13 +71,27 @@ exports.getPending = async (req, res) => {
 exports.updateStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        const { id } = req.params;
+
+        // Validate status against allowed values
         const validStatuses = ['pending', 'approved', 'rejected'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ success: false, message: 'Invalid status value' });
         }
-        await Review.findByIdAndUpdate(req.params.id, { status });
-        res.json({ success: true, message: `Review ${status} successfully.` });
+
+        const updated = await Review.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        if (!updated) {
+            return res.status(404).json({ success: false, message: 'Review not found' });
+        }
+
+        res.json({ success: true, message: `Review ${status} successfully.`, data: updated.toJSON() });
     } catch (error) {
+        console.error('updateStatus error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };

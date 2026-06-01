@@ -191,11 +191,19 @@ const HomePage = () => {
     };
 
     const validCategories = categories.filter(cat =>
-        allMenuProducts.some(p => String(p.category_id?._id || p.category_id) === String(cat.id || cat._id))
+        // Use .id (virtual set by toJSON) — NOT ._id which is deleted by the transform
+        allMenuProducts.some(p => {
+            const pCatId = p.category_id?.id || p.category?.id;
+            const catId = cat.id || cat._id;
+            return String(pCatId) === String(catId);
+        })
     );
     const activeCat = validCategories[activeCatIdx];
     const activeCatProduct = activeCat
-        ? allMenuProducts.find(p => String(p.category_id?._id || p.category_id) === String(activeCat.id || activeCat._id))
+        ? allMenuProducts.find(p => {
+            const pCatId = p.category_id?.id || p.category?.id;
+            return String(pCatId) === String(activeCat.id || activeCat._id);
+        })
         : null;
 
     return (
@@ -360,7 +368,12 @@ const HomePage = () => {
 
                     {/* Mobile Only Carousel */}
                     <div className="block sm:hidden relative px-10">
-                        {validCategories.length > 0 && activeCatProduct ? (
+                        {loading ? (
+                            <div className="text-center py-12">
+                                <div className="w-8 h-8 border-3 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3 }} />
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
+                            </div>
+                        ) : validCategories.length > 0 && activeCatProduct ? (
                             <div className="reviews-swiper-wrapper" style={{ minHeight: '300px' }}>
                                 <div className="relative overflow-hidden w-full">
                                     <AnimatePresence initial={false} custom={catDirection} mode="wait">
@@ -443,8 +456,13 @@ const HomePage = () => {
                                 </button>
                             </div>
                         ) : (
-                            <div className="text-center py-8 text-sm" style={{ color: 'var(--text-muted)' }}>
-                                Loading categories...
+                            <div className="text-center py-8">
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                    No categories available yet.
+                                </p>
+                                <Link to="/menu" className="btn-primary inline-flex items-center gap-2 mt-4 px-6 py-2.5" style={{ textDecoration: 'none' }}>
+                                    Browse Menu <FiArrowRight size={14} />
+                                </Link>
                             </div>
                         )}
                     </div>

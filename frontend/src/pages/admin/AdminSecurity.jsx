@@ -14,14 +14,21 @@ const AdminSecurity = () => {
     const [form, setForm] = useState({ id: null, name: '', email: '', password: '' })
     const [isEditing, setIsEditing] = useState(false)
 
+    const [error, setError] = useState(null)
+
     const fetchAdmins = async () => {
         setLoading(true)
+        setError(null)
         try {
             const res = await getAdmins()
             if (res.data.success) {
                 setAdmins(res.data.data || [])
+            } else {
+                setError('Failed to load administrator accounts.')
             }
         } catch (err) {
+            console.error('fetchAdmins error:', err)
+            setError(err.response?.data?.message || 'Failed to load administrator accounts.')
             toast.error('Failed to load administrator accounts')
         } finally {
             setLoading(false)
@@ -127,6 +134,16 @@ const AdminSecurity = () => {
                 <div className="card p-8 flex justify-center items-center">
                     <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
                 </div>
+            ) : error ? (
+                <div className="card p-8 text-center">
+                    <p className="text-sm font-medium mb-3" style={{ color: '#dc2626' }}>{error}</p>
+                    <button
+                        onClick={fetchAdmins}
+                        className="btn-primary px-5 py-2 text-sm"
+                    >
+                        Retry
+                    </button>
+                </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Form Area */}
@@ -214,7 +231,11 @@ const AdminSecurity = () => {
                                 </span>
                             </div>
                             <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-                                {admins.map((adminItem) => (
+                                {admins.length === 0 ? (
+                                    <div className="p-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                                        No administrator accounts found.
+                                    </div>
+                                ) : admins.map((adminItem) => (
                                     <div key={adminItem.id} className="p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                         <div className="space-y-1 min-w-0">
                                             <div className="flex items-center gap-2">

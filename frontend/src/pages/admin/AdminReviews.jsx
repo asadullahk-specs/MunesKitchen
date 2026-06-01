@@ -7,12 +7,8 @@ import {
 } from 'react-icons/fi';
 import { getReviews, updateReviewStatus, deleteReview } from '../../api/reviews';
 
-const BACKEND = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
-
 const STATUS_CFG = {
-    pending:  { label: 'Pending',  color: '#d97706', bg: 'rgba(217,119,6,0.1)',  border: 'rgba(217,119,6,0.3)',  Icon: FiClock },
+    pending: { label: 'Pending', color: '#d97706', bg: 'rgba(217,119,6,0.1)', border: 'rgba(217,119,6,0.3)', Icon: FiClock },
     approved: { label: 'Approved', color: '#059669', bg: 'rgba(5,150,105,0.1)', border: 'rgba(5,150,105,0.3)', Icon: FiCheckCircle },
     rejected: { label: 'Rejected', color: '#dc2626', bg: 'rgba(220,38,38,0.08)', border: 'rgba(220,38,38,0.2)', Icon: FiXCircle },
 };
@@ -43,19 +39,25 @@ const StatusBadge = ({ status }) => {
 };
 
 const ReviewCard = ({ review, onAction, busy }) => {
-    const images = (() => {
-        try { return (review.images && review.images !== 'NULL') ? JSON.parse(review.images) : []; }
-        catch { return []; }
-    })();
-
-    const displayImages = images.length > 0
-        ? images.map(img => img.startsWith('http') ? img : `${BACKEND}/${img.replace(/^\//, '')}`)
-        : (review.product_image ? [review.product_image] : []);
-
-    const initial = (review.customer_name || '?').charAt(0).toUpperCase();
+    // Derive display values from review data
+    const initial = (review.customer_name || 'A').charAt(0).toUpperCase();
     const date = review.created_at
-        ? new Date(review.created_at).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })
+        ? new Date(review.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
         : '';
+
+    // Robustly parse the images field (stored as JSON string of base64 data URLs)
+    const displayImages = useMemo(() => {
+        try {
+            if (!review.images) return [];
+            if (Array.isArray(review.images)) return review.images.filter(Boolean);
+            if (review.images === 'NULL' || review.images === '[]') return [];
+            const parsed = JSON.parse(review.images);
+            return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+        } catch (e) {
+            console.error('Error parsing review images:', e);
+            return [];
+        }
+    }, [review.images]);
 
     return (
         <motion.div
@@ -112,29 +114,35 @@ const ReviewCard = ({ review, onAction, busy }) => {
                 "{review.message}"
             </p>
 
-
-
             {/* ── Images ── */}
-            {displayImages.length > 0 && (
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {displayImages.length > 0 ? (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                     {displayImages.slice(0, 5).map((src, i) => (
-                        <img key={i} src={src} alt={`img-${i}`}
-                            style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 8, border: '1.5px solid var(--border)' }}
-                            onError={e => { e.target.style.display = 'none'; }}
-                        />
+                        <a key={i} href={src} target="_blank" rel="noopener noreferrer">
+                            <img
+                                src={src}
+                                alt={`review-img-${i + 1}`}
+                                style={{
+                                    width: 60, height: 60, objectFit: 'cover',
+                                    borderRadius: 8, border: '1.5px solid var(--border)',
+                                    cursor: 'pointer', transition: 'opacity 0.2s',
+                                }}
+                                onError={e => { e.target.style.display = 'none'; }}
+                            />
+                        </a>
                     ))}
-                    {images.length > 5 && (
+                    {displayImages.length > 5 && (
                         <div style={{
-                            width: 56, height: 56, borderRadius: 8, border: '1.5px solid var(--border)',
+                            width: 60, height: 60, borderRadius: 8, border: '1.5px solid var(--border)',
                             background: 'var(--bg-input)', display: 'flex', alignItems: 'center',
                             justifyContent: 'center', fontSize: 12, color: 'var(--text-muted)', fontWeight: 600,
-                        }}>+{images.length - 5}</div>
+                        }}>+{displayImages.length - 5}</div>
                     )}
-                    {images.length === 0 && review.product_image && (
-                        <div style={{ fontSize: 10, color: 'var(--text-muted)', alignSelf: 'center' }}>
-                            (product image fallback)
-                        </div>
-                    )}
+                </div>
+            ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-muted)' }}>
+                    <FiImage size={13} />
+                    No images attached
                 </div>
             )}
 
@@ -234,12 +242,13 @@ const AdminReviews = () => {
             } else {
                 await updateReviewStatus(id, action);
                 setAllReviews(prev =>
-                    prev.map(r => r.id === id ? { ...r, status: action } : r)
+                    prev.map(r => (r.id === id ? { ...r, status: action } : r))
                 );
-                toast.success(`Review ${action}`);
+                toast.success(`Review ${action} successfully.`);
             }
-        } catch {
-            toast.error('Action failed. Please try again.');
+        } catch (err) {
+            console.error('Action error:', err);
+            toast.error(err.response?.data?.message || 'Action failed. Please try again.');
         } finally {
             setBusyId(null);
         }
