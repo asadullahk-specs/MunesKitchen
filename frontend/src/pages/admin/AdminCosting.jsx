@@ -35,7 +35,7 @@ const AdminCosting = () => {
 
     // Get active product details
     const selectedProduct = useMemo(() => {
-        return products.find(p => p.id === Number(selectedProductId)) || null;
+        return products.find(p => String(p.id) === String(selectedProductId)) || null;
     }, [products, selectedProductId]);
 
     // Fetch costing for selected product
@@ -321,7 +321,7 @@ const AdminCosting = () => {
                                 <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'collapse' }}>
                                     <thead>
                                         <tr style={{ borderBottom: '1px solid var(--border)', textAlign: 'left' }}>
-                                            <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Ingredient Name</th>
+                                            <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Title</th>
                                             <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', width: '120px' }}>Quantity</th>
                                             <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', width: '150px' }}>Unit Cost (Rs.)</th>
                                             <th style={{ padding: '10px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', width: '150px', textAlign: 'right' }}>Total (Rs.)</th>
@@ -337,7 +337,7 @@ const AdminCosting = () => {
                                                         <input
                                                             type="text"
                                                             className="form-input input-field"
-                                                            placeholder="e.g. Chicken breast, cheese..."
+                                                         placeholder="e.g. Chicken, Sauce, Packaging..."
                                                             value={ing.name}
                                                             onChange={(e) => handleUpdateIngredient(ing.tempId, 'name', e.target.value)}
                                                             style={{ padding: '8px 12px', borderRadius: '8px' }}

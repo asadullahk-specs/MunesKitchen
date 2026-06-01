@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }) => {
     const loginAdmin = (token, adminData) => {
         localStorage.setItem('mk_admin_token', token)
         localStorage.setItem('mk_admin_data', JSON.stringify(adminData))
+        sessionStorage.setItem('mk_admin_session', 'active')
         setAdmin(adminData)
     }
 

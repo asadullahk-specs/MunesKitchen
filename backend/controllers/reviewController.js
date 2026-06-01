@@ -95,17 +95,28 @@ exports.create = async (req, res) => {
             );
         }
 
-        await Review.create({
+        const newReview = await Review.create({
             customer_name,
             product_id: product_id || null,
             rating: Number(rating),
             message,
             special_instructions: instructions || null,
-            images: JSON.stringify(imagePaths),
+            images: imagePaths.length > 0 ? JSON.stringify(imagePaths) : null,
             status: 'pending'
         });
 
-        res.status(201).json({ success: true, message: 'Review submitted! It will appear after approval.' });
+        res.status(201).json({
+            success: true,
+            message: 'Review submitted! It will appear after approval.',
+            data: {
+                id: newReview._id.toString(),
+                customer_name,
+                rating: Number(rating),
+                message,
+                images: imagePaths.length > 0 ? JSON.stringify(imagePaths) : null,
+                status: 'pending'
+            }
+        });
     } catch (error) {
         console.error('Review create error:', error);
         res.status(500).json({ success: false, message: error.message });

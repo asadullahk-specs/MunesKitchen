@@ -21,9 +21,9 @@ const connectDB = async () => {
         await Admin.deleteMany({ email: 'admin@muneskitchen.com' });
         
         const defaultAdmins = [
-            { name: 'Asadullah K', email: 'asadullahk@admin1.muneskitchen', password: 'admin#1@kitchen' },
-            { name: 'Sameer K', email: 'sameerk@admin2.muneskitchen', password: 'admin#2@kitchen' },
-            { name: 'Munes', email: 'munes@admin3.muneskitchen', password: 'admin#3@kitchen' }
+            { name: 'Asadullah Khan', email: 'asadullahk@admin1.muneskitchen', password: 'admin#1@kitchen' },
+            { name: 'Sameer Khan', email: 'sameerk@admin2.muneskitchen', password: 'admin#2@kitchen' },
+            { name: 'Munes Admin', email: 'munes@admin3.muneskitchen', password: 'admin#3@kitchen' }
         ];
 
         for (const adminData of defaultAdmins) {
@@ -37,7 +37,7 @@ const connectDB = async () => {
                 });
                 console.log(`✨ Admin user seeded: ${adminData.email}`);
             } else {
-                await Admin.updateOne({ email: adminData.email }, { password: hashedPassword });
+                await Admin.updateOne({ email: adminData.email }, { name: adminData.name, password: hashedPassword });
             }
         }
     } catch (error) {

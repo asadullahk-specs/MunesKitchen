@@ -125,7 +125,7 @@ const AdminExpenses = () => {
 
                                 {/* Add a safe optional chain (?.) to map over the values safely */}
                                 {categories?.map((c) => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                    <option key={c.id || c._id} value={c.id || c._id}>{c.name}</option>
                                 ))}
                             </select>
                         </div>
@@ -227,7 +227,7 @@ const AdminExpenses = () => {
                                 No expenses yet
                             </div>
                         ) : expenses.map((exp) => (
-                            <div key={exp.id}
+                            <div key={exp.id || exp._id}
                                 className="flex items-center gap-3 p-3"
                                 style={{ borderBottom: '1px solid var(--border)' }}>
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
@@ -246,7 +246,7 @@ const AdminExpenses = () => {
                                     <p className="text-xs font-bold" style={{ color: 'var(--primary)' }}>
                                         Rs. {Number(exp.amount).toLocaleString()}
                                     </p>
-                                    <button onClick={() => handleDelete(exp.id)}
+                                    <button onClick={() => handleDelete(exp.id || exp._id)}
                                         className="mt-0.5 opacity-50 hover:opacity-100"
                                         style={{ color: '#ef4444' }}>
                                         <FiTrash2 size={12} />

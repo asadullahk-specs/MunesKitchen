@@ -34,7 +34,7 @@ const CartPage = () => {
     }
 
     return (
-        <div className="animate-fadeIn min-h-screen py-12 px-4 sm:px-6">
+        <div className="animate-fadeIn min-h-screen py-6 px-4 sm:px-6">
             <div className="max-w-5xl mx-auto">
 
                 <div className="flex items-center justify-between mb-8">

@@ -58,7 +58,7 @@ const ProductCard = ({ product, onViewDetails }) => {
             </div>
 
             {/* Content */}
-            <div className="flex flex-col flex-1 p-4 gap-3">
+            <div className="flex flex-col flex-1 p-2 gap-1.5">
                 <div>
                     <h3 className="font-display font-semibold text-base leading-tight" style={{ color: 'var(--text-main)' }}>
                         {product.name}

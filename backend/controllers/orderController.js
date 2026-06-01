@@ -182,7 +182,12 @@ const updateOrderStatus = async (req, res) => {
     }
 
     try {
-        await Order.findByIdAndUpdate(req.params.id, { status });
+        const updateData = { status };
+        // Record paid_at timestamp when marked as paid
+        if (status === 'paid') {
+            updateData.paid_at = new Date();
+        }
+        await Order.findByIdAndUpdate(req.params.id, updateData);
         res.json({ success: true, message: 'Status updated' });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -230,7 +235,8 @@ const getDashboardStats = async (req, res) => {
                     totalOrders: { $sum: 1 },
                     pendingOrders: { $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] } },
                     deliveredOrders: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, 1, 0] } },
-                    totalRevenue: { $sum: { $cond: [{ $eq: ['$status', 'delivered'] }, '$total', 0] } }
+                    paidOrders: { $sum: { $cond: [{ $eq: ['$status', 'paid'] }, 1, 0] } },
+                    totalRevenue: { $sum: { $cond: [{ $eq: ['$status', 'paid'] }, '$total', 0] } }
                 }
             }
         ]);
@@ -239,15 +245,17 @@ const getDashboardStats = async (req, res) => {
             totalOrders: 0,
             pendingOrders: 0,
             deliveredOrders: 0,
+            paidOrders: 0,
             totalRevenue: 0
         };
 
         const totalCustomers = await Customer.countDocuments({});
 
-        // Monthly revenue aggregates for past 6 months
+        // Monthly revenue aggregates for past 6 months (only paid orders)
         const monthlyRevenue = await Order.aggregate([
             {
                 $match: {
+                    status: 'paid',
                     created_at: { $gte: new Date(new Date().setMonth(new Date().getMonth() - 6)) }
                 }
             },
@@ -300,6 +308,7 @@ const getDashboardStats = async (req, res) => {
                 totalOrders: Number(orderStats.totalOrders),
                 pendingOrders: Number(orderStats.pendingOrders),
                 deliveredOrders: Number(orderStats.deliveredOrders),
+                paidOrders: Number(orderStats.paidOrders || 0),
                 totalRevenue: Number(orderStats.totalRevenue),
                 totalCustomers: Number(totalCustomers),
                 monthlyRevenue: monthlyRevenue || [],

@@ -372,7 +372,7 @@ const AdminSettings = () => {
                                                 </div>
                                                 <div className="flex gap-2">
                                                     <button
-                                                        onClick={() => setDeliveryForm({ id: area.id || area._id, name: area.name, charge: area.charge || '' })}
+                                                        onClick={() => setDeliveryForm({ id: area.id || area._id, name: area.name, charge: (area.charge !== undefined && area.charge !== null) ? String(area.charge) : '0' })}
                                                         className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >

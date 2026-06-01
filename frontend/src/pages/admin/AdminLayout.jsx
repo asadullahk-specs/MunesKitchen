@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
     FiHome, FiShoppingBag, FiGrid, FiUsers,
     FiDollarSign, FiLogOut, FiMenu, FiX,
     FiExternalLink, FiSun, FiMoon, FiStar,
-    FiSettings, FiMessageSquare
+    FiSettings, FiMessageSquare, FiShield
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000 // 5 minutes
 
 const LINKS = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: FiHome },
@@ -20,6 +22,7 @@ const LINKS = [
     { to: '/admin/expenses', label: 'Expenses', icon: FiDollarSign },
     { to: '/admin/messages', label: 'Messages', icon: FiMessageSquare },
     { to: '/admin/settings', label: 'Settings', icon: FiSettings },
+    { to: '/admin/security', label: 'Security', icon: FiShield },
 ]
 
 const SidebarContent = ({ onClose }) => {
@@ -28,6 +31,7 @@ const SidebarContent = ({ onClose }) => {
     const navigate = useNavigate()
 
     const handleLogout = () => {
+        sessionStorage.removeItem('mk_admin_session')
         logoutAdmin()
         navigate('/admin/login')
     }
@@ -124,6 +128,62 @@ const SidebarContent = ({ onClose }) => {
 
 const AdminLayout = () => {
     const [open, setOpen] = useState(false)
+    const { logoutAdmin, isAuthenticated } = useAuth()
+    const navigate = useNavigate()
+    const inactivityTimer = useRef(null)
+
+    const doLogout = () => {
+        sessionStorage.removeItem('mk_admin_session')
+        logoutAdmin()
+        navigate('/admin/login')
+    }
+
+    // ── 1. REFRESH PROTECTION ────────────────────────────────────────────────
+    useEffect(() => {
+        const sessionActive = sessionStorage.getItem('mk_admin_session')
+        if (!sessionActive) {
+            // Page was refreshed or session is new without login → logout
+            doLogout()
+            return
+        }
+
+        // Mark unload so refresh clears the flag
+        const handleBeforeUnload = () => {
+            sessionStorage.removeItem('mk_admin_session')
+        }
+        window.addEventListener('beforeunload', handleBeforeUnload)
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    }, [])
+
+    // ── 2. VISIBILITY PROTECTION ─────────────────────────────────────────────
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.hidden) {
+                doLogout()
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibility)
+        return () => document.removeEventListener('visibilitychange', handleVisibility)
+    }, [])
+
+    // ── 3. INACTIVITY AUTO-LOGOUT (5 minutes) ───────────────────────────────
+    useEffect(() => {
+        const resetTimer = () => {
+            if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
+            inactivityTimer.current = setTimeout(() => {
+                doLogout()
+            }, INACTIVITY_TIMEOUT)
+        }
+
+        const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart']
+        events.forEach(e => window.addEventListener(e, resetTimer))
+        resetTimer() // start timer on mount
+
+        return () => {
+            events.forEach(e => window.removeEventListener(e, resetTimer))
+            if (inactivityTimer.current) clearTimeout(inactivityTimer.current)
+        }
+    }, [])
 
     return (
         <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg-deep)' }}>

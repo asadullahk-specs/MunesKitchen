@@ -212,14 +212,14 @@ const CheckoutPage = () => {
                                         className="p-4 sm:p-3 rounded-xl text-center transition-all"
                                         style={{
                                             border: paymentMethod === method.value
-                                                ? '2px solid var(--primary)' : '2px solid var(--border)',
+                                                ? '2px solid #16a34a' : '2px solid var(--border)',
                                             background: paymentMethod === method.value
-                                                ? 'var(--primary-glow)' : 'var(--bg-card)',
+                                                ? 'rgba(22,163,74,0.08)' : 'var(--bg-card)',
                                         }}>
                                         <p className="text-sm sm:text-xs font-semibold leading-tight"
                                             style={{
                                                 color: paymentMethod === method.value
-                                                    ? 'var(--primary)' : 'var(--text-main)',
+                                                    ? '#16a34a' : 'var(--text-main)',
                                             }}>
                                             {method.label}
                                         </p>

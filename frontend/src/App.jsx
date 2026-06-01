@@ -27,6 +27,7 @@ import AdminReviews from './pages/admin/AdminReviews';
 import AdminCosting from './pages/admin/AdminCosting';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminSettings from './pages/admin/AdminSettings';
+import AdminSecurity from './pages/admin/AdminSecurity';
 
 const PublicLayout = ({ children }) => (
   <div>
@@ -71,6 +72,7 @@ function App() {
                 <Route path="expenses" element={<AdminExpenses />} />
                 <Route path="messages" element={<AdminMessages />} />
                 <Route path="settings" element={<AdminSettings />} />
+                <Route path="security" element={<AdminSecurity />} />
               </Route>
 
             </Routes>

@@ -72,3 +72,105 @@ exports.changePassword = async (req, res) => {
         res.status(500).json({ success: false, message: error.message })
     }
 }
+
+// ── Admin CRUD (Security Tab) ─────────────────────────────────────────────────
+
+exports.getAllAdmins = async (req, res) => {
+    try {
+        const admins = await Admin.find().sort({ created_at: 1 })
+        // Return admins with hashed password for display in security tab
+        const adminList = admins.map(a => ({
+            id: a.id,
+            name: a.name,
+            email: a.email,
+            passwordHash: a.password // bcrypt hash for display
+        }))
+        res.json({ success: true, data: adminList })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+exports.createAdmin = async (req, res) => {
+    try {
+        const { name, email, password } = req.body
+        if (!name || !name.trim()) return res.status(400).json({ success: false, message: 'Name is required.' })
+        if (!email || !email.trim()) return res.status(400).json({ success: false, message: 'Email is required.' })
+        if (!password || password.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' })
+
+        const existing = await Admin.findOne({ email: email.trim().toLowerCase() })
+        if (existing) return res.status(400).json({ success: false, message: 'An admin with this email already exists.' })
+
+        const hashed = await bcrypt.hash(password, 10)
+        const newAdmin = await Admin.create({
+            name: name.trim(),
+            email: email.trim().toLowerCase(),
+            password: hashed
+        })
+
+        res.status(201).json({
+            success: true,
+            message: 'Admin created successfully.',
+            data: {
+                id: newAdmin.id,
+                name: newAdmin.name,
+                email: newAdmin.email,
+                passwordHash: newAdmin.password
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+exports.updateAdmin = async (req, res) => {
+    try {
+        const { name, email, password } = req.body
+        const adminToUpdate = await Admin.findById(req.params.id)
+        if (!adminToUpdate) return res.status(404).json({ success: false, message: 'Admin not found.' })
+
+        if (name && name.trim()) adminToUpdate.name = name.trim()
+        if (email && email.trim()) {
+            const existing = await Admin.findOne({ email: email.trim().toLowerCase(), _id: { $ne: req.params.id } })
+            if (existing) return res.status(400).json({ success: false, message: 'Email already in use by another admin.' })
+            adminToUpdate.email = email.trim().toLowerCase()
+        }
+        if (password && password.length >= 6) {
+            adminToUpdate.password = await bcrypt.hash(password, 10)
+        }
+
+        await adminToUpdate.save()
+
+        res.json({
+            success: true,
+            message: 'Admin updated successfully.',
+            data: {
+                id: adminToUpdate.id,
+                name: adminToUpdate.name,
+                email: adminToUpdate.email,
+                passwordHash: adminToUpdate.password
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}
+
+exports.deleteAdmin = async (req, res) => {
+    try {
+        const count = await Admin.countDocuments()
+        if (count <= 1) return res.status(400).json({ success: false, message: 'Cannot delete the last admin account.' })
+
+        // Prevent self-deletion
+        if (req.params.id === req.admin.id) {
+            return res.status(400).json({ success: false, message: 'You cannot delete your own account.' })
+        }
+
+        const deleted = await Admin.findByIdAndDelete(req.params.id)
+        if (!deleted) return res.status(404).json({ success: false, message: 'Admin not found.' })
+
+        res.json({ success: true, message: 'Admin removed successfully.' })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message })
+    }
+}

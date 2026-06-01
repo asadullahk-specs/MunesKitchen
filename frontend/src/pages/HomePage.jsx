@@ -132,12 +132,17 @@ const ReviewCard = ({ review }) => {
 const HomePage = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [allMenuProducts, setAllMenuProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
     const [reviewStats, setReviewStats] = useState({ avgRating: 0, total: 0, breakdown: [] });
     const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [activeIdx, setActiveIdx] = useState(0);
     const [direction, setDirection] = useState(0);
+    
+    // Category Carousel States (Mobile Only)
+    const [activeCatIdx, setActiveCatIdx] = useState(0);
+    const [catDirection, setCatDirection] = useState(0);
 
     useEffect(() => {
         const load = async () => {
@@ -150,6 +155,11 @@ const HomePage = () => {
                 const catRes = await getCategories();
                 setCategories(catRes?.data?.data || []);
             } catch (err) { console.error("Categories failed to load:", err); }
+
+            try {
+                const allMenuRes = await getProducts({ show_on_menu: true });
+                setAllMenuProducts(allMenuRes?.data?.data || []);
+            } catch (err) { console.error("All menu products failed to load:", err); }
 
             try {
                 const revRes = await getReviews({ status: 'approved' });
@@ -179,6 +189,14 @@ const HomePage = () => {
             return { ...prev, total: newTotal, avgRating: newAvg.toFixed(1) };
         });
     };
+
+    const validCategories = categories.filter(cat =>
+        allMenuProducts.some(p => String(p.category_id?._id || p.category_id) === String(cat.id || cat._id))
+    );
+    const activeCat = validCategories[activeCatIdx];
+    const activeCatProduct = activeCat
+        ? allMenuProducts.find(p => String(p.category_id?._id || p.category_id) === String(activeCat.id || activeCat._id))
+        : null;
 
     return (
         <div>
@@ -309,7 +327,9 @@ const HomePage = () => {
                         <h2 className="section-title mb-2">Explore Categories</h2>
                         <p className="section-subtitle">Pick your favorite</p>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 sm:gap-6">
+
+                    {/* Desktop/Tablet View */}
+                    <div className="hidden sm:grid grid-cols-3 gap-4 sm:gap-6">
                         {categories.map((cat, i) => (
                             <motion.div
                                 key={cat.id || i}
@@ -336,6 +356,97 @@ const HomePage = () => {
                                 </Link>
                             </motion.div>
                         ))}
+                    </div>
+
+                    {/* Mobile Only Carousel */}
+                    <div className="block sm:hidden relative px-10">
+                        {validCategories.length > 0 && activeCatProduct ? (
+                            <div className="reviews-swiper-wrapper" style={{ minHeight: '300px' }}>
+                                <div className="relative overflow-hidden w-full">
+                                    <AnimatePresence initial={false} custom={catDirection} mode="wait">
+                                        <motion.div
+                                            key={activeCatIdx}
+                                            custom={catDirection}
+                                            variants={{
+                                                enter: (dir) => ({
+                                                    x: dir > 0 ? '100%' : '-100%',
+                                                    opacity: 0
+                                                }),
+                                                center: {
+                                                    x: 0,
+                                                    opacity: 1
+                                                },
+                                                exit: (dir) => ({
+                                                    x: dir < 0 ? '100%' : '-100%',
+                                                    opacity: 0
+                                                })
+                                            }}
+                                            initial="enter"
+                                            animate="center"
+                                            exit="exit"
+                                            transition={{
+                                                x: { type: "spring", stiffness: 300, damping: 30 },
+                                                opacity: { duration: 0.2 }
+                                            }}
+                                            drag="x"
+                                            dragConstraints={{ left: 0, right: 0 }}
+                                            dragElastic={0.6}
+                                            onDragEnd={(event, info) => {
+                                                const swipeThreshold = 50;
+                                                if (info.offset.x < -swipeThreshold) {
+                                                    setCatDirection(1);
+                                                    setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
+                                                } else if (info.offset.x > swipeThreshold) {
+                                                    setCatDirection(-1);
+                                                    setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
+                                                }
+                                            }}
+                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center"
+                                        >
+                                            <h3 className="font-display font-bold text-center text-lg mb-3" style={{ color: 'var(--primary)' }}>
+                                                {activeCat.name}
+                                            </h3>
+                                            <div className="w-full max-w-sm">
+                                                <ProductCard product={activeCatProduct} onViewDetails={setSelectedProduct} />
+                                            </div>
+                                            <Link
+                                                to={`/menu?category=${activeCat.id || activeCat._id}`}
+                                                className="btn-primary w-full max-w-sm text-center py-2.5 mt-4 flex items-center justify-center gap-2"
+                                                style={{ textDecoration: 'none' }}
+                                            >
+                                                Explore More <FiArrowRight size={14} />
+                                            </Link>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Custom navigation arrows */}
+                                <button
+                                    className="reviews-prev swiper-nav-btn"
+                                    onClick={() => {
+                                        setCatDirection(-1);
+                                        setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
+                                    }}
+                                    aria-label="Previous Category"
+                                >
+                                    <FiChevronLeft size={20} />
+                                </button>
+                                <button
+                                    className="reviews-next swiper-nav-btn"
+                                    onClick={() => {
+                                        setCatDirection(1);
+                                        setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
+                                    }}
+                                    aria-label="Next Category"
+                                >
+                                    <FiChevronRight size={20} />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-sm" style={{ color: 'var(--text-muted)' }}>
+                                Loading categories...
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
