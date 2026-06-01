@@ -173,7 +173,7 @@ const MenuPage = () => {
                     </div>
                 </div>
 
-                {/* ─── PRODUCTS VIEW (RESPONSIVE CAROUSELS) ─── */}
+                {/* ─── PRODUCTS VIEW (RESPONSIVE CAROUSELS / GRID) ─── */}
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)}
@@ -187,112 +187,126 @@ const MenuPage = () => {
                         <p style={{ color: 'var(--text-muted)' }}>Try a different category</p>
                     </div>
                 ) : (
-                    <div className="space-y-10 animate-fadeIn">
-                        {groupedProducts.map((group) => {
-                            const activeIdx = activeProdIndices[group.id] || 0;
-                            const direction = directions[group.id] || 0;
-                            const activeProduct = group.products[activeIdx] || group.products[0];
+                    <>
+                        {/* Desktop Grid Layout (sm and larger) */}
+                        <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {products.map((product) => (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onViewDetails={setSelectedProduct}
+                                />
+                            ))}
+                        </div>
 
-                            return (
-                                <div key={group.id} className="space-y-4 max-w-lg mx-auto">
-                                    {/* Category Header */}
-                                    <div className="flex items-center justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
-                                        <h2 className="font-display font-bold text-lg md:text-xl" style={{ color: 'var(--primary)' }}>
-                                            {group.name}
-                                        </h2>
-                                        <div className="flex items-center gap-2">
-                                            {group.products.length > 1 && (
-                                                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
-                                                    {activeIdx + 1} / {group.products.length}
+                        {/* Mobile Category-Wise Swiper Layout (less than sm) */}
+                        <div className="block sm:hidden space-y-10 animate-fadeIn">
+                            {groupedProducts.map((group) => {
+                                const activeIdx = activeProdIndices[group.id] || 0;
+                                const direction = directions[group.id] || 0;
+                                const activeProduct = group.products[activeIdx] || group.products[0];
+
+                                return (
+                                    <div key={group.id} className="space-y-4 max-w-lg mx-auto">
+                                        {/* Category Header */}
+                                        <div className="flex items-center justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
+                                            <h2 className="font-display font-bold text-lg" style={{ color: 'var(--primary)' }}>
+                                                {group.name}
+                                            </h2>
+                                            <div className="flex items-center gap-2">
+                                                {group.products.length > 1 && (
+                                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
+                                                        {activeIdx + 1} / {group.products.length}
+                                                    </span>
+                                                )}
+                                                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
+                                                    {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
                                                 </span>
-                                            )}
-                                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
-                                                {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
-                                            </span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Product Swiper Box */}
-                                    <div className="relative flex items-center justify-center px-12 sm:px-14">
-                                        {/* Left Arrow Button */}
-                                        {group.products.length > 1 && (
-                                            <button
-                                                onClick={() => handlePrevProduct(group.id, group.products.length)}
-                                                className="swiper-nav-btn reviews-prev"
-                                                style={{
-                                                    position: 'absolute',
-                                                    left: 0,
-                                                    top: '50%',
-                                                    transform: 'translateY(-50%)',
-                                                    zIndex: 10
-                                                }}
-                                                aria-label="Previous Product"
-                                            >
-                                                <FiChevronLeft size={20} />
-                                            </button>
-                                        )}
-
-                                        {/* Product Card Container with Framer Motion slide transition */}
-                                        <div className="w-full max-w-[320px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
-                                            <AnimatePresence initial={false} custom={direction} mode="wait">
-                                                <motion.div
-                                                    key={`${group.id}-${activeIdx}`}
-                                                    custom={direction}
-                                                    variants={{
-                                                        enter: (dir) => ({
-                                                            x: dir > 0 ? 120 : -120,
-                                                            opacity: 0
-                                                        }),
-                                                        center: {
-                                                            x: 0,
-                                                            opacity: 1
-                                                        },
-                                                        exit: (dir) => ({
-                                                            x: dir < 0 ? 120 : -120,
-                                                            opacity: 0
-                                                        })
+                                        {/* Product Swiper Box */}
+                                        <div className="relative flex items-center justify-center px-12 sm:px-14">
+                                            {/* Left Arrow Button */}
+                                            {group.products.length > 1 && (
+                                                <button
+                                                    onClick={() => handlePrevProduct(group.id, group.products.length)}
+                                                    className="swiper-nav-btn reviews-prev"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        left: 0,
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                        zIndex: 10
                                                     }}
-                                                    initial="enter"
-                                                    animate="center"
-                                                    exit="exit"
-                                                    transition={{
-                                                        x: { type: "spring", stiffness: 300, damping: 30 },
-                                                        opacity: { duration: 0.2 }
-                                                    }}
-                                                    className="w-full flex justify-center"
+                                                    aria-label="Previous Product"
                                                 >
-                                                    <div className="w-full">
-                                                        <ProductCard
-                                                            product={activeProduct}
-                                                            onViewDetails={setSelectedProduct}
-                                                        />
-                                                    </div>
-                                                </motion.div>
-                                            </AnimatePresence>
-                                        </div>
+                                                    <FiChevronLeft size={20} />
+                                                </button>
+                                            )}
 
-                                        {/* Right Arrow Button */}
-                                        {group.products.length > 1 && (
-                                            <button
-                                                onClick={() => handleNextProduct(group.id, group.products.length)}
-                                                className="swiper-nav-btn reviews-next"
-                                                style={{
-                                                    position: 'absolute',
-                                                    right: 0,
-                                                    top: '50%',
-                                                    transform: 'translateY(-50%)',
-                                                    zIndex: 10
-                                                }}
-                                                aria-label="Next Product"
-                                            >
-                                                <FiChevronRight size={20} />
-                                            </button>
-                                        )}
+                                            {/* Product Card Container with Framer Motion slide transition */}
+                                            <div className="w-full max-w-[320px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
+                                                <AnimatePresence initial={false} custom={direction} mode="wait">
+                                                    <motion.div
+                                                        key={`${group.id}-${activeIdx}`}
+                                                        custom={direction}
+                                                        variants={{
+                                                            enter: (dir) => ({
+                                                                x: dir > 0 ? 120 : -120,
+                                                                opacity: 0
+                                                            }),
+                                                            center: {
+                                                                x: 0,
+                                                                opacity: 1
+                                                            },
+                                                            exit: (dir) => ({
+                                                                x: dir < 0 ? 120 : -120,
+                                                                opacity: 0
+                                                            })
+                                                        }}
+                                                        initial="enter"
+                                                        animate="center"
+                                                        exit="exit"
+                                                        transition={{
+                                                            x: { type: "spring", stiffness: 300, damping: 30 },
+                                                            opacity: { duration: 0.2 }
+                                                        }}
+                                                        className="w-full flex justify-center"
+                                                    >
+                                                        <div className="w-full">
+                                                            <ProductCard
+                                                                product={activeProduct}
+                                                                onViewDetails={setSelectedProduct}
+                                                            />
+                                                        </div>
+                                                    </motion.div>
+                                                </AnimatePresence>
+                                            </div>
+
+                                            {/* Right Arrow Button */}
+                                            {group.products.length > 1 && (
+                                                <button
+                                                    onClick={() => handleNextProduct(group.id, group.products.length)}
+                                                    className="swiper-nav-btn reviews-next"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        right: 0,
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                        zIndex: 10
+                                                    }}
+                                                    aria-label="Next Product"
+                                                >
+                                                    <FiChevronRight size={20} />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
-                    </div>
+                                );
+                            })}
+                        </div>
+                    </>
                 )}
             </div>
 
