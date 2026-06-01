@@ -199,7 +199,7 @@ const MenuPage = () => {
                                             {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3">
+                                    <div className="grid grid-cols-1 gap-4">
                                         {group.products.map((product) => (
                                             <ProductCard
                                                 key={product.id}

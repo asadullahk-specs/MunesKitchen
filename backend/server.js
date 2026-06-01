@@ -67,7 +67,7 @@ app.use('/api/customers', require('./routes/customers'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-    res.json({ success: true, message: "Mune's Kitchen API is running 🍱" });
+    res.json({ success: true, message: "Mune's Kitchen API is running 🍱", version: '2.1.0' });
 });
 
 // 404 handler

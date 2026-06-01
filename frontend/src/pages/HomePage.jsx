@@ -345,10 +345,11 @@ const HomePage = () => {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: i * 0.08 }}
+                                whileHover={{ y: -6 }}
                             >
                                 <Link
                                     to={`/menu?category=${cat.id}`}
-                                    className="flex flex-col items-center text-center p-5 rounded-2xl transition-all block"
+                                    className="flex flex-col items-center text-center p-6 rounded-2xl transition-all block"
                                     style={{
                                         background: 'var(--bg-card)',
                                         border: '1.5px solid var(--border)',
@@ -357,25 +358,36 @@ const HomePage = () => {
                                         textDecoration: 'none'
                                     }}
                                 >
-                                    <div className="font-semibold text-sm">{cat.name}</div>
-                                    <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                                        {cat.products?.length || 0} items
+                                    {cat.icon && (
+                                        <div className="text-4xl mb-3">{cat.icon}</div>
+                                    )}
+                                    <div className="font-bold text-sm">{cat.name}</div>
+                                    <div className="text-xs mt-1.5 px-3 py-0.5 rounded-full" style={{ color: 'var(--primary)', background: 'var(--primary-glow)', fontWeight: 600 }}>
+                                        Browse Items →
                                     </div>
                                 </Link>
                             </motion.div>
                         ))}
                     </div>
 
-                    {/* Mobile Only Carousel */}
-                    <div className="block sm:hidden relative px-10">
+                    {/* ── Mobile Only Carousel ── */}
+                    <div className="block sm:hidden">
                         {loading ? (
                             <div className="text-center py-12">
-                                <div className="w-8 h-8 border-3 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3 }} />
+                                <div className="w-8 h-8 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid' }} />
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
                             </div>
                         ) : validCategories.length > 0 && activeCatProduct ? (
-                            <div className="reviews-swiper-wrapper" style={{ minHeight: '300px' }}>
-                                <div className="relative overflow-hidden w-full">
+                            <div style={{ position: 'relative' }}>
+                                {/* Counter pill */}
+                                <div className="flex justify-center mb-4">
+                                    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                                        {activeCatIdx + 1} / {validCategories.length}
+                                    </span>
+                                </div>
+
+                                {/* Slide area */}
+                                <div className="relative overflow-hidden w-full" style={{ paddingBottom: 8 }}>
                                     <AnimatePresence initial={false} custom={catDirection} mode="wait">
                                         <motion.div
                                             key={activeCatIdx}
@@ -414,45 +426,80 @@ const HomePage = () => {
                                                     setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
                                                 }
                                             }}
-                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center"
+                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center px-2"
                                         >
-                                            <h3 className="font-display font-bold text-center text-lg mb-3" style={{ color: 'var(--primary)' }}>
-                                                {activeCat.name}
-                                            </h3>
-                                            <div className="w-full max-w-sm">
+                                            {/* Category name with icon */}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                {activeCat?.icon && <span className="text-2xl">{activeCat.icon}</span>}
+                                                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--primary)' }}>
+                                                    {activeCat?.name}
+                                                </h3>
+                                            </div>
+                                            <div className="w-full" style={{ maxWidth: 360 }}>
                                                 <ProductCard product={activeCatProduct} onViewDetails={setSelectedProduct} />
                                             </div>
                                             <Link
-                                                to={`/menu?category=${activeCat.id || activeCat._id}`}
-                                                className="btn-primary w-full max-w-sm text-center py-2.5 mt-4 flex items-center justify-center gap-2"
-                                                style={{ textDecoration: 'none' }}
+                                                to={`/menu?category=${activeCat?.id || activeCat?._id}`}
+                                                className="btn-primary w-full text-center py-3 mt-4 flex items-center justify-center gap-2"
+                                                style={{ textDecoration: 'none', maxWidth: 360 }}
                                             >
-                                                Explore More <FiArrowRight size={14} />
+                                                Explore All {activeCat?.name} <FiArrowRight size={14} />
                                             </Link>
                                         </motion.div>
                                     </AnimatePresence>
                                 </div>
 
-                                {/* Custom navigation arrows */}
+                                {/* Dot indicators */}
+                                <div className="flex justify-center gap-2 mt-5">
+                                    {validCategories.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => { setCatDirection(i > activeCatIdx ? 1 : -1); setActiveCatIdx(i); }}
+                                            aria-label={`Go to category ${i + 1}`}
+                                            style={{
+                                                width: i === activeCatIdx ? 22 : 8,
+                                                height: 8,
+                                                borderRadius: 4,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                                transition: 'all 0.3s ease',
+                                                background: i === activeCatIdx ? 'var(--primary)' : 'var(--border)',
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Left / Right arrows */}
                                 <button
-                                    className="reviews-prev swiper-nav-btn"
-                                    onClick={() => {
-                                        setCatDirection(-1);
-                                        setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
-                                    }}
+                                    onClick={() => { setCatDirection(-1); setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length); }}
                                     aria-label="Previous Category"
+                                    style={{
+                                        position: 'absolute', top: '50%', left: 0,
+                                        transform: 'translateY(-50%)',
+                                        width: 36, height: 36, borderRadius: '50%',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)',
+                                        boxShadow: 'var(--shadow-md)', cursor: 'pointer',
+                                        color: 'var(--text-main)', zIndex: 10,
+                                    }}
                                 >
-                                    <FiChevronLeft size={20} />
+                                    <FiChevronLeft size={18} />
                                 </button>
                                 <button
-                                    className="reviews-next swiper-nav-btn"
-                                    onClick={() => {
-                                        setCatDirection(1);
-                                        setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
-                                    }}
+                                    onClick={() => { setCatDirection(1); setActiveCatIdx((prev) => (prev + 1) % validCategories.length); }}
                                     aria-label="Next Category"
+                                    style={{
+                                        position: 'absolute', top: '50%', right: 0,
+                                        transform: 'translateY(-50%)',
+                                        width: 36, height: 36, borderRadius: '50%',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)',
+                                        boxShadow: 'var(--shadow-md)', cursor: 'pointer',
+                                        color: 'var(--text-main)', zIndex: 10,
+                                    }}
                                 >
-                                    <FiChevronRight size={20} />
+                                    <FiChevronRight size={18} />
                                 </button>
                             </div>
                         ) : (
