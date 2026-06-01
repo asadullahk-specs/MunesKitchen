@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiFilter, FiX, FiChevronRight, FiGrid, FiArrowRight } from 'react-icons/fi';
+import { FiFilter, FiX, FiChevronLeft, FiChevronRight, FiGrid, FiArrowRight } from 'react-icons/fi';
 import { getProducts } from '../api/products';
 import { getCategories } from '../api/categories';
 import ProductCard from '../components/ProductCard';
@@ -16,6 +16,10 @@ const MenuPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+    
+    // Per-category active product carousel indexing and animation direction
+    const [activeProdIndices, setActiveProdIndices] = useState({});
+    const [directions, setDirections] = useState({});
 
     useEffect(() => {
         getCategories().then((res) => setCategories(res.data.data)).catch(() => { });
@@ -43,12 +47,20 @@ const MenuPage = () => {
         setFilterDrawerOpen(false);
     };
 
-    // Next Category handler for mobile specific view
-    const handleNextCategory = () => {
-        if (categories.length === 0) return;
-        const currentIdx = categories.findIndex(c => String(c.id) === activeCategory);
-        const nextIdx = (currentIdx + 1) % categories.length;
-        handleCategoryChange(String(categories[nextIdx].id));
+    const handlePrevProduct = (catId, numProducts) => {
+        setDirections(prev => ({ ...prev, [catId]: -1 }));
+        setActiveProdIndices(prev => ({
+            ...prev,
+            [catId]: ((prev[catId] || 0) - 1 + numProducts) % numProducts
+        }));
+    };
+
+    const handleNextProduct = (catId, numProducts) => {
+        setDirections(prev => ({ ...prev, [catId]: 1 }));
+        setActiveProdIndices(prev => ({
+            ...prev,
+            [catId]: ((prev[catId] || 0) + 1) % numProducts
+        }));
     };
 
     // Group items category-wise in frontend
@@ -161,7 +173,7 @@ const MenuPage = () => {
                     </div>
                 </div>
 
-                {/* ─── PRODUCTS VIEW (RESPONSIVE) ─── */}
+                {/* ─── PRODUCTS VIEW (RESPONSIVE CAROUSELS) ─── */}
                 {loading ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)}
@@ -175,55 +187,112 @@ const MenuPage = () => {
                         <p style={{ color: 'var(--text-muted)' }}>Try a different category</p>
                     </div>
                 ) : (
-                    <>
-                        {/* Desktop Grid Layout */}
-                        <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {products.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    onViewDetails={setSelectedProduct}
-                                />
-                            ))}
-                        </div>
+                    <div className="space-y-10 animate-fadeIn">
+                        {groupedProducts.map((group) => {
+                            const activeIdx = activeProdIndices[group.id] || 0;
+                            const direction = directions[group.id] || 0;
+                            const activeProduct = group.products[activeIdx] || group.products[0];
 
-                        {/* Mobile Category-Wise Stack Layout */}
-                        <div className="block sm:hidden space-y-8 animate-fadeIn">
-                            {groupedProducts.map((group) => (
-                                <div key={group.id} className="space-y-4">
+                            return (
+                                <div key={group.id} className="space-y-4 max-w-lg mx-auto">
+                                    {/* Category Header */}
                                     <div className="flex items-center justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
-                                        <h2 className="font-display font-bold text-lg" style={{ color: 'var(--primary)' }}>
+                                        <h2 className="font-display font-bold text-lg md:text-xl" style={{ color: 'var(--primary)' }}>
                                             {group.name}
                                         </h2>
-                                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
-                                            {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            {group.products.length > 1 && (
+                                                <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
+                                                    {activeIdx + 1} / {group.products.length}
+                                                </span>
+                                            )}
+                                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
+                                                {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-4">
-                                        {group.products.map((product) => (
-                                            <ProductCard
-                                                key={product.id}
-                                                product={product}
-                                                onViewDetails={setSelectedProduct}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
 
-                            {/* Mobile "Next Category" button (only displayed when a single category filter is active) */}
-                            {activeCategory !== 'all' && categories.length > 1 && (
-                                <div className="pt-4">
-                                    <button
-                                        onClick={handleNextCategory}
-                                        className="btn-primary w-full py-3.5 flex items-center justify-center gap-2 rounded-2xl shadow-lg"
-                                    >
-                                        Next Category <FiChevronRight size={18} />
-                                    </button>
+                                    {/* Product Swiper Box */}
+                                    <div className="relative flex items-center justify-center px-12 sm:px-14">
+                                        {/* Left Arrow Button */}
+                                        {group.products.length > 1 && (
+                                            <button
+                                                onClick={() => handlePrevProduct(group.id, group.products.length)}
+                                                className="swiper-nav-btn reviews-prev"
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: 0,
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    zIndex: 10
+                                                }}
+                                                aria-label="Previous Product"
+                                            >
+                                                <FiChevronLeft size={20} />
+                                            </button>
+                                        )}
+
+                                        {/* Product Card Container with Framer Motion slide transition */}
+                                        <div className="w-full max-w-[320px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
+                                            <AnimatePresence initial={false} custom={direction} mode="wait">
+                                                <motion.div
+                                                    key={`${group.id}-${activeIdx}`}
+                                                    custom={direction}
+                                                    variants={{
+                                                        enter: (dir) => ({
+                                                            x: dir > 0 ? 120 : -120,
+                                                            opacity: 0
+                                                        }),
+                                                        center: {
+                                                            x: 0,
+                                                            opacity: 1
+                                                        },
+                                                        exit: (dir) => ({
+                                                            x: dir < 0 ? 120 : -120,
+                                                            opacity: 0
+                                                        })
+                                                    }}
+                                                    initial="enter"
+                                                    animate="center"
+                                                    exit="exit"
+                                                    transition={{
+                                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                                        opacity: { duration: 0.2 }
+                                                    }}
+                                                    className="w-full flex justify-center"
+                                                >
+                                                    <div className="w-full">
+                                                        <ProductCard
+                                                            product={activeProduct}
+                                                            onViewDetails={setSelectedProduct}
+                                                        />
+                                                    </div>
+                                                </motion.div>
+                                            </AnimatePresence>
+                                        </div>
+
+                                        {/* Right Arrow Button */}
+                                        {group.products.length > 1 && (
+                                            <button
+                                                onClick={() => handleNextProduct(group.id, group.products.length)}
+                                                className="swiper-nav-btn reviews-next"
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: 0,
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    zIndex: 10
+                                                }}
+                                                aria-label="Next Product"
+                                            >
+                                                <FiChevronRight size={20} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                    </>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
