@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiTrash2, FiMinus, FiPlus, FiArrowRight, FiShoppingBag } from 'react-icons/fi'
@@ -8,6 +9,13 @@ const CartPage = () => {
     const { cart, removeFromCart, updateQuantity, clearCart, cartSubtotal } = useCart()
 
     const safeCart = Array.isArray(cart) ? cart : []
+
+    // Force scroll to top on mount — overrides Framer Motion layout animation scroll restoration
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, [])
 
     if (safeCart.length === 0) {
         return (
