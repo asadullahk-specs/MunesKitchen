@@ -34,7 +34,17 @@ const ScrollToTop = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Immediately reset all possible scroll containers
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.documentElement.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      document.body.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    };
+
+    resetScroll();
+    // Deferred second call covers async page renders (e.g. post-order navigate)
+    const timer = setTimeout(resetScroll, 0);
+    return () => clearTimeout(timer);
   }, [pathname]);
 
   return null;
