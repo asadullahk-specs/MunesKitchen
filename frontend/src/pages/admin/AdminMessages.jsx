@@ -3,6 +3,20 @@ import { toast } from 'react-toastify';
 import { FiTrash2, FiMail, FiPhone, FiCheck, FiBookOpen, FiClock, FiSearch } from 'react-icons/fi';
 import { getContacts, markContactRead, deleteContact } from '../../api/contacts';
 
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+};
+
 const AdminMessages = () => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -203,7 +217,7 @@ const AdminMessages = () => {
                                 <div className="flex items-center gap-4 mt-3 pt-2 text-[10px]" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-muted)' }}>
                                     <span className="flex items-center gap-1">
                                         <FiClock size={10} />
-                                        {new Date(msg.created_at || Date.now()).toLocaleString('en-PK')}
+                                        {formatDateTime(msg.created_at)}
                                     </span>
                                     {msg.email && (
                                         <span className="flex items-center gap-1 truncate max-w-[150px]">
@@ -233,7 +247,7 @@ const AdminMessages = () => {
                                         {selectedMessage.name}
                                     </h2>
                                     <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
-                                        Sent {new Date(selectedMessage.created_at || Date.now()).toLocaleString('en-PK')}
+                                        Sent {formatDateTime(selectedMessage.created_at)}
                                     </span>
                                 </div>
                                 <button

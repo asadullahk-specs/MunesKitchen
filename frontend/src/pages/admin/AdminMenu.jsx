@@ -6,7 +6,24 @@ import { getProducts, createProduct, updateProduct, deleteProduct } from '../../
 import { getCategories } from '../../api/categories'
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000'
-const emptyForm = { name: '', category_id: '', price: '', description: '', image: '', hot_selling: false, show_on_menu: true }
+const emptyForm = {
+    name: '',
+    category_id: '',
+    price: '',
+    description: '',
+    image: '',
+    hot_selling: false,
+    show_on_menu: true,
+    long_description: '',
+    ingredients: '',
+    allergens: '',
+    serving_size: '',
+    calories: '',
+    prep_time: '',
+    spice_level: '',
+    storage_info: '',
+    additional_notes: ''
+}
 
 const AdminMenu = () => {
     const [products, setProducts] = useState([])
@@ -15,8 +32,14 @@ const AdminMenu = () => {
     const [showModal, setShowModal] = useState(false)
     const [editProduct, setEditProduct] = useState(null)
     const [form, setForm] = useState(emptyForm)
-    const [imageFile, setImageFile] = useState(null)
     const [saving, setSaving] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
+
+    const filteredProducts = products.filter(p =>
+        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.category?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
 
     const fetchAll = async () => {
         setLoading(true)
@@ -36,7 +59,6 @@ const AdminMenu = () => {
     const openAdd = () => {
         setEditProduct(null)
         setForm(emptyForm)
-        setImageFile(null)
         setShowModal(true)
     }
 
@@ -44,12 +66,21 @@ const AdminMenu = () => {
         setEditProduct(p)
         setForm({
             name: p.name,
-            category_id: p.category_id,
+            category_id: p.category_id?.id || p.category_id?._id || p.category_id,
             price: p.price,
             description: p.description || '',
             image: p.image || '',
             hot_selling: p.hot_selling,
-            show_on_menu: p.show_on_menu
+            show_on_menu: p.show_on_menu,
+            long_description: p.long_description || '',
+            ingredients: p.ingredients || '',
+            allergens: p.allergens || '',
+            serving_size: p.serving_size || '',
+            calories: p.calories || '',
+            prep_time: p.prep_time || '',
+            spice_level: p.spice_level || '',
+            storage_info: p.storage_info || '',
+            additional_notes: p.additional_notes || ''
         })
         setShowModal(true)
     }
@@ -96,12 +127,23 @@ const AdminMenu = () => {
                 <div>
                     <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Menu</h1>
                     <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                        {products.length} products
+                        {filteredProducts.length} products found
                     </p>
                 </div>
                 <button onClick={openAdd} className="btn-primary self-start sm:self-auto">
                     <FiPlus size={16} /> Add Product
                 </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-6">
+                <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Search by product name, category, or description..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
             </div>
 
             {/* Mobile Product Cards */}
@@ -119,11 +161,11 @@ const AdminMenu = () => {
                             </div>
                         </div>
                     ))
-                ) : products.length === 0 ? (
+                ) : filteredProducts.length === 0 ? (
                     <div className="card p-8 text-center" style={{ color: 'var(--text-muted)' }}>
-                        No products yet
+                        No products match your search
                     </div>
-                ) : products.map((p) => {
+                ) : filteredProducts.map((p) => {
                     const imgUrl = p.image
                         ? (p.image.startsWith('/uploads') ? `${BACKEND_URL}${p.image}` : p.image)
                         : null
@@ -208,13 +250,13 @@ const AdminMenu = () => {
                                         ))}
                                     </tr>
                                 ))
-                            ) : products.length === 0 ? (
+                            ) : filteredProducts.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-                                        No products yet
+                                        No products match your search
                                     </td>
                                 </tr>
-                            ) : products.map((p) => {
+                            ) : filteredProducts.map((p) => {
                                 const imgUrl = p.image
                                     ? (p.image.startsWith('/uploads') ? `${BACKEND_URL}${p.image}` : p.image)
                                     : null
@@ -364,6 +406,106 @@ const AdminMenu = () => {
                                         placeholder="Paste Cloudinary or any direct image URL..."
                                         value={form.image}
                                         onChange={(e) => setForm({ ...form, image: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="form-label">Long Description (Product Details Tab)</label>
+                                    <textarea
+                                        className="form-input"
+                                        rows={3}
+                                        placeholder="Detailed product description..."
+                                        value={form.long_description}
+                                        onChange={(e) => setForm({ ...form, long_description: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="form-label">Ingredients</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="e.g. Chicken, Spices, Flour"
+                                            value={form.ingredients}
+                                            onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Allergens</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="e.g. Wheat, Gluten, Dairy"
+                                            value={form.allergens}
+                                            onChange={(e) => setForm({ ...form, allergens: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="form-label">Serving Size</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="e.g. 2-3 Persons"
+                                            value={form.serving_size}
+                                            onChange={(e) => setForm({ ...form, serving_size: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Calories</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="e.g. 350"
+                                            value={form.calories}
+                                            onChange={(e) => setForm({ ...form, calories: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="form-label">Prep Time</label>
+                                        <input
+                                            className="form-input"
+                                            placeholder="e.g. 15 Mins"
+                                            value={form.prep_time}
+                                            onChange={(e) => setForm({ ...form, prep_time: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Spice Level</label>
+                                        <select
+                                            className="form-input"
+                                            value={form.spice_level}
+                                            onChange={(e) => setForm({ ...form, spice_level: e.target.value })}
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="None">None</option>
+                                            <option value="Low">Low</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="High">High</option>
+                                            <option value="Extra Hot">Extra Hot</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="form-label">Storage Info</label>
+                                    <input
+                                        className="form-input"
+                                        placeholder="e.g. Keep frozen under -18C"
+                                        value={form.storage_info}
+                                        onChange={(e) => setForm({ ...form, storage_info: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="form-label">Additional Notes</label>
+                                    <input
+                                        className="form-input"
+                                        placeholder="e.g. Serve hot with sauce"
+                                        value={form.additional_notes}
+                                        onChange={(e) => setForm({ ...form, additional_notes: e.target.value })}
                                     />
                                 </div>
 

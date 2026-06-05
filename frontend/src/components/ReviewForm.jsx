@@ -5,14 +5,20 @@ import { toast } from 'react-toastify';
 import { createReview } from '../api/reviews';
 import { getProducts } from '../api/products';
 
-const ReviewForm = ({ onSuccess }) => {
-    const [form, setForm] = useState({ customer_name: '', product_id: '', rating: 0, message: '', instructions: '' });
+const ReviewForm = ({ onSuccess, productId }) => {
+    const [form, setForm] = useState({ customer_name: '', product_id: productId || '', rating: 0, message: '', instructions: '' });
     const [hover, setHover] = useState(0);
     const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [dbProducts, setDbProducts] = useState([]);
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        if (productId) {
+            setForm(f => ({ ...f, product_id: productId }));
+        }
+    }, [productId]);
 
     useEffect(() => {
         const fetchAllProds = async () => {
@@ -124,7 +130,7 @@ const ReviewForm = ({ onSuccess }) => {
                 Share Your Experience
             </h3>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className={productId ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
                     <div>
                         <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
                             Your Name *
@@ -137,21 +143,23 @@ const ReviewForm = ({ onSuccess }) => {
                             onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
                         />
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
-                            Item Ordered
-                        </label>
-                        <select
-                            className="input-field"
-                            value={form.product_id}
-                            onChange={(e) => setForm({ ...form, product_id: e.target.value })}
-                        >
-                            <option value="">Select an item (optional)</option>
-                            {dbProducts.map((p) => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
-                    </div>
+                    {!productId && (
+                        <div>
+                            <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                                Item Ordered
+                            </label>
+                            <select
+                                className="input-field"
+                                value={form.product_id}
+                                onChange={(e) => setForm({ ...form, product_id: e.target.value })}
+                            >
+                                <option value="">Select an item (optional)</option>
+                                {dbProducts.map((p) => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                 </div>
 
                 {/* Star Rating */}

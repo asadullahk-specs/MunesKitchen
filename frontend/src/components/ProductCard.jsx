@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiPlus, FiMinus, FiShoppingCart, FiEye, FiImage, FiStar } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
@@ -6,6 +7,7 @@ import { useCart } from '../context/CartContext';
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 const ProductCard = ({ product, onViewDetails }) => {
+    const navigate = useNavigate();
     const [qty, setQty] = useState(1);
     const { addToCart } = useCart();
 
@@ -112,15 +114,13 @@ const ProductCard = ({ product, onViewDetails }) => {
                         Add
                     </button>
 
-                    {onViewDetails && (
-                        <button
-                            onClick={() => onViewDetails(product)}
-                            className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-105"
-                            style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--primary)', border: '1.5px solid rgba(239,68,68,0.2)' }}
-                        >
-                            <FiEye size={15} />
-                        </button>
-                    )}
+                    <button
+                        onClick={() => navigate(`/product/${product.id || product._id}`)}
+                        className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-105"
+                        style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--primary)', border: '1.5px solid rgba(239,68,68,0.2)' }}
+                    >
+                        <FiEye size={15} />
+                    </button>
                 </div>
             </div>
         </motion.div>

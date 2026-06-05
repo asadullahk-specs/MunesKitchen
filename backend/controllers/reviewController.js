@@ -4,11 +4,14 @@ const { Review } = require('../models');
 // ── GET /reviews (filter by status via ?status=) ───────────────────────────
 exports.getAll = async (req, res) => {
     try {
-        const { status } = req.query;
+        const { status, product_id } = req.query;
         const query = {};
 
         if (status && status !== 'all') {
             query.status = status;
+        }
+        if (product_id) {
+            query.product_id = product_id;
         }
 
         const reviews = await Review.find(query)

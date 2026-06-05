@@ -5,7 +5,7 @@ import {
     FiHome, FiShoppingBag, FiGrid, FiUsers,
     FiDollarSign, FiLogOut, FiMenu, FiX,
     FiExternalLink, FiSun, FiMoon, FiStar,
-    FiSettings, FiMessageSquare, FiShield
+    FiSettings, FiMessageSquare, FiShield, FiGift
 } from 'react-icons/fi'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -16,6 +16,7 @@ const LINKS = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: FiHome },
     { to: '/admin/orders', label: 'Orders', icon: FiShoppingBag },
     { to: '/admin/menu', label: 'Menu', icon: FiGrid },
+    { to: '/admin/offers', label: 'Offers', icon: FiGift },
     { to: '/admin/costing', label: 'Food Costing', icon: FiDollarSign },
     { to: '/admin/reviews', label: 'Reviews', icon: FiStar },
     { to: '/admin/customers', label: 'Customers', icon: FiUsers },
@@ -62,12 +63,19 @@ const SidebarContent = ({ onClose }) => {
 
             <div className="p-4 mx-3 mt-4 rounded-2xl" style={{ background: 'var(--primary-glow)', border: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 flex items-center justify-center overflow-hidden">
-                        <img
-                            src="/logo.png"
-                            alt="Logo"
-                            className="w-full h-full object-contain"
-                        />
+                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style={{ borderColor: 'var(--primary)' }}>
+                        {admin?.profile_image ? (
+                            <img
+                                src={admin.profile_image.startsWith('http') ? admin.profile_image : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${admin.profile_image.replace(/^\//, '')}`}
+                                alt={admin.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center font-bold text-sm" style={{ background: 'var(--primary)', color: '#fff' }}>
+                                {(admin?.name || 'A').charAt(0).toUpperCase()}
+                            </div>
+                        )}
                     </div>
                     <div className="min-w-0">
                         <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-main)' }}>

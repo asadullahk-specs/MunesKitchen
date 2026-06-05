@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import {
     FiStar, FiCheck, FiX, FiTrash2, FiRefreshCw,
-    FiClock, FiCheckCircle, FiXCircle, FiImage, FiMessageSquare,
+    FiClock, FiCheckCircle, FiXCircle, FiImage, FiMessageSquare, FiSearch,
 } from 'react-icons/fi';
 import { getReviews, updateReviewStatus, deleteReview } from '../../api/reviews';
 
@@ -38,12 +38,29 @@ const StatusBadge = ({ status }) => {
     );
 };
 
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const strHours = String(hours).padStart(2, '0');
+    
+    return `${day}/${month}/${year} ${strHours}:${minutes} ${ampm}`;
+};
+
 const ReviewCard = ({ review, onAction, busy }) => {
     // Derive display values from review data
     const initial = (review.customer_name || 'A').charAt(0).toUpperCase();
-    const date = review.created_at
-        ? new Date(review.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
-        : '';
+    const date = formatDateTime(review.created_at);
 
     // Robustly parse the images field (stored as JSON string of base64 data URLs)
     const displayImages = useMemo(() => {
@@ -205,6 +222,7 @@ const AdminReviews = () => {
     const [loading, setLoading] = useState(true);
     const [tab, setTab] = useState('all');
     const [busyId, setBusyId] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchReviews = async () => {
         setLoading(true);
@@ -227,10 +245,16 @@ const AdminReviews = () => {
         rejected: allReviews.filter(r => r.status === 'rejected').length,
     }), [allReviews]);
 
-    const filtered = useMemo(() =>
-        tab === 'all' ? allReviews : allReviews.filter(r => r.status === tab),
-        [allReviews, tab]
-    );
+    const filtered = useMemo(() => {
+        const byTab = tab === 'all' ? allReviews : allReviews.filter(r => r.status === tab);
+        if (!searchQuery.trim()) return byTab;
+        const q = searchQuery.toLowerCase();
+        return byTab.filter(r =>
+            (r.customer_name || '').toLowerCase().includes(q) ||
+            (r.product_name || '').toLowerCase().includes(q) ||
+            (r.message || '').toLowerCase().includes(q)
+        );
+    }, [allReviews, tab, searchQuery]);
 
     const handleAction = async (id, action) => {
         setBusyId(id);
@@ -269,18 +293,31 @@ const AdminReviews = () => {
                         Approve, reject, or remove customer reviews
                     </p>
                 </div>
-                <button
-                    onClick={fetchReviews}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 6,
-                        padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600,
-                        background: 'var(--bg-card)', color: 'var(--text-muted)',
-                        border: '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.2s',
-                    }}
-                >
-                    <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-                    Refresh
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <div style={{ position: 'relative' }}>
+                        <FiSearch size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                        <input
+                            type="text"
+                            className="form-input"
+                            style={{ paddingLeft: 32, fontSize: 13, minWidth: 200 }}
+                            placeholder="Search by name, product, message..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={fetchReviews}
+                        style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                            background: 'var(--bg-card)', color: 'var(--text-muted)',
+                            border: '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.2s',
+                        }}
+                    >
+                        <FiRefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                </div>
             </div>
 
             {/* ── Stats Row ── */}

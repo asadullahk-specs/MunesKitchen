@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiFilter, FiX, FiChevronLeft, FiChevronRight, FiGrid, FiArrowRight } from 'react-icons/fi';
+import { FiFilter, FiX, FiChevronLeft, FiChevronRight, FiGrid, FiArrowRight, FiSearch } from 'react-icons/fi';
 import { getProducts } from '../api/products';
 import { getCategories } from '../api/categories';
 import ProductCard from '../components/ProductCard';
@@ -16,10 +16,17 @@ const MenuPage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     
     // Per-category active product carousel indexing and animation direction
     const [activeProdIndices, setActiveProdIndices] = useState({});
     const [directions, setDirections] = useState({});
+
+    const filteredProductsList = products.filter(p =>
+        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.category?.name && p.category.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
 
     useEffect(() => {
         getCategories().then((res) => setCategories(res.data.data)).catch(() => { });
@@ -66,7 +73,7 @@ const MenuPage = () => {
     // Group items category-wise in frontend
     // Use .id (virtual set by Mongoose toJSON transform) — NOT ._id which is deleted
     const groupedProducts = categories.map(cat => {
-        const catProds = products.filter(p => {
+        const catProds = filteredProductsList.filter(p => {
             const pCatId = p.category_id?.id || p.category?.id;
             const targetCatId = cat.id || cat._id;
             return String(pCatId) === String(targetCatId);
@@ -103,6 +110,32 @@ const MenuPage = () => {
                     >
                         Fresh, frozen, and ready to cook
                     </motion.p>
+                </div>
+
+                {/* Search Bar */}
+                <div className="max-w-md mx-auto mb-8 relative">
+                    <input
+                        type="text"
+                        placeholder="Search our delicious items..."
+                        className="w-full px-5 py-3 rounded-2xl border transition-all text-sm pr-12 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                        style={{
+                            background: 'var(--bg-card)',
+                            borderColor: 'var(--border)',
+                            color: 'var(--text-main)',
+                            boxShadow: 'var(--shadow-sm)'
+                        }}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
+                        {searchQuery ? (
+                            <button type="button" onClick={() => setSearchQuery('')} className="hover:text-red-500 transition-colors">
+                                <FiX size={16} />
+                            </button>
+                        ) : (
+                            <FiSearch size={16} />
+                        )}
+                    </span>
                 </div>
 
                 {/* ─── DESKTOP/TABLET CATEGORY FILTER TABS ─── */}
@@ -178,19 +211,19 @@ const MenuPage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />)}
                     </div>
-                ) : products.length === 0 ? (
+                ) : filteredProductsList.length === 0 ? (
                     <div className="text-center py-20">
                         <div className="text-6xl mb-4">🍱</div>
                         <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--text-main)' }}>
                             No items found
                         </h3>
-                        <p style={{ color: 'var(--text-muted)' }}>Try a different category</p>
+                        <p style={{ color: 'var(--text-muted)' }}>Try a different category or search term</p>
                     </div>
                 ) : (
                     <>
                         {/* Desktop Grid Layout (sm and larger) */}
                         <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {products.map((product) => (
+                            {filteredProductsList.map((product) => (
                                 <ProductCard
                                     key={product.id}
                                     product={product}

@@ -1,17 +1,32 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiRefreshCw, FiX, FiMapPin, FiPhone, FiMail, FiCheckSquare } from 'react-icons/fi';
+import { FiRefreshCw, FiX, FiMapPin, FiPhone, FiMail, FiCheckSquare, FiTrash2, FiSearch } from 'react-icons/fi';
 import { toast } from 'react-toastify';
-import { getOrders, updateOrderStatus } from '../../api/orders';
+import { getOrders, updateOrderStatus, deleteOrder } from '../../api/orders';
 
-const STATUS_OPTIONS = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'paid'];
+const STATUS_OPTIONS = ['pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'paid', 'cancelled'];
 const STATUS_COLORS = {
     pending: '#f59e0b',
     confirmed: '#3b82f6',
     preparing: '#8b5cf6',
     out_for_delivery: '#06b6d4',
     delivered: '#10b981',
-    paid: '#ef4444',
+    paid: '#059669',
+    cancelled: '#ef4444',
+};
+
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
 };
 
 const AdminOrders = () => {
@@ -20,9 +35,11 @@ const AdminOrders = () => {
     const [filter, setFilter] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchQuery, setSearchQuery] = useState('');
 
     // Track which order is clicked for showing delivery details and food prep items
     const [selectedOrder, setSelectedOrder] = useState(null);
+    const [deletingId, setDeletingId] = useState(null);
 
     const fetchOrders = useCallback(async () => {
         setLoading(true);
@@ -55,8 +72,54 @@ const AdminOrders = () => {
         }
     };
 
+    const handleDeleteOrder = async (orderId) => {
+        if (!confirm('Permanently delete this order? This cannot be undone.')) return;
+        setDeletingId(orderId);
+        try {
+            await deleteOrder(orderId);
+            toast.success('Order deleted');
+            setSelectedOrder(null);
+            fetchOrders();
+        } catch {
+            toast.error('Failed to delete order');
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
+    const filteredOrders = orders.filter(o => {
+        const q = searchQuery.toLowerCase();
+        if (!q) return true;
+        return (
+            o.order_number?.toLowerCase().includes(q) ||
+            o.customer?.full_name?.toLowerCase().includes(q) ||
+            o.customer?.phone?.toLowerCase().includes(q) ||
+            o.status?.toLowerCase().includes(q)
+        );
+    });
+
     return (
         <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
+
+            {/* Page Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+                <div>
+                    <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Orders</h1>
+                    <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} found
+                    </p>
+                </div>
+                <div className="relative sm:w-64">
+                    <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        type="text"
+                        className="form-input pl-8 text-sm"
+                        placeholder="Search by order #, name, phone..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+            </div>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-2 items-center mb-5">
@@ -103,11 +166,11 @@ const AdminOrders = () => {
                             <div className="skeleton h-4 w-2/3 rounded" />
                         </div>
                     ))
-                ) : orders.length === 0 ? (
+                ) : filteredOrders.length === 0 ? (
                     <div className="card p-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
                         No orders found
                     </div>
-                ) : orders.map((order) => (
+                ) : filteredOrders.map((order) => (
                     <div
                         key={order.id}
                         className="card p-4 cursor-pointer hover:scale-[1.01] active:scale-[0.99] transition-all"
@@ -161,7 +224,7 @@ const AdminOrders = () => {
                             </select>
                         </div>
                         <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
-                            {new Date(order.created_at).toLocaleDateString()}
+                            {formatDateTime(order.created_at)}
                         </p>
                     </div>
                 ))}
@@ -230,7 +293,7 @@ const AdminOrders = () => {
                                         ))}
                                     </tr>
                                 ))
-                            ) : orders.length === 0 ? (
+                            ) : filteredOrders.length === 0 ? (
                                 <tr>
                                     <td
                                         colSpan={8}
@@ -244,7 +307,7 @@ const AdminOrders = () => {
                                         No orders found
                                     </td>
                                 </tr>
-                            ) : orders.map((order) => (
+                            ) : filteredOrders.map((order) => (
                                 <motion.tr
                                     key={order.id}
                                     initial={{ opacity: 0 }}
@@ -330,7 +393,7 @@ const AdminOrders = () => {
                                         </span>
                                     </td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
-                                        {new Date(order.created_at).toLocaleDateString()}
+                                        {formatDateTime(order.created_at)}
                                     </td>
                                     <td style={{ padding: '12px 16px' }} onClick={(e) => e.stopPropagation()}>
                                         {/* stopPropagation guarantees dropdown action won't re-trigger dialog state */}
@@ -559,22 +622,38 @@ const AdminOrders = () => {
                             </div>
 
                             {/* Modal Footer Controls */}
-                            <div className="p-4 flex justify-between items-center" style={{ background: 'var(--bg-deep)', borderTop: '1px solid var(--border)' }}>
+                            <div className="p-4 flex justify-between items-center gap-3 flex-wrap" style={{ background: 'var(--bg-deep)', borderTop: '1px solid var(--border)' }}>
                                 {/* Direct Live Badge Status Indicator */}
-                                <div className="flex items-center gap-2">
-                                    <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: STATUS_COLORS[selectedOrder.status] }} />
-                                    <span className="text-xs font-semibold capitalize" style={{ color: STATUS_COLORS[selectedOrder.status] }}>
-                                        Current Status: {selectedOrder.status?.replace(/_/g, ' ')}
+                                <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: STATUS_COLORS[selectedOrder.status] }} />
+                                        <span className="text-xs font-semibold capitalize" style={{ color: STATUS_COLORS[selectedOrder.status] }}>
+                                            Status: {selectedOrder.status?.replace(/_/g, ' ')}
+                                        </span>
+                                    </div>
+                                    <span className="text-xs pl-4" style={{ color: 'var(--text-muted)' }}>
+                                        {formatDateTime(selectedOrder.created_at)}
                                     </span>
                                 </div>
 
-                                <button
-                                    onClick={() => setSelectedOrder(null)}
-                                    className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
-                                    style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-main)' }}
-                                >
-                                    Dismiss View
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => handleDeleteOrder(selectedOrder.id)}
+                                        disabled={deletingId === selectedOrder.id}
+                                        className="px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                                        style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', opacity: deletingId === selectedOrder.id ? 0.6 : 1 }}
+                                    >
+                                        <FiTrash2 size={12} />
+                                        {deletingId === selectedOrder.id ? 'Deleting…' : 'Delete Order'}
+                                    </button>
+                                    <button
+                                        onClick={() => setSelectedOrder(null)}
+                                        className="px-4 py-2 rounded-xl text-xs font-semibold transition-colors"
+                                        style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-main)' }}
+                                    >
+                                        Dismiss View
+                                    </button>
+                                </div>
                             </div>
                         </motion.div>
                     </div>

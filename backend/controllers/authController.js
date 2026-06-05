@@ -38,7 +38,7 @@ exports.login = async (req, res) => {
         res.json({
             success: true,
             token,
-            admin: { id: admin.id, name: admin.name, email: admin.email },
+            admin: { id: admin.id, name: admin.name, email: admin.email, profile_image: admin.profile_image || '' },
         })
     } catch (error) {
         res.status(500).json({ success: false, message: error.message })
@@ -83,7 +83,8 @@ exports.getAllAdmins = async (req, res) => {
             id: a.id,
             name: a.name,
             email: a.email,
-            passwordHash: a.password // bcrypt hash for display
+            passwordHash: a.password, // bcrypt hash for display
+            profile_image: a.profile_image || ''
         }))
         res.json({ success: true, data: adminList })
     } catch (error) {
@@ -93,7 +94,7 @@ exports.getAllAdmins = async (req, res) => {
 
 exports.createAdmin = async (req, res) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, profile_image } = req.body
         if (!name || !name.trim()) return res.status(400).json({ success: false, message: 'Name is required.' })
         if (!email || !email.trim()) return res.status(400).json({ success: false, message: 'Email is required.' })
         if (!password || password.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' })
@@ -105,7 +106,8 @@ exports.createAdmin = async (req, res) => {
         const newAdmin = await Admin.create({
             name: name.trim(),
             email: email.trim().toLowerCase(),
-            password: hashed
+            password: hashed,
+            profile_image: profile_image || ''
         })
 
         res.status(201).json({
@@ -115,7 +117,8 @@ exports.createAdmin = async (req, res) => {
                 id: newAdmin.id,
                 name: newAdmin.name,
                 email: newAdmin.email,
-                passwordHash: newAdmin.password
+                passwordHash: newAdmin.password,
+                profile_image: newAdmin.profile_image || ''
             }
         })
     } catch (error) {
@@ -125,7 +128,7 @@ exports.createAdmin = async (req, res) => {
 
 exports.updateAdmin = async (req, res) => {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, profile_image } = req.body
         const adminToUpdate = await Admin.findById(req.params.id)
         if (!adminToUpdate) return res.status(404).json({ success: false, message: 'Admin not found.' })
 
@@ -138,6 +141,9 @@ exports.updateAdmin = async (req, res) => {
         if (password && password.length >= 6) {
             adminToUpdate.password = await bcrypt.hash(password, 10)
         }
+        if (profile_image !== undefined) {
+            adminToUpdate.profile_image = profile_image
+        }
 
         await adminToUpdate.save()
 
@@ -148,7 +154,8 @@ exports.updateAdmin = async (req, res) => {
                 id: adminToUpdate.id,
                 name: adminToUpdate.name,
                 email: adminToUpdate.email,
-                passwordHash: adminToUpdate.password
+                passwordHash: adminToUpdate.password,
+                profile_image: adminToUpdate.profile_image || ''
             }
         })
     } catch (error) {

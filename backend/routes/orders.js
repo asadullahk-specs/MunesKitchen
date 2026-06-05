@@ -7,7 +7,8 @@ const {
     getAllOrders,
     getOrderById,
     updateOrderStatus,
-    getDashboardStats
+    getDashboardStats,
+    deleteOrder
 } = require('../controllers/orderController')
 
 router.post('/', createOrder)
@@ -16,5 +17,6 @@ router.get('/dashboard/stats', protect, getDashboardStats)
 router.get('/', protect, getAllOrders)
 router.get('/:id', protect, getOrderById)
 router.put('/:id/status', protect, updateOrderStatus)
+router.delete('/:id', protect, deleteOrder)
 
 module.exports = router

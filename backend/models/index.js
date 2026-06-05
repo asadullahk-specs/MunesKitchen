@@ -8,6 +8,7 @@ const Review = require('./Review');
 const ExpenseCategory = require('./ExpenseCategory');
 const Expense = require('./Expense');
 const Contact = require('./Contact');
+const Offer = require('./Offer');
 
 module.exports = {
     Admin,
@@ -19,5 +20,6 @@ module.exports = {
     Review,
     ExpenseCategory,
     Expense,
-    Contact
+    Contact,
+    Offer
 };

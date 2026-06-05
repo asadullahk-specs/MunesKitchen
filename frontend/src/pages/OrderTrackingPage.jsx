@@ -6,6 +6,20 @@ import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
 
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    let hours = d.getHours();
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    return `${day}/${month}/${year} ${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+};
+
 const OrderTrackingPage = () => {
     const { orderNumber: urlOrderNumber } = useParams();
     const invoiceRef = useRef(null);
@@ -186,6 +200,7 @@ const OrderTrackingPage = () => {
                             <div>
                                 <p className="text-xs uppercase text-gray-400 font-bold tracking-wider">Order Reference</p>
                                 <h3 className="text-2xl font-black mt-0.5" style={{ color: 'var(--primary)' }}>#{order.order_number}</h3>
+                                <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{formatDateTime(order.created_at)}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-xs uppercase text-gray-400 font-bold tracking-wider mb-1">Status</p>
@@ -399,6 +414,10 @@ const OrderTrackingPage = () => {
                                     <div style={{ marginTop: '10px' }}>
                                         <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', fontWeight: '700', textTransform: 'uppercase' }}>Payment Method:</span>
                                         <strong style={{ fontWeight: '700', color: '#0f172a' }}>{formatPaymentMethod(order.payment_method)}</strong>
+                                    </div>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <span style={{ fontSize: '10px', color: '#94a3b8', display: 'block', fontWeight: '700', textTransform: 'uppercase' }}>Order Date:</span>
+                                        <strong style={{ fontWeight: '700', color: '#0f172a' }}>{formatDateTime(order.created_at)}</strong>
                                     </div>
                                 </div>
                             </div>

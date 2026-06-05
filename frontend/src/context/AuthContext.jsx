@@ -16,7 +16,12 @@ export const AuthProvider = ({ children }) => {
                 setAdmin(JSON.parse(savedAdmin))
                 API.get('/auth/me')
                     .then((res) => {
-                        setAdmin(res.data.admin)
+                        if (res.data.success && res.data.admin) {
+                            setAdmin(res.data.admin)
+                            localStorage.setItem('mk_admin_data', JSON.stringify(res.data.admin))
+                        } else {
+                            setAdmin(res.data.admin)
+                        }
                     })
                     .catch(() => {
                         localStorage.removeItem('mk_admin_token')

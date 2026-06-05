@@ -321,4 +321,17 @@ const getDashboardStats = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, trackOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats };
+const deleteOrder = async (req, res) => {
+    try {
+        const order = await Order.findByIdAndDelete(req.params.id);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+        res.json({ success: true, message: 'Order deleted successfully' });
+    } catch (error) {
+        console.error('Delete order error:', error.message);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = { createOrder, trackOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats, deleteOrder };

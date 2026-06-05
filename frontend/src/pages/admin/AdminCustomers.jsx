@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { FiSearch } from 'react-icons/fi'
 import API from '../../api/axios'
 
 const AdminCustomers = () => {
     const [customers, setCustomers] = useState([])
     const [loading, setLoading] = useState(true)
+    const [searchQuery, setSearchQuery] = useState('')
 
     useEffect(() => {
         API.get('/customers')
@@ -11,6 +13,16 @@ const AdminCustomers = () => {
             .catch(() => { })
             .finally(() => setLoading(false))
     }, [])
+
+    const filteredCustomers = customers.filter(c => {
+        const q = searchQuery.toLowerCase()
+        if (!q) return true
+        return (
+            (c.full_name || c.name || '').toLowerCase().includes(q) ||
+            (c.phone || '').toLowerCase().includes(q) ||
+            (c.email || '').toLowerCase().includes(q)
+        )
+    })
 
     if (loading) return (
         <div className="admin-page-wrapper">
@@ -31,11 +43,23 @@ const AdminCustomers = () => {
 
     return (
         <div className="admin-page-wrapper">
-            <div className="mb-6">
-                <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Customers</h1>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                    {customers.length} registered customers
-                </p>
+            <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Customers</h1>
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                        {filteredCustomers.length} of {customers.length} customers
+                    </p>
+                </div>
+                <div className="relative sm:w-64">
+                    <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
+                    <input
+                        type="text"
+                        className="form-input pl-8 text-sm"
+                        placeholder="Search by name, phone, email..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
             </div>
 
             {/* Desktop Table */}
@@ -51,13 +75,13 @@ const AdminCustomers = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.length === 0 ? (
+                            {filteredCustomers.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
-                                        No customers yet
+                                        {searchQuery ? 'No customers match your search' : 'No customers yet'}
                                     </td>
                                 </tr>
-                            ) : customers.map(c => (
+                            ) : filteredCustomers.map(c => (
                                 <tr key={c.id} style={{ borderBottom: '1px solid var(--border)' }}
                                     className="transition-colors hover:bg-red-50 dark:hover:bg-red-900/10">
                                     <td className="px-4 py-3">
@@ -93,11 +117,11 @@ const AdminCustomers = () => {
 
             {/* Mobile Cards */}
             <div className="sm:hidden space-y-3">
-                {customers.length === 0 ? (
+                {filteredCustomers.length === 0 ? (
                     <div className="card p-8 text-center" style={{ color: 'var(--text-muted)' }}>
-                        No customers yet
+                        {searchQuery ? 'No customers match your search' : 'No customers yet'}
                     </div>
-                ) : customers.map(c => (
+                ) : filteredCustomers.map(c => (
                     <div key={c.id} className="card p-4">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white shrink-0"

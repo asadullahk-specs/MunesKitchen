@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { FiArrowRight, FiPhone, FiStar, FiChevronLeft, FiChevronRight, FiClock, FiAward, FiShield, FiPhoneCall, FiImage } from 'react-icons/fi';
+import { FiArrowRight, FiPhone, FiStar, FiChevronLeft, FiChevronRight, FiClock, FiAward, FiShield, FiPhoneCall, FiImage, FiGift } from 'react-icons/fi';
 import { getProducts } from '../api/products';
 import { getCategories } from '../api/categories';
 import { getReviews } from '../api/reviews';
+import { getOffers } from '../api/offers';
 import ProductCard from '../components/ProductCard';
 import SkeletonCard from '../components/SkeletonCard';
 import ProductModal from '../components/ProductModal';
@@ -134,6 +135,7 @@ const HomePage = () => {
     const [categories, setCategories] = useState([]);
     const [allMenuProducts, setAllMenuProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
+    const [offers, setOffers] = useState([]);
     const [reviewStats, setReviewStats] = useState({ avgRating: 0, total: 0, breakdown: [] });
     const [loading, setLoading] = useState(true);
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -143,6 +145,10 @@ const HomePage = () => {
     // Category Carousel States (Mobile Only)
     const [activeCatIdx, setActiveCatIdx] = useState(0);
     const [catDirection, setCatDirection] = useState(0);
+
+    // Offers Carousel States
+    const [activeOfferIdx, setActiveOfferIdx] = useState(0);
+    const [offerDirection, setOfferDirection] = useState(0);
 
     useEffect(() => {
         const load = async () => {
@@ -171,23 +177,19 @@ const HomePage = () => {
                 });
             } catch (err) { console.error("Reviews failed to load:", err); }
 
+            try {
+                const offerRes = await getOffers({ active: 'true' });
+                setOffers(offerRes?.data?.data || []);
+            } catch (err) { console.error("Offers failed to load:", err); }
+
             setLoading(false);
         };
         load();
     }, []);
 
     const handleNewReview = (newReview) => {
-        // New reviews are 'pending' and won't appear until approved by admin.
-        // No optimistic update needed — just silently return if data is missing.
-        if (!newReview || !newReview.rating) return;
-        setReviews((prev) => [newReview, ...prev]);
-        setReviewStats((prev) => {
-            const total = Number(prev.total) || 0;
-            const avg = Number(prev.avgRating) || 0;
-            const newTotal = total + 1;
-            const newAvg = ((avg * total) + Number(newReview.rating)) / newTotal;
-            return { ...prev, total: newTotal, avgRating: newAvg.toFixed(1) };
-        });
+        // New reviews are pending by default and must NOT appear publicly immediately after submission.
+        // They will only be visible once approved by an admin.
     };
 
     const validCategories = categories.filter(cat =>
@@ -291,6 +293,177 @@ const HomePage = () => {
                     </motion.div>
                 </div>
             </section>
+
+            {/* ===== EXCLUSIVE OFFERS SECTION ===== */}
+            {offers.length > 0 && (
+                <section className="py-12 px-4" style={{ background: 'linear-gradient(180deg, rgba(239,68,68,0.01) 0%, rgba(239,68,68,0.05) 100%)' }}>
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-8">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
+                                <FiGift size={13} /> Exclusive Deals
+                            </span>
+                            <h2 className="section-title mb-2">PROMO OFFERS & BANNERS</h2>
+                            <p className="section-subtitle">Mouth-watering deals crafted just for you!</p>
+                        </div>
+
+                        <div className="relative overflow-hidden w-full min-h-[280px]" style={{ position: 'relative' }}>
+                            <AnimatePresence initial={false} custom={offerDirection} mode="wait">
+                                <motion.div
+                                    key={activeOfferIdx}
+                                    custom={offerDirection}
+                                    variants={{
+                                        enter: (dir) => ({
+                                            x: dir > 0 ? '100%' : '-100%',
+                                            opacity: 0
+                                        }),
+                                        center: {
+                                            x: 0,
+                                            opacity: 1
+                                        },
+                                        exit: (dir) => ({
+                                            x: dir < 0 ? '100%' : '-100%',
+                                            opacity: 0
+                                        })
+                                    }}
+                                    initial="enter"
+                                    animate="center"
+                                    exit="exit"
+                                    transition={{
+                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                        opacity: { duration: 0.2 }
+                                    }}
+                                    className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-2xl glass border border-[var(--border)] shadow-md"
+                                    style={{ background: 'var(--bg-card)' }}
+                                >
+                                    {/* Offer Image */}
+                                    <div className="w-full md:w-1/3 aspect-video md:aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                                        {offers[activeOfferIdx].image ? (
+                                            <img
+                                                src={offers[activeOfferIdx].image.startsWith('http') ? offers[activeOfferIdx].image : `${BACKEND}/${offers[activeOfferIdx].image.replace(/^\//, '')}`}
+                                                alt={offers[activeOfferIdx].name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <FiGift size={48} style={{ color: 'var(--primary)', opacity: 0.4 }} />
+                                        )}
+                                    </div>
+
+                                    {/* Offer Details */}
+                                    <div className="flex-1 text-center md:text-left flex flex-col justify-between h-full py-2">
+                                        <div>
+                                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
+                                                <h3 className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>
+                                                    {offers[activeOfferIdx].name}
+                                                </h3>
+                                                {offers[activeOfferIdx].discount_percentage > 0 && (
+                                                    <span className="badge-hot font-extrabold">
+                                                        {offers[activeOfferIdx].discount_percentage}% OFF
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                                                {offers[activeOfferIdx].description || 'No description available for this deal.'}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
+                                            <div className="text-center sm:text-left">
+                                                <span className="text-xs text-[var(--text-muted)] line-through block">
+                                                    Rs. {offers[activeOfferIdx].original_price}
+                                                </span>
+                                                <span className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
+                                                    Rs. {offers[activeOfferIdx].discounted_price}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                <Link to="/menu" className="btn-primary text-xs py-2 px-5">
+                                                    Explore Menu
+                                                </Link>
+                                                <a
+                                                    href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offers[activeOfferIdx].name)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="btn-outline text-xs py-2 px-5 flex items-center gap-1.5"
+                                                >
+                                                    <FiPhone size={12} /> WhatsApp Order
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
+
+                            {/* Left/Right Arrows */}
+                            {offers.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            setOfferDirection(-1);
+                                            setActiveOfferIdx((prev) => (prev - 1 + offers.length) % offers.length);
+                                        }}
+                                        aria-label="Previous Offer"
+                                        style={{
+                                            position: 'absolute', top: '50%', left: -18,
+                                            transform: 'translateY(-50%)',
+                                            width: 36, height: 36, borderRadius: '50%',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            background: 'var(--bg-card)', border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-md)', cursor: 'pointer',
+                                            color: 'var(--text-main)', zIndex: 10,
+                                        }}
+                                        className="hover:scale-105 transition-transform animate-none"
+                                    >
+                                        <FiChevronLeft size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setOfferDirection(1);
+                                            setActiveOfferIdx((prev) => (prev + 1) % offers.length);
+                                        }}
+                                        aria-label="Next Offer"
+                                        style={{
+                                            position: 'absolute', top: '50%', right: -18,
+                                            transform: 'translateY(-50%)',
+                                            width: 36, height: 36, borderRadius: '50%',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            background: 'var(--bg-card)', border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-md)', cursor: 'pointer',
+                                            color: 'var(--text-main)', zIndex: 10,
+                                        }}
+                                        className="hover:scale-105 transition-transform animate-none"
+                                    >
+                                        <FiChevronRight size={18} />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Dot indicators */}
+                        {offers.length > 1 && (
+                            <div className="flex justify-center gap-2 mt-5">
+                                {offers.map((_, i) => (
+                                    <button
+                                        key={i}
+                                        onClick={() => { setOfferDirection(i > activeOfferIdx ? 1 : -1); setActiveOfferIdx(i); }}
+                                        aria-label={`Go to offer ${i + 1}`}
+                                        style={{
+                                            width: i === activeOfferIdx ? 22 : 8,
+                                            height: 8,
+                                            borderRadius: 4,
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            padding: 0,
+                                            transition: 'all 0.3s ease',
+                                            background: i === activeOfferIdx ? 'var(--primary)' : 'var(--border)',
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
 
             {/* ===== ABOUT SECTION ===== */}
             <section className="py-6 md:py-10 px-4">

@@ -16,6 +16,7 @@ import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
 import ContactPage from './pages/ContactPage'
 import OrderTrackingPage from './pages/OrderTrackingPage'
+import ProductPage from './pages/ProductPage'
 
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/AdminLogin'
@@ -29,6 +30,7 @@ import AdminCosting from './pages/admin/AdminCosting';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminSettings from './pages/admin/AdminSettings';
 import AdminSecurity from './pages/admin/AdminSecurity';
+import AdminOffers from './pages/admin/AdminOffers';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -74,6 +76,7 @@ function App() {
               <Route path="/contact" element={<PublicLayout><ContactPage /></PublicLayout>} />
               <Route path="/track" element={<PublicLayout><OrderTrackingPage /></PublicLayout>} />
               <Route path="/track/:orderNumber" element={<PublicLayout><OrderTrackingPage /></PublicLayout>} />
+              <Route path="/product/:id" element={<PublicLayout><ProductPage /></PublicLayout>} />
 
               <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -95,6 +98,7 @@ function App() {
                 <Route path="messages" element={<AdminMessages />} />
                 <Route path="settings" element={<AdminSettings />} />
                 <Route path="security" element={<AdminSecurity />} />
+                <Route path="offers" element={<AdminOffers />} />
               </Route>
 
             </Routes>

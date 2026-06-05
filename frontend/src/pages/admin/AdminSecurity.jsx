@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'react-toastify'
-import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff } from 'react-icons/fi'
 import { getAdmins, createAdmin, updateAdmin, deleteAdmin } from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
 
@@ -13,6 +13,7 @@ const AdminSecurity = () => {
     // Form States
     const [form, setForm] = useState({ id: null, name: '', email: '', password: '' })
     const [isEditing, setIsEditing] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     const [error, setError] = useState(null)
 
@@ -193,13 +194,22 @@ const AdminSecurity = () => {
                                             <FiLock size={14} />
                                         </span>
                                         <input
-                                            className="form-input pl-10"
-                                            type="password"
+                                            className="form-input pl-10 pr-10"
+                                            type={showPassword ? 'text' : 'password'}
                                             placeholder={isEditing ? '••••••••' : 'Password (min 6 chars)'}
                                             value={form.password}
                                             onChange={(e) => setForm({ ...form, password: e.target.value })}
                                             required={!isEditing}
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(p => !p)}
+                                            className="absolute inset-y-0 right-0 pr-3.5 flex items-center"
+                                            style={{ color: 'var(--text-muted)' }}
+                                            tabIndex={-1}
+                                        >
+                                            {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                                        </button>
                                     </div>
                                 </div>
                                 <div className="flex gap-2 pt-2">
