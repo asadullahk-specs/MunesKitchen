@@ -105,6 +105,22 @@ const ProductPage = () => {
         addToCart(product, qty);
     };
 
+    const handleTabClick = (tabId) => {
+        if (['description', 'info', 'reviews'].includes(tabId)) {
+            setActiveTab(tabId);
+        } else if (tabId === 'related') {
+            const el = document.getElementById('related-items-section');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        } else if (tabId === 'explore') {
+            const el = document.getElementById('explore-products-section');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--bg-deep)]">
@@ -252,11 +268,13 @@ const ProductPage = () => {
                             ].map(tab => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
+                                    onClick={() => handleTabClick(tab.id)}
                                     className={`flex items-center gap-2 py-4 px-4 font-semibold text-sm transition-all border-b-2 outline-none whitespace-nowrap ${
-                                        activeTab === tab.id
-                                            ? 'border-[var(--primary)] text-[var(--primary)]'
-                                            : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                                        (tab.id === 'related' || tab.id === 'explore')
+                                            ? 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                                            : activeTab === tab.id
+                                                ? 'border-[var(--primary)] text-[var(--primary)]'
+                                                : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
                                     }`}
                                 >
                                     {tab.icon}
@@ -392,40 +410,36 @@ const ProductPage = () => {
                                     </div>
                                 </div>
                             )}
-
-                            {/* RELATED ITEMS TAB */}
-                            {activeTab === 'related' && (
-                                <div>
-                                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
-                                    {relatedProducts.length === 0 ? (
-                                        <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
-                                    ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                                            {relatedProducts.map(p => (
-                                                <ProductCard key={p.id || p._id} product={p} />
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* EXPLORE PRODUCTS TAB */}
-                            {activeTab === 'explore' && (
-                                <div>
-                                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
-                                    {exploreProducts.length === 0 ? (
-                                        <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
-                                    ) : (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                                            {exploreProducts.map(p => (
-                                                <ProductCard key={p.id || p._id} product={p} />
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </motion.div>
                     </AnimatePresence>
+                </div>
+
+                {/* RELATED ITEMS SECTION (Always Visible) */}
+                <div id="related-items-section" className="mb-12 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
+                    {relatedProducts.length === 0 ? (
+                        <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                            {relatedProducts.map(p => (
+                                <ProductCard key={p.id || p._id} product={p} />
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* EXPLORE PRODUCTS SECTION (Always Visible) */}
+                <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
+                    {exploreProducts.length === 0 ? (
+                        <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                            {exploreProducts.map(p => (
+                                <ProductCard key={p.id || p._id} product={p} />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
