@@ -1,4 +1,5 @@
 const { Review } = require('../models');
+const mongoose = require('mongoose');
 
 
 // ── GET /reviews (filter by status via ?status=) ───────────────────────────
@@ -11,7 +12,13 @@ exports.getAll = async (req, res) => {
             query.status = status;
         }
         if (product_id) {
-            query.product_id = product_id;
+            // Safely cast to ObjectId — invalid IDs would throw a CastError without this guard
+            if (mongoose.Types.ObjectId.isValid(product_id)) {
+                query.product_id = new mongoose.Types.ObjectId(product_id);
+            } else {
+                // Non-ObjectId product_id can never match; return empty immediately
+                return res.json({ success: true, data: [], avgRating: 0, total: 0, breakdown: [] });
+            }
         }
 
         const reviews = await Review.find(query)
