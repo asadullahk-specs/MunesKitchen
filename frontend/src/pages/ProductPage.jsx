@@ -247,7 +247,8 @@ const ProductPage = () => {
                                 { id: 'description', label: 'Description', icon: <FiLayers size={15} /> },
                                 { id: 'info', label: 'Additional Info', icon: <FiInfo size={15} /> },
                                 { id: 'reviews', label: `Reviews (${reviewStats.total})`, icon: <FiMessageSquare size={15} /> },
-                                { id: 'related', label: 'Explore Products', icon: <FiActivity size={15} /> }
+                                { id: 'related', label: 'Related Items', icon: <FiActivity size={15} /> },
+                                { id: 'explore', label: 'Explore Products', icon: <FiShoppingCart size={15} /> }
                             ].map(tab => (
                                 <button
                                     key={tab.id}
@@ -392,36 +393,35 @@ const ProductPage = () => {
                                 </div>
                             )}
 
-                            {/* EXPLORE PRODUCTS TAB */}
+                            {/* RELATED ITEMS TAB */}
                             {activeTab === 'related' && (
                                 <div>
-                                    {/* Related products (same category) */}
-                                    <div className="mb-10">
-                                        <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
-                                        {relatedProducts.length === 0 ? (
-                                            <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
-                                        ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                                                {relatedProducts.map(p => (
-                                                    <ProductCard key={p.id || p._id} product={p} />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
+                                    {relatedProducts.length === 0 ? (
+                                        <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                            {relatedProducts.map(p => (
+                                                <ProductCard key={p.id || p._id} product={p} />
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
 
-                                    {/* Explore more (different categories) */}
-                                    <div>
-                                        <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
-                                        {exploreProducts.length === 0 ? (
-                                            <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
-                                        ) : (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                                                {exploreProducts.map(p => (
-                                                    <ProductCard key={p.id || p._id} product={p} />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                            {/* EXPLORE PRODUCTS TAB */}
+                            {activeTab === 'explore' && (
+                                <div>
+                                    <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
+                                    {exploreProducts.length === 0 ? (
+                                        <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
+                                    ) : (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                                            {exploreProducts.map(p => (
+                                                <ProductCard key={p.id || p._id} product={p} />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </motion.div>
