@@ -211,235 +211,126 @@ const HomePage = () => {
     return (
         <div>
             {/* ===== HERO SECTION ===== */}
-            <section className="relative overflow-hidden" style={{ minHeight: '88vh', display: 'flex', alignItems: 'center' }}>
-                {/* Background layers */}
-                <div className="absolute inset-0 pattern-bg" style={{ opacity: 0.4 }} />
-                <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 30% 60%, var(--primary-glow) 0%, transparent 55%)' }} />
-                <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 80% 20%, rgba(153,0,0,0.06) 0%, transparent 50%)' }} />
+            <section
+                className="relative overflow-hidden"
+                style={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundImage: 'url(/hero-bg.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                }}
+            >
+                {/* Dark cinematic overlay */}
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.78) 100%)' }} />
 
-                <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                {/* Centered Content */}
+                <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center py-28">
+                    <motion.p
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                        className="text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] mb-5"
+                        style={{ color: 'rgba(255,255,255,0.65)' }}
+                    >
+                        <FiClock size={11} className="inline mr-1.5 animate-pulse" style={{ verticalAlign: 'middle' }} />
+                        Order at least 3 hours in advance
+                    </motion.p>
 
-                        {/* ── LEFT: Text Content ── */}
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.7 }}
-                            className="flex flex-col gap-6 order-2 lg:order-1"
+                    <motion.h1
+                        initial={{ opacity: 0, y: 24 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.7, delay: 0.1 }}
+                        className="font-extrabold text-white leading-tight mb-4"
+                        style={{ fontSize: 'clamp(2.4rem, 8vw, 5rem)', lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.4)' }}
+                    >
+                        Where{' '}
+                        <span style={{ color: '#ff6b35', fontStyle: 'italic' }}>Freshness</span>
+                        <br />
+                        Meets Freezing
+                    </motion.h1>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="text-sm sm:text-base mb-2 italic"
+                        style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Georgia, serif' }}
+                    >
+                        Taste the mystery, Savor the excellence.
+                    </motion.p>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.25 }}
+                        className="text-xs sm:text-sm mb-10 max-w-lg mx-auto"
+                        style={{ color: 'rgba(255,255,255,0.55)' }}
+                    >
+                        Every dish is masterfully prepared with fresh ingredients and secret spices.
+                        Any issues? Call us at{' '}
+                        <span className="font-semibold" style={{ color: '#ff8c5a' }}>+92 303 2683689</span>
+                    </motion.p>
+
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.35 }}
+                        className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
+                    >
+                        <Link
+                            to="/menu"
+                            className="btn-primary text-sm px-10 py-3.5 flex items-center gap-2"
+                            style={{ boxShadow: '0 6px 24px rgba(153,0,0,0.5)', letterSpacing: '0.02em' }}
                         >
-                            {/* Availability badge */}
-                            <div className="flex">
-                                <span
-                                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest"
-                                    style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(153, 0, 0, 0.2)' }}
-                                >
-                                    <FiClock size={12} className="animate-pulse" /> Order at least 3 hours in advance
-                                </span>
-                            </div>
-
-                            {/* Headline */}
-                            <div>
-                                <h1
-                                    className="font-display font-extrabold leading-tight"
-                                    style={{ fontSize: 'clamp(2rem, 5vw, 3.4rem)', color: 'var(--text-main)', lineHeight: 1.15 }}
-                                >
-                                    Where{' '}
-                                    <span style={{ color: 'var(--primary)', fontStyle: 'italic' }}>Freshness</span>
-                                    <br />Meets{' '}
-                                    <span style={{
-                                        background: 'linear-gradient(135deg, #990000, #cc3300)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                        backgroundClip: 'text',
-                                    }}>
-                                        Freezing
-                                    </span>
-                                </h1>
-                                <p
-                                    className="mt-3 text-base md:text-lg font-medium italic"
-                                    style={{ color: 'var(--text-muted)', fontFamily: 'Georgia, serif' }}
-                                >
-                                    Taste the mystery, Savor the excellence.
-                                </p>
-                            </div>
-
-                            {/* Description */}
-                            <p className="text-sm md:text-base leading-relaxed" style={{ color: 'var(--text-muted)', maxWidth: 480 }}>
-                                Every dish is masterfully prepared with fresh ingredients and secret spices.
-                                Any issues placing orders? Call us at{' '}
-                                <span className="font-semibold" style={{ color: 'var(--primary)' }}>+92 303 2683689</span>
-                            </p>
-
-                            {/* CTA Buttons */}
-                            <div className="flex flex-wrap gap-3">
-                                <Link to="/menu" className="btn-primary text-sm px-7 py-3 flex items-center gap-2">
-                                    Explore Menu <FiArrowRight size={16} />
-                                </Link>
-                                <a
-                                    href="https://wa.me/923032683689"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="btn-outline text-sm px-7 py-3 flex items-center gap-2"
-                                >
-                                    <FiPhone size={15} /> Order on WhatsApp
-                                </a>
-                            </div>
-
-                            {/* Call pill */}
-                            <div
-                                className="inline-flex items-center gap-3 self-start px-5 py-3 rounded-2xl"
-                                style={{
-                                    background: 'var(--bg-card)',
-                                    border: '1px solid var(--border)',
-                                    boxShadow: 'var(--shadow)',
-                                }}
-                            >
-                                <div
-                                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                                    style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}
-                                >
-                                    <FiPhoneCall size={16} />
-                                </div>
-                                <div className="text-left">
-                                    <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Call for Delivery</div>
-                                    <div className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>+92 303 2683689</div>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* ── RIGHT: Food Image Collage ── */}
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.7, delay: 0.15 }}
-                            className="relative order-1 lg:order-2"
+                            Explore Menu <FiArrowRight size={15} />
+                        </Link>
+                        <a
+                            href="https://wa.me/923032683689"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm px-10 py-3.5 flex items-center gap-2 font-semibold rounded-full transition-all"
+                            style={{
+                                background: 'rgba(255,255,255,0.1)',
+                                color: 'white',
+                                border: '2px solid rgba(255,255,255,0.4)',
+                                backdropFilter: 'blur(8px)',
+                                textDecoration: 'none',
+                                letterSpacing: '0.02em',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
                         >
-                            {/* Glow blob behind images */}
-                            <div
-                                className="absolute inset-0 rounded-3xl"
-                                style={{
-                                    background: 'radial-gradient(circle at 50% 50%, rgba(153,0,0,0.12) 0%, transparent 70%)',
-                                    filter: 'blur(24px)',
-                                    transform: 'scale(1.1)',
-                                }}
-                            />
+                            <FiPhone size={14} /> Order on WhatsApp
+                        </a>
+                    </motion.div>
 
-                            {products.length >= 4 ? (
-                                /* 2×2 Collage when we have 4 products */
-                                <div
-                                    className="relative grid grid-cols-2 gap-3 p-2"
-                                    style={{ aspectRatio: '1 / 1', maxWidth: 480, margin: '0 auto' }}
-                                >
-                                    {products.slice(0, 4).map((p, idx) => {
-                                        const src = p.image
-                                            ? p.image.startsWith('http')
-                                                ? p.image
-                                                : `${BACKEND}/${p.image.replace(/^\//, '')}`
-                                            : null;
-
-                                        const radii = [
-                                            '24px 8px 24px 8px',
-                                            '8px 24px 8px 24px',
-                                            '8px 24px 8px 24px',
-                                            '24px 8px 24px 8px',
-                                        ];
-
-                                        return (
-                                            <div
-                                                key={p.id || idx}
-                                                className="relative overflow-hidden"
-                                                style={{
-                                                    borderRadius: radii[idx],
-                                                    aspectRatio: '1 / 1',
-                                                    boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-                                                    border: '2px solid var(--border)',
-                                                    background: 'var(--bg-card)',
-                                                }}
-                                            >
-                                                {src ? (
-                                                    <img
-                                                        src={src}
-                                                        alt={p.name}
-                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.5s ease' }}
-                                                        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.07)'}
-                                                        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-                                                    />
-                                                ) : (
-                                                    <div
-                                                        className="w-full h-full flex items-center justify-center"
-                                                        style={{ background: 'var(--primary-glow)' }}
-                                                    >
-                                                        <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.4 }} />
-                                                    </div>
-                                                )}
-                                                {/* Product name label */}
-                                                <div
-                                                    className="absolute bottom-0 left-0 right-0 px-3 py-2"
-                                                    style={{
-                                                        background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
-                                                    }}
-                                                >
-                                                    <p className="text-white text-xs font-semibold truncate" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.5)' }}>
-                                                        {p.name}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-
-                                    {/* Central brand badge */}
-                                    <div
-                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-16 h-16 rounded-full flex items-center justify-center"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #990000, #7a0000)',
-                                            boxShadow: '0 4px 20px rgba(153,0,0,0.5), 0 0 0 4px var(--bg-card)',
-                                        }}
-                                    >
-                                        <span className="text-white text-xs font-bold text-center leading-tight px-1">MK</span>
-                                    </div>
-                                </div>
-                            ) : products.length > 0 ? (
-                                /* Single featured image fallback */
-                                <div
-                                    className="relative overflow-hidden"
-                                    style={{
-                                        borderRadius: '32px 12px 32px 12px',
-                                        aspectRatio: '4 / 3',
-                                        maxWidth: 480,
-                                        margin: '0 auto',
-                                        boxShadow: '0 16px 60px rgba(0,0,0,0.15)',
-                                        border: '2px solid var(--border)',
-                                        background: 'var(--bg-card)',
-                                    }}
-                                >
-                                    {(() => {
-                                        const p = products[0];
-                                        const src = p?.image
-                                            ? p.image.startsWith('http') ? p.image : `${BACKEND}/${p.image.replace(/^\//, '')}`
-                                            : null;
-                                        return src ? (
-                                            <img src={src} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--primary-glow)' }}>
-                                                <FiImage size={48} style={{ color: 'var(--primary)', opacity: 0.3 }} />
-                                            </div>
-                                        );
-                                    })()}
-                                </div>
-                            ) : (
-                                /* Loading skeleton */
-                                <div
-                                    className="skeleton"
-                                    style={{
-                                        aspectRatio: '1 / 1',
-                                        maxWidth: 480,
-                                        margin: '0 auto',
-                                        borderRadius: 24,
-                                    }}
-                                />
-                            )}
-                        </motion.div>
-                    </div>
+                    {/* Call pill */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.92 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, delay: 0.5 }}
+                        className="inline-flex items-center gap-3 px-5 py-3 rounded-xl"
+                        style={{
+                            background: 'rgba(255,255,255,0.08)',
+                            backdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.18)',
+                        }}
+                    >
+                        <div
+                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#990000', color: 'white' }}
+                        >
+                            <FiPhoneCall size={15} />
+                        </div>
+                        <div className="text-left">
+                            <div className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>Call for Delivery</div>
+                            <div className="font-bold text-sm text-white">+92 303 2683689</div>
+                        </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -500,7 +391,7 @@ const HomePage = () => {
                             >
                                 <Link
                                     to={`/menu?category=${cat.id}`}
-                                    className="flex flex-col items-center justify-center text-center p-6 h-28 rounded-2xl transition-all block"
+                                    className="flex flex-col items-center justify-center text-center p-6 h-28 rounded-lg transition-all block"
                                     style={{
                                         background: 'var(--bg-card)',
                                         border: '1.5px solid var(--border)',
@@ -666,7 +557,7 @@ const HomePage = () => {
                                         x: { type: "spring", stiffness: 300, damping: 30 },
                                         opacity: { duration: 0.2 }
                                     }}
-                                    className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-2xl glass border border-[var(--border)] shadow-md"
+                                    className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md"
                                     style={{ background: 'var(--bg-card)' }}
                                 >
                                     {/* Offer Image */}

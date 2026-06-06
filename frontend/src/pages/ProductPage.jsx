@@ -157,7 +157,7 @@ const ProductPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
                     {/* Left: Product Image */}
                     <motion.div
-                        className="rounded-3xl overflow-hidden glass border border-[var(--border)] shadow-lg aspect-square flex items-center justify-center relative bg-[var(--bg-card)]"
+                        className="rounded-lg overflow-hidden glass border border-[var(--border)] shadow-lg aspect-square flex items-center justify-center relative bg-[var(--bg-card)]"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
@@ -306,7 +306,7 @@ const ProductPage = () => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                             transition={{ duration: 0.2 }}
-                            className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 shadow-sm"
+                            className="bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm"
                         >
                             {/* DESCRIPTION TAB */}
                             {activeTab === 'description' && (
@@ -421,7 +421,7 @@ const ProductPage = () => {
                 </div>
 
                 {/* RELATED ITEMS SECTION (Always Visible) */}
-                <div id="related-items-section" className="mb-12 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                <div id="related-items-section" className="mb-12 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
                     {relatedProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
@@ -517,7 +517,7 @@ const ProductPage = () => {
                 </div>
 
                 {/* EXPLORE PRODUCTS SECTION (Always Visible) */}
-                <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
                     {exploreProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
