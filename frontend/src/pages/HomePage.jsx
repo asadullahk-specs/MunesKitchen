@@ -18,7 +18,6 @@ const BACKEND = import.meta.env.VITE_API_URL
 
 // ─── ReviewCard: single review with image display logic ──────────────────────
 const ReviewCard = ({ review }) => {
-    // 1. Safe parse of stored images (JSON string of base64 data: URLs)
     const userImages = (() => {
         try {
             if (!review.images) return [];
@@ -29,15 +28,10 @@ const ReviewCard = ({ review }) => {
         } catch { return []; }
     })();
 
-    // 2. Build the final display list:
-    //    → user images if any
-    //    → else product image if linked
-    //    → else empty (we'll show a placeholder box)
     const displayImages = (() => {
-        if (userImages.length > 0) return userImages; // base64 data URLs
+        if (userImages.length > 0) return userImages;
         const prodImg = review.product_image;
         if (prodImg) {
-            // absolute URLs are used as-is; relative paths get the backend prefix
             const src = prodImg.startsWith('http')
                 ? prodImg
                 : `${BACKEND}/${prodImg.replace(/^\//, '')}`;
@@ -46,7 +40,6 @@ const ReviewCard = ({ review }) => {
         return [];
     })();
 
-    // 3. Slider state
     const [imgIdx, setImgIdx] = useState(0);
 
     const prev = (e) => {
@@ -61,16 +54,22 @@ const ReviewCard = ({ review }) => {
     if (!review) return null;
 
     return (
-        <div className="card p-5 flex flex-col h-full" style={{ border: '1px solid var(--border)', borderRadius: '1rem' }}>
+        <div 
+            className="flex flex-col h-full w-full overflow-hidden" 
+            style={{ 
+                background: 'var(--bg-card)',
+                border: '1.5px solid var(--border)', 
+                borderRadius: 'var(--radius)',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+            }}
+        >
             {/* Image area */}
             {displayImages.length > 0 ? (
-                <div className="review-img-slider mb-4">
-                    {/* Show current image */}
+                <div className="relative overflow-hidden shrink-0" style={{ aspectRatio: '4/3', background: 'var(--primary-glow)' }}>
                     <img
                         src={displayImages[imgIdx]}
                         alt={`Review photo ${imgIdx + 1}`}
-                        className="review-img-slide"
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                         onError={(e) => { e.target.style.display = 'none'; }}
                     />
 
@@ -99,32 +98,41 @@ const ReviewCard = ({ review }) => {
                     )}
                 </div>
             ) : (
-                /* No images at all — show a neutral placeholder */
-                <div className="mb-4 flex items-center justify-center rounded-xl" style={{ height: 100, background: 'var(--primary-glow)', borderRadius: 12 }}>
-                    <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.5 }} />
+                /* No images at all — show a neutral placeholder box with same aspect ratio */
+                <div className="relative shrink-0 overflow-hidden flex items-center justify-center" style={{ aspectRatio: '4/3', background: 'var(--primary-glow)' }}>
+                    <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.3 }} />
                 </div>
             )}
 
             {/* Review content */}
-            <div className="flex flex-col gap-2 flex-1">
-                <div className="flex justify-between items-start">
-                    <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>
-                        {review.customer_name || 'Anonymous'}
-                    </h3>
-                    <div className="flex text-amber-400">
-                        {[...Array(5)].map((_, i) => (
-                            <FiStar key={i} size={14} fill={i < (review.rating || 0) ? "currentColor" : "none"} />
-                        ))}
+            <div className="px-3.5 py-3 flex flex-col flex-1 justify-between gap-2">
+                <div>
+                    <div className="flex justify-between items-start gap-2 mb-2">
+                        <h3 className="font-bold text-sm text-[var(--text-main)] truncate" title={review.customer_name || 'Anonymous'}>
+                            {review.customer_name || 'Anonymous'}
+                        </h3>
+                        <div className="flex text-amber-400 shrink-0">
+                            {[...Array(5)].map((_, i) => (
+                                <FiStar key={i} size={13} fill={i < (review.rating || 0) ? "currentColor" : "none"} stroke="currentColor" />
+                            ))}
+                        </div>
                     </div>
-                </div>
 
-                {(review.product_name || review.product_id?.name) && (
-                    <p className="text-xs font-medium px-2 py-1 rounded w-fit" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
-                        {review.product_name || review.product_id?.name}
+                    {(review.product_name || review.product_id?.name) && (
+                        <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded bg-[var(--primary-glow)] border border-[var(--border)] mb-2" style={{ color: 'var(--primary)', width: 'fit-content' }}>
+                            {review.product_name || review.product_id?.name}
+                        </span>
+                    )}
+
+                    <p className="text-xs italic leading-relaxed text-[var(--text-muted)] line-clamp-3">
+                        "{review.message || ''}"
                     </p>
-                )}
-
-                <p className="text-sm italic mt-1" style={{ color: 'var(--text-muted)' }}>"{review.message || ''}"</p>
+                </div>
+                
+                {/* Date footer */}
+                <div className="text-[10px] text-right font-medium" style={{ color: 'var(--text-muted)', opacity: 0.8 }}>
+                    {new Date(review.created_at || review.createdAt || Date.now()).toLocaleDateString('en-GB')}
+                </div>
             </div>
         </div>
     );
@@ -212,12 +220,8 @@ const HomePage = () => {
         <div>
             {/* ===== HERO SECTION ===== */}
             <section
-                className="relative overflow-hidden"
+                className="relative overflow-hidden flex items-center justify-center min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh]"
                 style={{
-                    minHeight: '100vh',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     backgroundImage: 'url(/hero-bg.jpg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
@@ -228,7 +232,7 @@ const HomePage = () => {
                 <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.78) 100%)' }} />
 
                 {/* Centered Content */}
-                <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center py-28">
+                <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center py-10 sm:py-16 md:py-20">
                     <motion.p
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -248,7 +252,7 @@ const HomePage = () => {
                         style={{ fontSize: 'clamp(2.4rem, 8vw, 5rem)', lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.4)' }}
                     >
                         Where{' '}
-                        <span style={{ color: '#ff6b35', fontStyle: 'italic' }}>Freshness</span>
+                        <span style={{ color: '#ef4444', fontStyle: 'italic' }}>Freshness</span>
                         <br />
                         Meets Freezing
                     </motion.h1>
@@ -379,7 +383,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Desktop/Tablet View — ProductCard per category */}
-                    <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 gap-6">
+                    <div className="hidden sm:grid grid-cols-2 md:grid-cols-4 gap-6 justify-items-start">
                         {validCategories.map((cat, i) => {
                             const catProduct = allMenuProducts.find(p => {
                                 const pCatId = p.category_id?.id || p.category?.id;
@@ -411,104 +415,37 @@ const HomePage = () => {
                         })}
                     </div>
 
-                    {/* ── Mobile Only Carousel ── */}
+                    {/* ── Mobile Only Horizontally Scrollable Row ── */}
                     <div className="block sm:hidden">
                         {loading ? (
                             <div className="text-center py-12">
                                 <div className="w-8 h-8 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid', borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
                             </div>
-                        ) : validCategories.length > 0 && activeCatProduct ? (
-                            <div style={{ position: 'relative' }}>
-                                {/* Counter pill */}
-                                <div className="flex justify-center mb-4">
-                                    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(153, 0, 0, 0.18)' }}>
-                                        {activeCatIdx + 1} / {validCategories.length}
-                                    </span>
-                                </div>
-
-                                {/* Slide area */}
-                                <div className="relative overflow-hidden w-full" style={{ paddingBottom: 8 }}>
-                                    <AnimatePresence initial={false} custom={catDirection} mode="wait">
-                                        <motion.div
-                                            key={activeCatIdx}
-                                            custom={catDirection}
-                                            variants={{
-                                                enter: (dir) => ({
-                                                    x: dir > 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                }),
-                                                center: {
-                                                    x: 0,
-                                                    opacity: 1
-                                                },
-                                                exit: (dir) => ({
-                                                    x: dir < 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                })
-                                            }}
-                                            initial="enter"
-                                            animate="center"
-                                            exit="exit"
-                                            transition={{
-                                                x: { type: "spring", stiffness: 300, damping: 30 },
-                                                opacity: { duration: 0.2 }
-                                            }}
-                                            drag="x"
-                                            dragConstraints={{ left: 0, right: 0 }}
-                                            dragElastic={0.6}
-                                            onDragEnd={(event, info) => {
-                                                const swipeThreshold = 50;
-                                                if (info.offset.x < -swipeThreshold) {
-                                                    setCatDirection(1);
-                                                    setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
-                                                } else if (info.offset.x > swipeThreshold) {
-                                                    setCatDirection(-1);
-                                                    setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
-                                                }
-                                            }}
-                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center px-2"
-                                        >
-                                            {/* Category name */}
-                                            <div className="flex items-center gap-2 mb-4">
-                                                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--primary)' }}>
-                                                    {activeCat?.name}
-                                                </h3>
+                        ) : validCategories.length > 0 ? (
+                            <div className="mobile-scroll-container px-4 -mx-4">
+                                {validCategories.map((cat, i) => {
+                                    const catProduct = allMenuProducts.find(p => {
+                                        const pCatId = p.category_id?.id || p.category?.id;
+                                        return String(pCatId) === String(cat.id || cat._id);
+                                    });
+                                    if (!catProduct) return null;
+                                    return (
+                                        <div key={cat.id || i} className="mobile-scroll-item flex flex-col">
+                                            <div className="flex items-center justify-between mb-3 px-1">
+                                                <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[150px]">{cat.name}</h3>
+                                                <Link
+                                                    to={`/menu?category=${cat.id}`}
+                                                    className="text-xs font-semibold flex items-center gap-0.5"
+                                                    style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                                                >
+                                                    See all <FiArrowRight size={10} />
+                                                </Link>
                                             </div>
-                                            <div className="w-full" style={{ maxWidth: 360 }}>
-                                                <ProductCard product={activeCatProduct} onViewDetails={setSelectedProduct} />
-                                            </div>
-                                            <Link
-                                                to={`/menu?category=${activeCat?.id || activeCat?._id}`}
-                                                className="btn-primary w-full text-center py-3 mt-4 flex items-center justify-center gap-2"
-                                                style={{ textDecoration: 'none', maxWidth: 360 }}
-                                            >
-                                                Explore All {activeCat?.name} <FiArrowRight size={14} />
-                                            </Link>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </div>
-
-                                {/* Dot indicators */}
-                                <div className="flex justify-center gap-2 mt-5">
-                                    {validCategories.map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => { setCatDirection(i > activeCatIdx ? 1 : -1); setActiveCatIdx(i); }}
-                                            aria-label={`Go to category ${i + 1}`}
-                                            style={{
-                                                width: i === activeCatIdx ? 22 : 8,
-                                                height: 8,
-                                                borderRadius: 4,
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                padding: 0,
-                                                transition: 'all 0.3s ease',
-                                                background: i === activeCatIdx ? 'var(--primary)' : 'var(--border)',
-                                            }}
-                                        />
-                                    ))}
-                                </div>
+                                            <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ) : (
                             <div className="text-center py-8">
@@ -526,17 +463,25 @@ const HomePage = () => {
 
             {/* ===== EXCLUSIVE OFFERS SECTION ===== */}
             {offers.length > 0 && (
-                <section className="py-12 px-4" style={{ background: 'linear-gradient(180deg, rgba(239,68,68,0.01) 0%, rgba(239,68,68,0.05) 100%)' }}>
-                    <div className="max-w-4xl mx-auto">
+                <section 
+                    className="relative py-12 px-4 overflow-hidden" 
+                    style={{ 
+                        backgroundImage: 'url(/hero-bg.jpg)',
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        backgroundRepeat: 'no-repeat'
+                    }}
+                >
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-[1px]" />
+                    
+                    <div className="relative z-10 max-w-4xl mx-auto">
                         <div className="text-center mb-8">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
-                                <FiGift size={13} /> Exclusive Deals
-                            </span>
-                            <h2 className="section-title mb-2">PROMO OFFERS & BANNERS</h2>
-                            <p className="section-subtitle">Mouth-watering deals crafted just for you!</p>
+                            <h2 className="section-title mb-3 text-white">PROMO OFFERS & BANNERS</h2>
+                            <p className="section-subtitle text-gray-300">Mouth-watering deals crafted just for you!</p>
                         </div>
 
-                        <div className="relative w-full px-10 md:px-0">
+                        {/* Desktop View (md and up) */}
+                        <div className="hidden md:block relative w-full">
                             <div className="overflow-hidden w-full min-h-[300px] pb-4">
                                 <AnimatePresence initial={false} custom={offerDirection} mode="wait">
                                     <motion.div
@@ -563,11 +508,11 @@ const HomePage = () => {
                                             x: { type: "spring", stiffness: 300, damping: 30 },
                                             opacity: { duration: 0.2 }
                                         }}
-                                        className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md"
+                                        className="w-full flex flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md animate-none"
                                         style={{ background: 'var(--bg-card)' }}
                                     >
                                         {/* Offer Image */}
-                                        <div className="w-full md:w-1/3 aspect-video md:aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                                        <div className="w-1/3 aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
                                             {offers[activeOfferIdx].image ? (
                                                 <img
                                                     src={offers[activeOfferIdx].image.startsWith('http') ? offers[activeOfferIdx].image : `${BACKEND}/${offers[activeOfferIdx].image.replace(/^\//, '')}`}
@@ -580,9 +525,9 @@ const HomePage = () => {
                                         </div>
 
                                         {/* Offer Details */}
-                                        <div className="flex-1 text-center md:text-left flex flex-col justify-between h-full py-2">
+                                        <div className="flex-1 text-left flex flex-col justify-between h-full py-2">
                                             <div>
-                                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
+                                                <div className="flex flex-wrap items-center gap-2 mb-3">
                                                     <h3 className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>
                                                         {offers[activeOfferIdx].name}
                                                     </h3>
@@ -597,8 +542,8 @@ const HomePage = () => {
                                                 </p>
                                             </div>
 
-                                            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                                                <div className="text-center sm:text-left">
+                                            <div className="flex flex-row items-center gap-6">
+                                                <div>
                                                     <span className="text-xs text-[var(--text-muted)] line-through block">
                                                         Rs. {offers[activeOfferIdx].original_price}
                                                     </span>
@@ -608,14 +553,14 @@ const HomePage = () => {
                                                 </div>
 
                                                 <div className="flex gap-2">
-                                                    <Link to="/menu" className="btn-primary text-xs py-2 px-5">
+                                                    <Link to="/menu" className="btn-primary text-xs py-2.5 px-5">
                                                         Explore Menu
                                                     </Link>
                                                     <a
                                                         href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offers[activeOfferIdx].name)}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="btn-outline text-xs py-2 px-5 flex items-center gap-1.5"
+                                                        className="btn-outline text-xs py-2.5 px-5 flex items-center gap-1.5"
                                                     >
                                                         <FiPhone size={12} /> WhatsApp Order
                                                     </a>
@@ -669,30 +614,101 @@ const HomePage = () => {
                                     </button>
                                 </>
                             )}
+
+                            {/* Dot indicators */}
+                            {offers.length > 1 && (
+                                <div className="flex justify-center gap-2 mt-5">
+                                    {offers.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => { setOfferDirection(i > activeOfferIdx ? 1 : -1); setActiveOfferIdx(i); }}
+                                            aria-label={`Go to offer ${i + 1}`}
+                                            style={{
+                                                width: i === activeOfferIdx ? 22 : 8,
+                                                height: 8,
+                                                borderRadius: 4,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                                transition: 'all 0.3s ease',
+                                                background: i === activeOfferIdx ? 'var(--primary)' : 'var(--border)',
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
-                        {/* Dot indicators */}
-                        {offers.length > 1 && (
-                            <div className="flex justify-center gap-2 mt-5">
-                                {offers.map((_, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => { setOfferDirection(i > activeOfferIdx ? 1 : -1); setActiveOfferIdx(i); }}
-                                        aria-label={`Go to offer ${i + 1}`}
-                                        style={{
-                                            width: i === activeOfferIdx ? 22 : 8,
-                                            height: 8,
-                                            borderRadius: 4,
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: 0,
-                                            transition: 'all 0.3s ease',
-                                            background: i === activeOfferIdx ? 'var(--primary)' : 'var(--border)',
-                                        }}
-                                    />
-                                ))}
+                        {/* Mobile/Tablet View (less than md) — scrollable cards */}
+                        <div className="block md:hidden">
+                            <div className="mobile-scroll-container px-4 -mx-4">
+                                {offers.map((offer, idx) => {
+                                    const imgUrl = offer.image 
+                                        ? (offer.image.startsWith('http') ? offer.image : `${BACKEND}/${offer.image.replace(/^\//, '')}`)
+                                        : null;
+                                    return (
+                                        <div 
+                                            key={offer.id || idx} 
+                                            className="mobile-scroll-item glass border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between"
+                                            style={{ background: 'var(--bg-card)', width: '280px' }}
+                                        >
+                                            {/* Image */}
+                                            <div className="aspect-video w-full rounded-lg overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0 mb-3">
+                                                {imgUrl ? (
+                                                    <img src={imgUrl} alt={offer.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <FiGift size={32} style={{ color: 'var(--primary)', opacity: 0.4 }} />
+                                                )}
+                                            </div>
+
+                                            {/* Details */}
+                                            <div className="flex-grow flex flex-col justify-between gap-3">
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1.5">
+                                                        <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[150px]" title={offer.name}>
+                                                            {offer.name}
+                                                        </h3>
+                                                        {offer.discount_percentage > 0 && (
+                                                            <span className="badge-hot font-extrabold text-[8px] px-1 py-0.5 shrink-0">
+                                                                {offer.discount_percentage}% OFF
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs leading-relaxed text-[var(--text-muted)] line-clamp-2">
+                                                        {offer.description || 'Special promo deal.'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <div className="mb-3">
+                                                        <span className="text-[10px] text-[var(--text-muted)] line-through block">
+                                                            Rs. {offer.original_price}
+                                                        </span>
+                                                        <span className="text-base font-black" style={{ color: 'var(--primary)' }}>
+                                                            Rs. {offer.discounted_price}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-1.5 w-full">
+                                                        <Link to="/menu" className="btn-primary text-xs py-2 px-3 text-center justify-center w-full">
+                                                            Explore Menu
+                                                        </Link>
+                                                        <a
+                                                            href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offer.name)}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="btn-outline text-xs py-2 px-3 flex items-center justify-center gap-1.5 w-full"
+                                                        >
+                                                            <FiPhone size={12} /> WhatsApp Order
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
-                        )}
+                        </div>
                     </div>
                 </section>
             )}
@@ -704,15 +720,20 @@ const HomePage = () => {
                         <h2 className="section-title mb-3">Top Products</h2>
                         <p className="section-subtitle">Our best-selling frozen favorites</p>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory flex-nowrap sm:flex-wrap sm:grid-cols-2 lg:grid-cols-4 gap-6 no-scrollbar pb-4 px-4 -mx-4 sm:px-0 sm:mx-0">
                         {loading
-                            ? Array(4).fill(0).map((_, i) => <SkeletonCard key={i} />)
+                            ? Array(4).fill(0).map((_, i) => (
+                                <div key={i} className="snap-center shrink-0 w-[280px] sm:w-auto">
+                                    <SkeletonCard />
+                                </div>
+                            ))
                             : products.map((product) => (
-                                <ProductCard
-                                    key={product.id}
-                                    product={product}
-                                    onViewDetails={setSelectedProduct}
-                                />
+                                <div key={product.id} className="snap-center shrink-0 w-[280px] sm:w-auto">
+                                    <ProductCard
+                                        product={product}
+                                        onViewDetails={setSelectedProduct}
+                                    />
+                                </div>
                             ))}
                     </div>
                     <div className="text-center mt-10">
@@ -724,16 +745,26 @@ const HomePage = () => {
             </section>
 
             {/* ===== TESTIMONIALS ===== */}
-            <section className="py-6 md:py-10 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
-                <div className="max-w-6xl mx-auto">
+            <section 
+                className="relative py-12 md:py-16 px-4 overflow-hidden" 
+                style={{ 
+                    backgroundImage: 'url(/hero-bg.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                <div className="absolute inset-0 bg-black/85 backdrop-blur-[1px]" />
+                
+                <div className="relative z-10 max-w-6xl mx-auto">
                     <div className="text-center mb-8">
-                        <h2 className="section-title mb-3">CUSTOMERS FEEDBACK</h2>
-                        <p className="section-subtitle">Real feedback from people who ordered from Mune's Kitchen</p>
+                        <h2 className="section-title mb-3 text-white">CUSTOMERS FEEDBACK</h2>
+                        <p className="section-subtitle text-gray-300">Real feedback from people who ordered from Mune's Kitchen</p>
                     </div>
 
                     {/* Rating summary + breakdown */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                        <div className="card p-6 flex flex-col items-center justify-center text-center">
+                        <div className="card p-6 flex flex-col items-center justify-center text-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             <div className="font-display text-6xl font-bold gradient-text mb-2">
                                 {Number(reviewStats.avgRating).toFixed(1)}
                             </div>
@@ -745,12 +776,12 @@ const HomePage = () => {
                                     />
                                 ))}
                             </div>
-                            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                            <div className="text-sm font-semibold text-[var(--text-muted)]">
                                 Based on {reviewStats.total} reviews
                             </div>
                         </div>
 
-                        <div className="card p-6 flex flex-col gap-2">
+                        <div className="card p-6 flex flex-col gap-2 justify-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             {reviewStats.breakdown.map(({ star, count }) => (
                                 <div key={star} className="flex items-center gap-3">
                                     <span className="text-sm w-12 flex items-center justify-end gap-1 text-right" style={{ color: 'var(--text-muted)' }}>
@@ -765,97 +796,115 @@ const HomePage = () => {
                                             }}
                                         />
                                     </div>
-                                    <span className="text-sm w-6" style={{ color: 'var(--text-muted)' }}>{count}</span>
+                                    <span className="text-sm w-6 font-semibold" style={{ color: 'var(--text-muted)' }}>{count}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* ===== REVIEWS: grid (≤3) or carousel (>3) ===== */}
+                    {/* ===== REVIEWS: grid (≤3) or carousel (>3) on Desktop, scrollable on Mobile ===== */}
                     <div className="mb-8">
                         {reviews.length === 0 ? (
-                            <p className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
+                            <p className="text-center py-8 text-gray-400">
                                 No reviews yet. Be the first to share your experience!
                             </p>
-                        ) : reviews.length <= 3 ? (
-                            <div className={`grid gap-6 ${reviews.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                                reviews.length === 2 ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto' :
-                                    'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                                }`}>
-                                {reviews.map((review, i) => (
-                                    <ReviewCard key={review.id || i} review={review} isStatic={true} />
-                                ))}
-                            </div>
                         ) : (
-                            <div className="reviews-swiper-wrapper">
-                                <div className="relative overflow-hidden w-full">
-                                    <AnimatePresence initial={false} custom={direction} mode="wait">
-                                        <motion.div
-                                            key={activeIdx}
-                                            custom={direction}
-                                            variants={{
-                                                enter: (dir) => ({
-                                                    x: dir > 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                }),
-                                                center: {
-                                                    x: 0,
-                                                    opacity: 1
-                                                },
-                                                exit: (dir) => ({
-                                                    x: dir < 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                })
-                                            }}
-                                            initial="enter"
-                                            animate="center"
-                                            exit="exit"
-                                            transition={{
-                                                x: { type: "spring", stiffness: 300, damping: 30 },
-                                                opacity: { duration: 0.2 }
-                                            }}
-                                            drag="x"
-                                            dragConstraints={{ left: 0, right: 0 }}
-                                            dragElastic={0.6}
-                                            onDragEnd={(event, info) => {
-                                                const swipeThreshold = 50;
-                                                if (info.offset.x < -swipeThreshold) {
-                                                    setDirection(1);
-                                                    setActiveIdx((prev) => (prev + 1) % reviews.length);
-                                                } else if (info.offset.x > swipeThreshold) {
-                                                    setDirection(-1);
-                                                    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
-                                                }
-                                            }}
-                                            className="w-full cursor-grab active:cursor-grabbing"
-                                        >
-                                            <ReviewCard review={reviews[activeIdx]} />
-                                        </motion.div>
-                                    </AnimatePresence>
+                            <>
+                                {/* Mobile View — Horizontally Scrollable Row */}
+                                <div className="block sm:hidden">
+                                    <div className="mobile-scroll-container px-4 -mx-4">
+                                        {reviews.map((review, i) => (
+                                            <div key={review.id || i} className="mobile-scroll-item">
+                                                <ReviewCard review={review} />
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
-                                {/* Custom navigation arrows */}
-                                <button
-                                    className="reviews-prev swiper-nav-btn"
-                                    onClick={() => {
-                                        setDirection(-1);
-                                        setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
-                                    }}
-                                    aria-label="Previous reviews"
-                                >
-                                    <FiChevronLeft size={20} />
-                                </button>
-                                <button
-                                    className="reviews-next swiper-nav-btn"
-                                    onClick={() => {
-                                        setDirection(1);
-                                        setActiveIdx((prev) => (prev + 1) % reviews.length);
-                                    }}
-                                    aria-label="Next reviews"
-                                >
-                                    <FiChevronRight size={20} />
-                                </button>
-                            </div>
+                                {/* Desktop View — grid or swiper */}
+                                <div className="hidden sm:block">
+                                    {reviews.length <= 3 ? (
+                                        <div className={`grid gap-6 ${reviews.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
+                                            reviews.length === 2 ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto' :
+                                                'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                                            }`}>
+                                            {reviews.map((review, i) => (
+                                                <ReviewCard key={review.id || i} review={review} isStatic={true} />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="reviews-swiper-wrapper">
+                                            <div className="relative overflow-hidden w-full">
+                                                <AnimatePresence initial={false} custom={direction} mode="wait">
+                                                    <motion.div
+                                                        key={activeIdx}
+                                                        custom={direction}
+                                                        variants={{
+                                                            enter: (dir) => ({
+                                                                x: dir > 0 ? '100%' : '-100%',
+                                                                opacity: 0
+                                                            }),
+                                                            center: {
+                                                                x: 0,
+                                                                opacity: 1
+                                                            },
+                                                            exit: (dir) => ({
+                                                                x: dir < 0 ? '100%' : '-100%',
+                                                                opacity: 0
+                                                            })
+                                                        }}
+                                                        initial="enter"
+                                                        animate="center"
+                                                        exit="exit"
+                                                        transition={{
+                                                            x: { type: "spring", stiffness: 300, damping: 30 },
+                                                            opacity: { duration: 0.2 }
+                                                        }}
+                                                        drag="x"
+                                                        dragConstraints={{ left: 0, right: 0 }}
+                                                        dragElastic={0.6}
+                                                        onDragEnd={(event, info) => {
+                                                            const swipeThreshold = 50;
+                                                            if (info.offset.x < -swipeThreshold) {
+                                                                setDirection(1);
+                                                                setActiveIdx((prev) => (prev + 1) % reviews.length);
+                                                            } else if (info.offset.x > swipeThreshold) {
+                                                                setDirection(-1);
+                                                                setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
+                                                            }
+                                                        }}
+                                                        className="w-full cursor-grab active:cursor-grabbing"
+                                                    >
+                                                        <ReviewCard review={reviews[activeIdx]} />
+                                                    </motion.div>
+                                                </AnimatePresence>
+                                            </div>
+
+                                            {/* Custom navigation arrows */}
+                                            <button
+                                                className="reviews-prev swiper-nav-btn"
+                                                onClick={() => {
+                                                    setDirection(-1);
+                                                    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
+                                                }}
+                                                aria-label="Previous reviews"
+                                            >
+                                                <FiChevronLeft size={20} />
+                                            </button>
+                                            <button
+                                                className="reviews-next swiper-nav-btn"
+                                                onClick={() => {
+                                                    setDirection(1);
+                                                    setActiveIdx((prev) => (prev + 1) % reviews.length);
+                                                }}
+                                                aria-label="Next reviews"
+                                            >
+                                                <FiChevronRight size={20} />
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
                         )}
                     </div>
 

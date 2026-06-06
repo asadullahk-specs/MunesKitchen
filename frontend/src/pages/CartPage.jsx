@@ -58,7 +58,7 @@ const CartPage = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                     <div className="lg:col-span-2 space-y-4">
                         <AnimatePresence>
@@ -141,7 +141,7 @@ const CartPage = () => {
                     </div>
 
                     <div className="lg:col-span-1">
-                        <div className="card p-6 sticky top-24">
+                        <div className="card p-5 lg:sticky lg:top-24">
                             <h2
                                 className="font-bold text-lg mb-5"
                                 style={{ color: 'var(--text-main)' }}
@@ -150,11 +150,11 @@ const CartPage = () => {
                             </h2>
                             <div className="space-y-3 mb-5">
                                 {safeCart.map((item) => (
-                                    <div key={item.id} className="flex justify-between text-sm">
-                                        <span style={{ color: 'var(--text-muted)' }}>
+                                    <div key={item.id} className="flex justify-between text-sm gap-2">
+                                        <span className="flex-1 min-w-0 truncate" style={{ color: 'var(--text-muted)' }}>
                                             {item.name} × {item.quantity}
                                         </span>
-                                        <span style={{ color: 'var(--text-main)' }}>
+                                        <span className="shrink-0 font-semibold" style={{ color: 'var(--text-main)' }}>
                                             Rs. {(Number(item.price) * item.quantity).toLocaleString()}
                                         </span>
                                     </div>

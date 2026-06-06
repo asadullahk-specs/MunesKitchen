@@ -19,31 +19,11 @@ const ProductPage = () => {
     const [loading, setLoading] = useState(true);
     const [qty, setQty] = useState(1);
     
-    // Accordion open/close states (Woodmart/Dinenos style)
-    const [openAccordion, setOpenAccordion] = useState({
-        description: true,
-        info: false,
-        reviews: false,
-        brand: false,
-        shipping: false
-    });
+    // Accordion open/close states — single-active (opening one closes others)
+    const [openAccordion, setOpenAccordion] = useState('description');
 
     const toggleAccordion = (tabId) => {
-        setOpenAccordion(prev => ({ ...prev, [tabId]: !prev[tabId] }));
-    };
-
-    // Sticky bottom nav state (shows on small screens after scroll)
-    const [showStickyNav, setShowStickyNav] = useState(false);
-    useEffect(() => {
-        const handleScroll = () => setShowStickyNav(window.scrollY > 300);
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const scrollToAccordion = (tabId) => {
-        setOpenAccordion(prev => ({ ...prev, [tabId]: true }));
-        const el = document.getElementById(`accordion-${tabId}`);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setOpenAccordion(prev => (prev === tabId ? null : tabId));
     };
 
     // Reviews states
@@ -54,10 +34,8 @@ const ProductPage = () => {
     // Related & Explore states
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [exploreProducts, setExploreProducts] = useState([]);
-    const [activeRelatedIdx, setActiveRelatedIdx] = useState(0);
-    const [activeExploreIdx, setActiveExploreIdx] = useState(0);
-    const [relatedDirection, setRelatedDirection] = useState(0);
-    const [exploreDirection, setExploreDirection] = useState(0);
+    const relatedScrollRef = useRef(null);
+    const exploreScrollRef = useRef(null);
 
     useEffect(() => {
         if (!id) return;
@@ -66,8 +44,6 @@ const ProductPage = () => {
             setLoading(true);
             setReviewsLoading(true);
             setQty(1);
-            setActiveRelatedIdx(0);
-            setActiveExploreIdx(0);
             try {
                 // 1. Fetch Product details
                 const prodRes = await getProduct(id);
@@ -137,21 +113,8 @@ const ProductPage = () => {
         addToCart(product, qty);
     };
 
-    const handleTabClick = (tabId) => {
-        if (['description', 'info', 'reviews'].includes(tabId)) {
-            setActiveTab(tabId);
-        } else if (tabId === 'related') {
-            const el = document.getElementById('related-items-section');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        } else if (tabId === 'explore') {
-            const el = document.getElementById('explore-products-section');
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-    };
+
+
 
     if (loading) {
         return (
@@ -168,53 +131,7 @@ const ProductPage = () => {
         : null;
 
     return (
-        <div className="min-h-screen bg-[var(--bg-deep)] pt-28 pb-16 px-4 sm:px-6 lg:px-8">
-            {/* ─── Sticky bottom pill nav — visible only on small screens when scrolled ─── */}
-            <AnimatePresence>
-                {showStickyNav && (
-                    <motion.div
-                        initial={{ y: 80, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: 80, opacity: 0 }}
-                        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
-                        className="fixed bottom-4 left-1/2 z-50 sm:hidden"
-                        style={{ transform: 'translateX(-50%)', width: 'max-content', maxWidth: '95vw' }}
-                    >
-                        <div
-                            className="flex items-center gap-1 px-2 py-1.5 rounded-full shadow-2xl"
-                            style={{
-                                background: 'var(--bg-card)',
-                                border: '1.5px solid var(--border)',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
-                            }}
-                        >
-                            {[
-                                { id: 'description', icon: <FiLayers size={14} />, label: 'Info' },
-                                { id: 'info', icon: <FiInfo size={14} />, label: 'Details' },
-                                { id: 'reviews', icon: <FiMessageSquare size={14} />, label: 'Reviews' },
-                                { id: 'brand', icon: <FiAward size={14} />, label: 'Brand' },
-                                { id: 'shipping', icon: <FiTruck size={14} />, label: 'Delivery' },
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => scrollToAccordion(tab.id)}
-                                    className="flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
-                                    style={{
-                                        background: openAccordion[tab.id] ? 'var(--primary)' : 'transparent',
-                                        color: openAccordion[tab.id] ? '#fff' : 'var(--text-muted)',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        minWidth: 48,
-                                    }}
-                                >
-                                    {tab.icon}
-                                    <span style={{ fontSize: '0.6rem', lineHeight: 1 }}>{tab.label}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+        <div className="min-h-screen bg-[var(--bg-deep)] pt-16 pb-12 px-4 sm:px-6 lg:px-8">
 
             <div className="max-w-6xl mx-auto">
                 {/* Back button */}
@@ -339,19 +256,19 @@ const ProductPage = () => {
                         <button
                             onClick={() => toggleAccordion('description')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
-                            style={{ color: openAccordion.description ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            style={{ color: openAccordion === 'description' ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
                         >
                             <div className="flex items-center gap-2.5">
-                                <FiLayers size={17} style={{ color: openAccordion.description ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <FiLayers size={17} style={{ color: openAccordion === 'description' ? 'var(--primary)' : 'var(--text-muted)' }} />
                                 <span>Description</span>
                             </div>
                             <FiChevronDown
                                 size={18}
-                                className={`transition-transform duration-300 ${openAccordion.description ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                                className={`transition-transform duration-300 ${openAccordion === 'description' ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
                             />
                         </button>
                         <AnimatePresence initial={false}>
-                            {openAccordion.description && (
+                            {openAccordion === 'description' && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -376,19 +293,19 @@ const ProductPage = () => {
                         <button
                             onClick={() => toggleAccordion('info')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
-                            style={{ color: openAccordion.info ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            style={{ color: openAccordion === 'info' ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
                         >
                             <div className="flex items-center gap-2.5">
-                                <FiInfo size={17} style={{ color: openAccordion.info ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <FiInfo size={17} style={{ color: openAccordion === 'info' ? 'var(--primary)' : 'var(--text-muted)' }} />
                                 <span>Additional Information</span>
                             </div>
                             <FiChevronDown
                                 size={18}
-                                className={`transition-transform duration-300 ${openAccordion.info ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                                className={`transition-transform duration-300 ${openAccordion === 'info' ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
                             />
                         </button>
                         <AnimatePresence initial={false}>
-                            {openAccordion.info && (
+                            {openAccordion === 'info' && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -427,19 +344,19 @@ const ProductPage = () => {
                         <button
                             onClick={() => toggleAccordion('reviews')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
-                            style={{ color: openAccordion.reviews ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            style={{ color: openAccordion === 'reviews' ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
                         >
                             <div className="flex items-center gap-2.5">
-                                <FiMessageSquare size={17} style={{ color: openAccordion.reviews ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <FiMessageSquare size={17} style={{ color: openAccordion === 'reviews' ? 'var(--primary)' : 'var(--text-muted)' }} />
                                 <span>Reviews ({reviewStats.total})</span>
                             </div>
                             <FiChevronDown
                                 size={18}
-                                className={`transition-transform duration-300 ${openAccordion.reviews ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                                className={`transition-transform duration-300 ${openAccordion === 'reviews' ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
                             />
                         </button>
                         <AnimatePresence initial={false}>
-                            {openAccordion.reviews && (
+                            {openAccordion === 'reviews' && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
@@ -522,91 +439,6 @@ const ProductPage = () => {
                             )}
                         </AnimatePresence>
                     </div>
-
-                    {/* PANEL 4: ABOUT BRAND */}
-                    <div id="accordion-brand" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
-                        <button
-                            onClick={() => toggleAccordion('brand')}
-                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
-                            style={{ color: openAccordion.brand ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                        >
-                            <div className="flex items-center gap-2.5">
-                                <FiAward size={17} style={{ color: openAccordion.brand ? 'var(--primary)' : 'var(--text-muted)' }} />
-                                <span>About Brand</span>
-                            </div>
-                            <FiChevronDown
-                                size={18}
-                                className={`transition-transform duration-300 ${openAccordion.brand ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
-                            />
-                        </button>
-                        <AnimatePresence initial={false}>
-                            {openAccordion.brand && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
-                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
-                                            <p className="mb-3">
-                                                <strong>Mune's Kitchen</strong> is a premium, home-based culinary destination specializing in masterfully crafted, fresh, and frozen delicacies.
-                                            </p>
-                                            <p>
-                                                We believe in the power of fresh ingredients, time-honored family recipes, and hygienic preparation methods. From hot-selling BBQ and rolls to homemade frozen snacks, every bite is curated to offer an exceptional dining experience right at your home.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* PANEL 5: SHIPPING & DELIVERY */}
-                    <div id="accordion-shipping" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
-                        <button
-                            onClick={() => toggleAccordion('shipping')}
-                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
-                            style={{ color: openAccordion.shipping ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
-                        >
-                            <div className="flex items-center gap-2.5">
-                                <FiTruck size={17} style={{ color: openAccordion.shipping ? 'var(--primary)' : 'var(--text-muted)' }} />
-                                <span>Shipping & Delivery</span>
-                            </div>
-                            <FiChevronDown
-                                size={18}
-                                className={`transition-transform duration-300 ${openAccordion.shipping ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
-                            />
-                        </button>
-                        <AnimatePresence initial={false}>
-                            {openAccordion.shipping && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
-                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
-                                            <ul className="list-disc pl-5 space-y-2">
-                                                <li>
-                                                    <strong>Lahore Delivery:</strong> We deliver to all selected sectors of Lahore (including DHA, Gulberg, Johar Town, Model Town, Cavalry Ground, etc.).
-                                                </li>
-                                                <li>
-                                                    <strong>Pre-order Requirement:</strong> Please place your orders at least 3 hours in advance to guarantee freshly prepared items.
-                                                </li>
-                                                <li>
-                                                    <strong>Delivery Fees:</strong> Standard charges apply depending on your selected neighborhood, which will be automatically calculated during checkout.
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
                 </div>
 
                 {/* RELATED ITEMS SECTION (Always Visible) */}
@@ -623,83 +455,18 @@ const ProductPage = () => {
                                 ))}
                             </div>
 
-                            {/* Mobile View: Swipe-friendly arrow-navigated single card carousel */}
-                            <div className="block sm:hidden relative px-8">
-                                <div className="relative overflow-hidden min-h-[380px] flex items-center justify-center">
-                                    {relatedProducts.length > 1 && (
-                                        <button
-                                            onClick={() => {
-                                                setRelatedDirection(-1);
-                                                setActiveRelatedIdx(prev => (prev - 1 + relatedProducts.length) % relatedProducts.length);
-                                            }}
-                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
-                                            aria-label="Previous Related Item"
-                                        >
-                                            <FiChevronLeft size={16} />
-                                        </button>
-                                    )}
-                                    <AnimatePresence initial={false} custom={relatedDirection} mode="wait">
-                                        <motion.div
-                                            key={`related-${activeRelatedIdx}`}
-                                            custom={relatedDirection}
-                                            variants={{
-                                                enter: (dir) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
-                                                center: { x: 0, opacity: 1 },
-                                                exit: (dir) => ({ x: dir < 0 ? 120 : -120, opacity: 0 })
-                                            }}
-                                            initial="enter"
-                                            animate="center"
-                                            exit="exit"
-                                            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-                                            drag="x"
-                                            dragConstraints={{ left: 0, right: 0 }}
-                                            dragElastic={0.6}
-                                            onDragEnd={(e, info) => {
-                                                const swipeThreshold = 50;
-                                                if (info.offset.x < -swipeThreshold) {
-                                                    setRelatedDirection(1);
-                                                    setActiveRelatedIdx(prev => (prev + 1) % relatedProducts.length);
-                                                } else if (info.offset.x > swipeThreshold) {
-                                                    setRelatedDirection(-1);
-                                                    setActiveRelatedIdx(prev => (prev - 1 + relatedProducts.length) % relatedProducts.length);
-                                                }
-                                            }}
-                                            className="w-full flex justify-center"
-                                        >
-                                            <div className="w-full max-w-[280px]">
-                                                <ProductCard product={relatedProducts[activeRelatedIdx]} />
-                                            </div>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                    {relatedProducts.length > 1 && (
-                                        <button
-                                            onClick={() => {
-                                                setRelatedDirection(1);
-                                                setActiveRelatedIdx(prev => (prev + 1) % relatedProducts.length);
-                                            }}
-                                            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
-                                            aria-label="Next Related Item"
-                                        >
-                                            <FiChevronRight size={16} />
-                                        </button>
-                                    )}
+                            {/* Mobile View — horizontal scroll row */}
+                            <div className="block sm:hidden">
+                                <div
+                                    ref={relatedScrollRef}
+                                    className="mobile-scroll-container px-4 -mx-4 pb-2"
+                                >
+                                    {relatedProducts.map(p => (
+                                        <div key={p.id || p._id} className="mobile-scroll-item">
+                                            <ProductCard product={p} />
+                                        </div>
+                                    ))}
                                 </div>
-                                {/* Indicator dots */}
-                                {relatedProducts.length > 1 && (
-                                    <div className="flex justify-center gap-1.5 mt-2">
-                                        {relatedProducts.map((_, idx) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => {
-                                                    setRelatedDirection(idx > activeRelatedIdx ? 1 : -1);
-                                                    setActiveRelatedIdx(idx);
-                                                }}
-                                                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === activeRelatedIdx ? 'bg-[var(--primary)] w-3' : 'bg-[var(--border)]'}`}
-                                                aria-label={`Go to related slide ${idx + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
                             </div>
                         </>
                     )}
@@ -719,83 +486,18 @@ const ProductPage = () => {
                                 ))}
                             </div>
 
-                            {/* Mobile View: Swipe-friendly arrow-navigated single card carousel */}
-                            <div className="block sm:hidden relative px-8">
-                                <div className="relative overflow-hidden min-h-[380px] flex items-center justify-center">
-                                    {exploreProducts.length > 1 && (
-                                        <button
-                                            onClick={() => {
-                                                setExploreDirection(-1);
-                                                setActiveExploreIdx(prev => (prev - 1 + exploreProducts.length) % exploreProducts.length);
-                                            }}
-                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
-                                            aria-label="Previous Explore Item"
-                                        >
-                                            <FiChevronLeft size={16} />
-                                        </button>
-                                    )}
-                                    <AnimatePresence initial={false} custom={exploreDirection} mode="wait">
-                                        <motion.div
-                                            key={`explore-${activeExploreIdx}`}
-                                            custom={exploreDirection}
-                                            variants={{
-                                                enter: (dir) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
-                                                center: { x: 0, opacity: 1 },
-                                                exit: (dir) => ({ x: dir < 0 ? 120 : -120, opacity: 0 })
-                                            }}
-                                            initial="enter"
-                                            animate="center"
-                                            exit="exit"
-                                            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-                                            drag="x"
-                                            dragConstraints={{ left: 0, right: 0 }}
-                                            dragElastic={0.6}
-                                            onDragEnd={(e, info) => {
-                                                const swipeThreshold = 50;
-                                                if (info.offset.x < -swipeThreshold) {
-                                                    setExploreDirection(1);
-                                                    setActiveExploreIdx(prev => (prev + 1) % exploreProducts.length);
-                                                } else if (info.offset.x > swipeThreshold) {
-                                                    setExploreDirection(-1);
-                                                    setActiveExploreIdx(prev => (prev - 1 + exploreProducts.length) % exploreProducts.length);
-                                                }
-                                            }}
-                                            className="w-full flex justify-center"
-                                        >
-                                            <div className="w-full max-w-[280px]">
-                                                <ProductCard product={exploreProducts[activeExploreIdx]} />
-                                            </div>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                    {exploreProducts.length > 1 && (
-                                        <button
-                                            onClick={() => {
-                                                setExploreDirection(1);
-                                                setActiveExploreIdx(prev => (prev + 1) % exploreProducts.length);
-                                            }}
-                                            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
-                                            aria-label="Next Explore Item"
-                                        >
-                                            <FiChevronRight size={16} />
-                                        </button>
-                                    )}
+                            {/* Mobile View — horizontal scroll row */}
+                            <div className="block sm:hidden">
+                                <div
+                                    ref={exploreScrollRef}
+                                    className="mobile-scroll-container px-4 -mx-4 pb-2"
+                                >
+                                    {exploreProducts.map(p => (
+                                        <div key={p.id || p._id} className="mobile-scroll-item">
+                                            <ProductCard product={p} />
+                                        </div>
+                                    ))}
                                 </div>
-                                {/* Indicator dots */}
-                                {exploreProducts.length > 1 && (
-                                    <div className="flex justify-center gap-1.5 mt-2">
-                                        {exploreProducts.map((_, idx) => (
-                                            <button
-                                                key={idx}
-                                                onClick={() => {
-                                                    setExploreDirection(idx > activeExploreIdx ? 1 : -1);
-                                                    setActiveExploreIdx(idx);
-                                                }}
-                                                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === activeExploreIdx ? 'bg-[var(--primary)] w-3' : 'bg-[var(--border)]'}`}
-                                                aria-label={`Go to explore slide ${idx + 1}`}
-                                            />
-                                        ))}
-                                    </div>
-                                )}
                             </div>
                         </>
                     )}

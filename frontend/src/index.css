@@ -828,3 +828,40 @@ html, body {
 textarea.form-input, textarea.input-field {
   resize: none !important;
 }
+
+/* Scrollable horizontal rows for mobile/tablet */
+.mobile-scroll-container {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  scroll-snap-type: x mandatory !important;
+  scroll-behavior: smooth !important;
+  -webkit-overflow-scrolling: touch !important;
+  gap: 1.25rem !important;
+  padding-bottom: 0.75rem !important;
+}
+
+/* Hide scrollbars for these scrollable rows */
+.mobile-scroll-container::-webkit-scrollbar {
+  display: none !important;
+}
+.mobile-scroll-container {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+.mobile-scroll-item {
+  flex-shrink: 0 !important;
+  scroll-snap-align: center !important;
+  width: 280px !important; /* Unified width on phone */
+}
+
+/* Utility: hide scrollbar while keeping scroll functionality */
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}

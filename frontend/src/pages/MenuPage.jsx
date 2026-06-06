@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiFilter, FiX, FiChevronLeft, FiChevronRight, FiGrid, FiArrowRight, FiSearch } from 'react-icons/fi';
+import { FiFilter, FiX, FiChevronLeft, FiChevronRight, FiGrid, FiArrowRight, FiSearch, FiPhone } from 'react-icons/fi';
 import { getProducts } from '../api/products';
 import { getCategories } from '../api/categories';
 import ProductCard from '../components/ProductCard';
@@ -18,9 +18,8 @@ const MenuPage = () => {
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     
-    // Per-category active product carousel indexing and animation direction
-    const [activeProdIndices, setActiveProdIndices] = useState({});
-    const [directions, setDirections] = useState({});
+    // scroll refs for mobile category rows
+    const scrollRefs = useRef({});
 
     const filteredProductsList = products.filter(p =>
         p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -34,7 +33,6 @@ const MenuPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        // Load all menu items if 'all', or filter by category
         const params = { show_on_menu: true };
         if (activeCategory !== 'all') params.category_id = activeCategory;
         
@@ -54,24 +52,14 @@ const MenuPage = () => {
         setFilterDrawerOpen(false);
     };
 
-    const handlePrevProduct = (catId, numProducts) => {
-        setDirections(prev => ({ ...prev, [catId]: -1 }));
-        setActiveProdIndices(prev => ({
-            ...prev,
-            [catId]: ((prev[catId] || 0) - 1 + numProducts) % numProducts
-        }));
+    const handleScroll = (catId, direction) => {
+        const container = scrollRefs.current[catId];
+        if (container) {
+            const scrollAmount = direction === 'left' ? -296 : 296;
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
     };
 
-    const handleNextProduct = (catId, numProducts) => {
-        setDirections(prev => ({ ...prev, [catId]: 1 }));
-        setActiveProdIndices(prev => ({
-            ...prev,
-            [catId]: ((prev[catId] || 0) + 1) % numProducts
-        }));
-    };
-
-    // Group items category-wise in frontend
-    // Use .id (virtual set by Mongoose toJSON transform) — NOT ._id which is deleted
     const groupedProducts = categories.map(cat => {
         const catProds = filteredProductsList.filter(p => {
             const pCatId = p.category_id?.id || p.category?.id;
@@ -87,23 +75,34 @@ const MenuPage = () => {
 
     return (
         <motion.div
-            className="min-h-screen pt-12 pb-24 sm:pb-16 px-4"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="min-h-screen pb-24 sm:pb-16"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
         >
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="text-center mb-6">
+            {/* Hero Banner Section */}
+            <div 
+                className="relative w-full py-16 md:py-24 text-center px-4 overflow-hidden mb-10"
+                style={{ 
+                    backgroundImage: 'url(/hero-bg.jpg)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat'
+                }}
+            >
+                <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" />
+                <div className="relative z-10 max-w-4xl mx-auto">
                     <motion.h1
-                        className="section-title mb-2"
+                        className="font-extrabold text-white leading-tight mb-3"
+                        style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
                         Our Menu
                     </motion.h1>
                     <motion.p
-                        className="section-subtitle"
+                        className="text-gray-300 font-medium tracking-wide"
+                        style={{ fontSize: 'clamp(0.9rem, 3vw, 1.1rem)' }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}
@@ -111,6 +110,9 @@ const MenuPage = () => {
                         Fresh, frozen, and ready to cook
                     </motion.p>
                 </div>
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4">
 
                 {/* Search Bar */}
                 <div className="max-w-md mx-auto mb-8 relative">
@@ -232,134 +234,95 @@ const MenuPage = () => {
                             ))}
                         </div>
 
-                        {/* Mobile Category-Wise Swiper Layout (less than sm) */}
+                        {/* Mobile Category-Wise Scrollable Layout (less than sm) */}
                         <div className="block sm:hidden space-y-10 animate-fadeIn">
-                            {groupedProducts.map((group) => {
-                                const activeIdx = activeProdIndices[group.id] || 0;
-                                const direction = directions[group.id] || 0;
-                                const activeProduct = group.products[activeIdx] || group.products[0];
-
-                                return (
-                                    <div key={group.id} className="space-y-4 max-w-lg mx-auto">
-                                        {/* Category Header */}
-                                        <div className="flex items-center justify-between border-b pb-2" style={{ borderColor: 'var(--border)' }}>
-                                            <h2 className="font-display font-bold text-lg" style={{ color: 'var(--primary)' }}>
-                                                {group.name}
-                                            </h2>
-                                            <div className="flex items-center gap-2">
-                                                {group.products.length > 1 && (
-                                                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
-                                                        {activeIdx + 1} / {group.products.length}
-                                                    </span>
-                                                )}
-                                                <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
-                                                    {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Product Swiper Box */}
-                                        <div className="relative flex items-center justify-center px-6 sm:px-14">
-                                            {/* Left Arrow Button */}
-                                            {group.products.length > 1 && (
-                                                <button
-                                                    onClick={() => handlePrevProduct(group.id, group.products.length)}
-                                                    className="swiper-nav-btn reviews-prev"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        left: '-6px',
-                                                        top: '50%',
-                                                        transform: 'translateY(-50%)',
-                                                        zIndex: 10,
-                                                        width: 36,
-                                                        height: 36,
-                                                        borderRadius: '50%',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        background: 'var(--bg-card)',
-                                                        border: '1.5px solid var(--border)',
-                                                        boxShadow: 'var(--shadow-sm)',
-                                                        cursor: 'pointer',
-                                                        color: 'var(--text-main)'
-                                                    }}
-                                                    aria-label="Previous Product"
-                                                >
-                                                    <FiChevronLeft size={18} />
-                                                </button>
-                                            )}
-
-                                            {/* Product Card Container with Framer Motion slide transition */}
-                                            <div className="w-full max-w-[340px] overflow-hidden relative min-h-[380px] flex items-center justify-center">
-                                                <AnimatePresence initial={false} custom={direction} mode="wait">
-                                                    <motion.div
-                                                        key={`${group.id}-${activeIdx}`}
-                                                        custom={direction}
-                                                        variants={{
-                                                            enter: (dir) => ({
-                                                                x: dir > 0 ? 120 : -120,
-                                                                opacity: 0
-                                                            }),
-                                                            center: {
-                                                                x: 0,
-                                                                opacity: 1
-                                                            },
-                                                            exit: (dir) => ({
-                                                                x: dir < 0 ? 120 : -120,
-                                                                opacity: 0
-                                                            })
-                                                        }}
-                                                        initial="enter"
-                                                        animate="center"
-                                                        exit="exit"
-                                                        transition={{
-                                                            x: { type: "spring", stiffness: 300, damping: 30 },
-                                                            opacity: { duration: 0.2 }
-                                                        }}
-                                                        className="w-full flex justify-center"
-                                                    >
-                                                        <div className="w-full">
-                                                            <ProductCard
-                                                                product={activeProduct}
-                                                                onViewDetails={setSelectedProduct}
-                                                            />
-                                                        </div>
-                                                    </motion.div>
-                                                </AnimatePresence>
-                                            </div>
-
-                                            {/* Right Arrow Button */}
-                                            {group.products.length > 1 && (
-                                                <button
-                                                    onClick={() => handleNextProduct(group.id, group.products.length)}
-                                                    className="swiper-nav-btn reviews-next"
-                                                    style={{
-                                                        position: 'absolute',
-                                                        right: '-6px',
-                                                        top: '50%',
-                                                        transform: 'translateY(-50%)',
-                                                        zIndex: 10,
-                                                        width: 36,
-                                                        height: 36,
-                                                        borderRadius: '50%',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        background: 'var(--bg-card)',
-                                                        border: '1.5px solid var(--border)',
-                                                        boxShadow: 'var(--shadow-sm)',
-                                                        cursor: 'pointer',
-                                                        color: 'var(--text-main)'
-                                                    }}
-                                                    aria-label="Next Product"
-                                                >
-                                                    <FiChevronRight size={18} />
-                                                </button>
-                                            )}
-                                        </div>
+                            {groupedProducts.map((group) => (
+                                <div key={group.id} className="space-y-3">
+                                    {/* Category Header */}
+                                    <div className="flex items-center justify-between border-b pb-2 px-1" style={{ borderColor: 'var(--border)' }}>
+                                        <h2 className="font-display font-bold text-lg" style={{ color: 'var(--primary)' }}>
+                                            {group.name}
+                                        </h2>
+                                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
+                                            {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
+                                        </span>
                                     </div>
-                                );
-                            })}
+
+                                    {/* Scrollable Container with Arrows */}
+                                    <div className="relative w-full">
+                                        {/* Left Arrow */}
+                                        {group.products.length > 1 && (
+                                            <button
+                                                onClick={() => handleScroll(group.id, 'left')}
+                                                style={{
+                                                    position: 'absolute',
+                                                    left: '-6px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    zIndex: 10,
+                                                    width: 32,
+                                                    height: 32,
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: 'var(--bg-card)',
+                                                    border: '1.5px solid var(--border)',
+                                                    boxShadow: 'var(--shadow-sm)',
+                                                    cursor: 'pointer',
+                                                    color: 'var(--text-main)'
+                                                }}
+                                                aria-label="Scroll Left"
+                                            >
+                                                <FiChevronLeft size={16} />
+                                            </button>
+                                        )}
+
+                                        {/* Horizontal Touch Scroll Row */}
+                                        <div
+                                            ref={(el) => { scrollRefs.current[group.id] = el; }}
+                                            className="mobile-scroll-container px-4 -mx-4 pb-2"
+                                        >
+                                            {group.products.map((product) => (
+                                                <div key={product.id} className="mobile-scroll-item">
+                                                    <ProductCard
+                                                        product={product}
+                                                        onViewDetails={setSelectedProduct}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Right Arrow */}
+                                        {group.products.length > 1 && (
+                                            <button
+                                                onClick={() => handleScroll(group.id, 'right')}
+                                                style={{
+                                                    position: 'absolute',
+                                                    right: '-6px',
+                                                    top: '50%',
+                                                    transform: 'translateY(-50%)',
+                                                    zIndex: 10,
+                                                    width: 32,
+                                                    height: 32,
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    background: 'var(--bg-card)',
+                                                    border: '1.5px solid var(--border)',
+                                                    boxShadow: 'var(--shadow-sm)',
+                                                    cursor: 'pointer',
+                                                    color: 'var(--text-main)'
+                                                }}
+                                                aria-label="Scroll Right"
+                                            >
+                                                <FiChevronRight size={16} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </>
                 )}
