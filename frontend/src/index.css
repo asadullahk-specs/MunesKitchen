@@ -25,9 +25,9 @@
 }
 
 .dark {
-  --primary: #cc3333;
-  --primary-dark: #990000;
-  --primary-glow: rgba(204, 51, 51, 0.12);
+  --primary: #990000;
+  --primary-dark: #7a0000;
+  --primary-glow: rgba(153, 0, 0, 0.15);
   --bg-deep: #0d0d14;
   --bg-card: rgba(22, 22, 35, 0.98);
   --bg-input: rgba(30, 30, 48, 0.95);
@@ -35,9 +35,9 @@
   --text-muted: #94a3b8;
   --border: rgba(255, 255, 255, 0.08);
   --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
-  --shadow-hover: 0 12px 40px rgba(204, 51, 51, 0.2);
+  --shadow-hover: 0 12px 40px rgba(153, 0, 0, 0.22);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 4px 20px rgba(204, 51, 51, 0.25);
+  --shadow-glow: 0 4px 20px rgba(153, 0, 0, 0.3);
   --radius: 16px;
   --nav-height: 68px;
   --nav-top: 12px;
@@ -810,4 +810,21 @@ html, body {
 .no-scrollbar {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
+}
+
+/* Custom status-cancelled badge styling */
+.status-cancelled {
+  background: rgba(153, 0, 0, 0.12);
+  color: var(--primary);
+  border: 1px solid rgba(153, 0, 0, 0.25);
+}
+.dark .status-cancelled {
+  background: rgba(153, 0, 0, 0.08);
+  color: #fb7185;
+  border-color: rgba(153, 0, 0, 0.2);
+}
+
+/* Ensure no textareas can be manually resized */
+textarea.form-input, textarea.input-field {
+  resize: none !important;
 }

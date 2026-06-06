@@ -207,7 +207,7 @@ const AdminSettings = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

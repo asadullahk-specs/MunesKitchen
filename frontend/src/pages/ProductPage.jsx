@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiPlus, FiMinus, FiShoppingCart, FiStar, FiChevronLeft, FiHeart, FiClock, FiActivity, FiLayers, FiInfo, FiMessageSquare } from 'react-icons/fi';
+import { FiPlus, FiMinus, FiShoppingCart, FiStar, FiChevronLeft, FiChevronRight, FiHeart, FiClock, FiActivity, FiLayers, FiInfo, FiMessageSquare } from 'react-icons/fi';
 import { getProduct, getProducts } from '../api/products';
 import { getReviews } from '../api/reviews';
 import { useCart } from '../context/CartContext';
@@ -28,6 +28,10 @@ const ProductPage = () => {
     // Related & Explore states
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [exploreProducts, setExploreProducts] = useState([]);
+    const [activeRelatedIdx, setActiveRelatedIdx] = useState(0);
+    const [activeExploreIdx, setActiveExploreIdx] = useState(0);
+    const [relatedDirection, setRelatedDirection] = useState(0);
+    const [exploreDirection, setExploreDirection] = useState(0);
 
     useEffect(() => {
         if (!id) return;
@@ -36,6 +40,8 @@ const ProductPage = () => {
             setLoading(true);
             setReviewsLoading(true);
             setQty(1);
+            setActiveRelatedIdx(0);
+            setActiveExploreIdx(0);
             try {
                 // 1. Fetch Product details
                 const prodRes = await getProduct(id);
@@ -258,7 +264,7 @@ const ProductPage = () => {
                 <div className="mb-16">
                     <div className="flex flex-wrap items-center justify-between border-b border-[var(--border)] mb-8 gap-4">
                         {/* Tab Headers */}
-                        <div className="flex gap-1 sm:gap-4 overflow-x-auto">
+                        <div className="flex flex-wrap gap-1 sm:gap-2">
                             {[
                                 { id: 'description', label: 'Description', icon: <FiLayers size={15} /> },
                                 { id: 'info', label: 'Additional Info', icon: <FiInfo size={15} /> },
@@ -269,7 +275,7 @@ const ProductPage = () => {
                                 <button
                                     key={tab.id}
                                     onClick={() => handleTabClick(tab.id)}
-                                    className={`flex items-center gap-2 py-4 px-4 font-semibold text-sm transition-all border-b-2 outline-none whitespace-nowrap ${
+                                    className={`flex items-center gap-2 py-3 px-3 font-semibold text-sm transition-all border-b-2 outline-none whitespace-nowrap ${
                                         (tab.id === 'related' || tab.id === 'explore')
                                             ? 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
                                             : activeTab === tab.id
@@ -420,11 +426,93 @@ const ProductPage = () => {
                     {relatedProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                            {relatedProducts.map(p => (
-                                <ProductCard key={p.id || p._id} product={p} />
-                            ))}
-                        </div>
+                        <>
+                            {/* Desktop/Tablet View */}
+                            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                {relatedProducts.map(p => (
+                                    <ProductCard key={p.id || p._id} product={p} />
+                                ))}
+                            </div>
+
+                            {/* Mobile View: Swipe-friendly arrow-navigated single card carousel */}
+                            <div className="block sm:hidden relative px-8">
+                                <div className="relative overflow-hidden min-h-[380px] flex items-center justify-center">
+                                    {relatedProducts.length > 1 && (
+                                        <button
+                                            onClick={() => {
+                                                setRelatedDirection(-1);
+                                                setActiveRelatedIdx(prev => (prev - 1 + relatedProducts.length) % relatedProducts.length);
+                                            }}
+                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
+                                            aria-label="Previous Related Item"
+                                        >
+                                            <FiChevronLeft size={16} />
+                                        </button>
+                                    )}
+                                    <AnimatePresence initial={false} custom={relatedDirection} mode="wait">
+                                        <motion.div
+                                            key={`related-${activeRelatedIdx}`}
+                                            custom={relatedDirection}
+                                            variants={{
+                                                enter: (dir) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
+                                                center: { x: 0, opacity: 1 },
+                                                exit: (dir) => ({ x: dir < 0 ? 120 : -120, opacity: 0 })
+                                            }}
+                                            initial="enter"
+                                            animate="center"
+                                            exit="exit"
+                                            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+                                            drag="x"
+                                            dragConstraints={{ left: 0, right: 0 }}
+                                            dragElastic={0.6}
+                                            onDragEnd={(e, info) => {
+                                                const swipeThreshold = 50;
+                                                if (info.offset.x < -swipeThreshold) {
+                                                    setRelatedDirection(1);
+                                                    setActiveRelatedIdx(prev => (prev + 1) % relatedProducts.length);
+                                                } else if (info.offset.x > swipeThreshold) {
+                                                    setRelatedDirection(-1);
+                                                    setActiveRelatedIdx(prev => (prev - 1 + relatedProducts.length) % relatedProducts.length);
+                                                }
+                                            }}
+                                            className="w-full flex justify-center"
+                                        >
+                                            <div className="w-full max-w-[280px]">
+                                                <ProductCard product={relatedProducts[activeRelatedIdx]} />
+                                            </div>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                    {relatedProducts.length > 1 && (
+                                        <button
+                                            onClick={() => {
+                                                setRelatedDirection(1);
+                                                setActiveRelatedIdx(prev => (prev + 1) % relatedProducts.length);
+                                            }}
+                                            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
+                                            aria-label="Next Related Item"
+                                        >
+                                            <FiChevronRight size={16} />
+                                        </button>
+                                    )}
+                                </div>
+                                {/* Indicator dots */}
+                                {relatedProducts.length > 1 && (
+                                    <div className="flex justify-center gap-1.5 mt-2">
+                                        {relatedProducts.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => {
+                                                    setRelatedDirection(idx > activeRelatedIdx ? 1 : -1);
+                                                    setActiveRelatedIdx(idx);
+                                                }}
+                                                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === activeRelatedIdx ? 'bg-[var(--primary)] w-3' : 'bg-[var(--border)]'}`}
+                                                aria-label={`Go to related slide ${idx + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
 
@@ -434,11 +522,93 @@ const ProductPage = () => {
                     {exploreProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                            {exploreProducts.map(p => (
-                                <ProductCard key={p.id || p._id} product={p} />
-                            ))}
-                        </div>
+                        <>
+                            {/* Desktop/Tablet View */}
+                            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6">
+                                {exploreProducts.map(p => (
+                                    <ProductCard key={p.id || p._id} product={p} />
+                                ))}
+                            </div>
+
+                            {/* Mobile View: Swipe-friendly arrow-navigated single card carousel */}
+                            <div className="block sm:hidden relative px-8">
+                                <div className="relative overflow-hidden min-h-[380px] flex items-center justify-center">
+                                    {exploreProducts.length > 1 && (
+                                        <button
+                                            onClick={() => {
+                                                setExploreDirection(-1);
+                                                setActiveExploreIdx(prev => (prev - 1 + exploreProducts.length) % exploreProducts.length);
+                                            }}
+                                            className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
+                                            aria-label="Previous Explore Item"
+                                        >
+                                            <FiChevronLeft size={16} />
+                                        </button>
+                                    )}
+                                    <AnimatePresence initial={false} custom={exploreDirection} mode="wait">
+                                        <motion.div
+                                            key={`explore-${activeExploreIdx}`}
+                                            custom={exploreDirection}
+                                            variants={{
+                                                enter: (dir) => ({ x: dir > 0 ? 120 : -120, opacity: 0 }),
+                                                center: { x: 0, opacity: 1 },
+                                                exit: (dir) => ({ x: dir < 0 ? 120 : -120, opacity: 0 })
+                                            }}
+                                            initial="enter"
+                                            animate="center"
+                                            exit="exit"
+                                            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
+                                            drag="x"
+                                            dragConstraints={{ left: 0, right: 0 }}
+                                            dragElastic={0.6}
+                                            onDragEnd={(e, info) => {
+                                                const swipeThreshold = 50;
+                                                if (info.offset.x < -swipeThreshold) {
+                                                    setExploreDirection(1);
+                                                    setActiveExploreIdx(prev => (prev + 1) % exploreProducts.length);
+                                                } else if (info.offset.x > swipeThreshold) {
+                                                    setExploreDirection(-1);
+                                                    setActiveExploreIdx(prev => (prev - 1 + exploreProducts.length) % exploreProducts.length);
+                                                }
+                                            }}
+                                            className="w-full flex justify-center"
+                                        >
+                                            <div className="w-full max-w-[280px]">
+                                                <ProductCard product={exploreProducts[activeExploreIdx]} />
+                                            </div>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                    {exploreProducts.length > 1 && (
+                                        <button
+                                            onClick={() => {
+                                                setExploreDirection(1);
+                                                setActiveExploreIdx(prev => (prev + 1) % exploreProducts.length);
+                                            }}
+                                            className="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-main)] shadow-sm z-10"
+                                            aria-label="Next Explore Item"
+                                        >
+                                            <FiChevronRight size={16} />
+                                        </button>
+                                    )}
+                                </div>
+                                {/* Indicator dots */}
+                                {exploreProducts.length > 1 && (
+                                    <div className="flex justify-center gap-1.5 mt-2">
+                                        {exploreProducts.map((_, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => {
+                                                    setExploreDirection(idx > activeExploreIdx ? 1 : -1);
+                                                    setActiveExploreIdx(idx);
+                                                }}
+                                                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${idx === activeExploreIdx ? 'bg-[var(--primary)] w-3' : 'bg-[var(--border)]'}`}
+                                                aria-label={`Go to explore slide ${idx + 1}`}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
                 </div>
             </div>

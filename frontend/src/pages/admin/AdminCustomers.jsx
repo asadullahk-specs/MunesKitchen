@@ -50,11 +50,11 @@ const AdminCustomers = () => {
                         {filteredCustomers.length} of {customers.length} customers
                     </p>
                 </div>
-                <div className="relative sm:w-64">
+                <div className="relative w-full sm:w-72">
                     <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                     <input
                         type="text"
-                        className="form-input pl-8 text-sm"
+                        className="form-input pl-8 text-sm w-full"
                         placeholder="Search by name, phone, email..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}

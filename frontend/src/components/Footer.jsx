@@ -137,7 +137,7 @@ const Footer = () => {
                         © {currentYear} Mune's Kitchen. All rights reserved.
                     </p>
                     <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
-                        Created by Sameer Khan
+                        Creation & Design Credits: Sameer Khan & Asadullah Khan
                     </p>
                 </div>
             </div>

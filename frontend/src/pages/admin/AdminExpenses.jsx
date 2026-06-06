@@ -140,7 +140,7 @@ const AdminExpenses = () => {
                         </div>
                         <div>
                             <label className="form-label">Note</label>
-                            <textarea className="form-input" rows={2} placeholder="Optional note..."
+                            <textarea className="form-input" rows={2} style={{ resize: 'none' }} placeholder="Optional note..."
                                 value={note} onChange={(e) => setNote(e.target.value)} />
                         </div>
                         <button onClick={handleAdd} disabled={saving} className="btn-primary w-full justify-center">

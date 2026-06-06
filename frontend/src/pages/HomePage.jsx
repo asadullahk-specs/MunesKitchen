@@ -214,7 +214,7 @@ const HomePage = () => {
             <section className="relative flex items-center justify-center overflow-hidden py-6 md:py-12">
                 <div className="absolute inset-0 pattern-bg" />
                 <div className="absolute inset-0"
-                    style={{ background: 'radial-gradient(ellipse at 70% 50%, rgba(239,68,68,0.08) 0%, transparent 60%)' }} />
+                    style={{ background: 'radial-gradient(ellipse at 70% 50%, var(--primary-glow) 0%, transparent 60%)' }} />
 
                 <div className="relative max-w-5xl mx-auto px-4 text-center">
                     <motion.div
@@ -222,17 +222,17 @@ const HomePage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6"
-                        style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--primary)', border: '1px solid rgba(239,68,68,0.2)' }}
+                        style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(153, 0, 0, 0.2)' }}
                     >
                         <FiClock className="animate-pulse" /> Order at least 3 hours in advance
                     </motion.div>
 
                     <motion.h1
-                        className="section-title mb-6"
+                        className="section-title mb-4"
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.7, delay: 0.1 }}
-                        style={{ fontSize: 'clamp(1.6rem, 5vw, 4.5rem)', lineHeight: 1.15 }}
+                        style={{ fontSize: 'clamp(1.8rem, 6vw, 3.8rem)', lineHeight: 1.2 }}
                     >
                         WHERE{' '}
                         <span style={{ color: 'var(--primary)', fontStyle: 'italic', fontWeight: '900' }}>FRESHNESS</span>
@@ -244,12 +244,12 @@ const HomePage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="mb-8 max-w-2xl mx-auto"
+                        className="mb-6 max-w-2xl mx-auto"
                     >
-                        <p className="font-accent italic text-xl md:text-2xl mb-3" style={{ color: 'var(--text-muted)' }}>
+                        <p className="font-accent italic text-lg md:text-2xl mb-2" style={{ color: 'var(--text-muted)' }}>
                             Taste the mystery, Savor the excellence.
                         </p>
-                        <p className="text-sm md:text-base" style={{ color: 'var(--text-muted)' }}>
+                        <p className="text-sm md:text-base leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                             Every dish is masterfully prepared with fresh ingredients and secret spices.
                             Any issues placing orders? Call us at{' '}
                             <span className="font-semibold" style={{ color: 'var(--primary)' }}>
@@ -285,12 +285,197 @@ const HomePage = () => {
                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}
                     >
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm"
-                            style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--primary)' }}><FiPhoneCall size={15} /></div>
+                            style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}><FiPhoneCall size={15} /></div>
                         <div className="text-left">
                             <div className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>Call Delivery</div>
                             <div className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>+92 303 2683689</div>
                         </div>
                     </motion.div>
+                </div>
+            </section>
+
+            {/* ===== ABOUT SECTION ===== */}
+            <section className="py-6 md:py-10 px-4">
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8">
+                        <h2 className="section-title mb-4">About Mune's Kitchen</h2>
+                        <p className="section-subtitle max-w-2xl mx-auto">
+                            Where tradition meets modern freezing technology
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            { icon: <FiClock size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Fast Service', desc: 'We ensure quick preparation and prompt delivery so your food reaches you hot, fresh, and right on time without unnecessary delays.' },
+                            { icon: <FiAward size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Secret Spices', desc: 'Our recipes are crafted with a proprietary blend of spices passed down through generations. Taste something truly unique.' },
+                            { icon: <FiShield size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Advanced Freezing & Preservation', desc: 'Our meals are carefully prepared and preserved using advanced freezing techniques that lock in freshness, nutrients, and original taste for long-term storage without compromising quality.' },
+                        ].map((item, i) => (
+                            <motion.div
+                                key={item.title}
+                                className="card p-6 text-center"
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.5, delay: i * 0.1 }}
+                                whileHover={{ y: -8 }}
+                            >
+                                <div className="mb-4">{item.icon}</div>
+                                <h3 className="font-display font-semibold text-lg mb-2" style={{ color: 'var(--text-main)' }}>
+                                    {item.title}
+                                </h3>
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* ===== CATEGORIES SECTION ===== */}
+            <section className="py-6 md:py-10 px-4" style={{ background: 'var(--bg-deep)' }}>
+                <div className="max-w-6xl mx-auto">
+                    <div className="text-center mb-8">
+                        <h2 className="section-title mb-2">Explore Categories</h2>
+                        <p className="section-subtitle">Pick your favorite</p>
+                    </div>
+
+                    {/* Desktop/Tablet View */}
+                    <div className="hidden sm:grid grid-cols-3 gap-4 sm:gap-6">
+                        {categories.map((cat, i) => (
+                            <motion.div
+                                key={cat.id || i}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: i * 0.08 }}
+                                whileHover={{ y: -6 }}
+                            >
+                                <Link
+                                    to={`/menu?category=${cat.id}`}
+                                    className="flex flex-col items-center justify-center text-center p-6 h-28 rounded-2xl transition-all block"
+                                    style={{
+                                        background: 'var(--bg-card)',
+                                        border: '1.5px solid var(--border)',
+                                        color: 'var(--text-main)',
+                                        boxShadow: 'var(--shadow)',
+                                        textDecoration: 'none'
+                                    }}
+                                >
+                                    <div className="font-bold text-base">{cat.name}</div>
+                                </Link>
+                            </motion.div>
+                        ))}
+                    </div>
+
+                    {/* ── Mobile Only Carousel ── */}
+                    <div className="block sm:hidden">
+                        {loading ? (
+                            <div className="text-center py-12">
+                                <div className="w-8 h-8 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid', borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
+                            </div>
+                        ) : validCategories.length > 0 && activeCatProduct ? (
+                            <div style={{ position: 'relative' }}>
+                                {/* Counter pill */}
+                                <div className="flex justify-center mb-4">
+                                    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(153, 0, 0, 0.18)' }}>
+                                        {activeCatIdx + 1} / {validCategories.length}
+                                    </span>
+                                </div>
+
+                                {/* Slide area */}
+                                <div className="relative overflow-hidden w-full" style={{ paddingBottom: 8 }}>
+                                    <AnimatePresence initial={false} custom={catDirection} mode="wait">
+                                        <motion.div
+                                            key={activeCatIdx}
+                                            custom={catDirection}
+                                            variants={{
+                                                enter: (dir) => ({
+                                                    x: dir > 0 ? '100%' : '-100%',
+                                                    opacity: 0
+                                                }),
+                                                center: {
+                                                    x: 0,
+                                                    opacity: 1
+                                                },
+                                                exit: (dir) => ({
+                                                    x: dir < 0 ? '100%' : '-100%',
+                                                    opacity: 0
+                                                })
+                                            }}
+                                            initial="enter"
+                                            animate="center"
+                                            exit="exit"
+                                            transition={{
+                                                x: { type: "spring", stiffness: 300, damping: 30 },
+                                                opacity: { duration: 0.2 }
+                                            }}
+                                            drag="x"
+                                            dragConstraints={{ left: 0, right: 0 }}
+                                            dragElastic={0.6}
+                                            onDragEnd={(event, info) => {
+                                                const swipeThreshold = 50;
+                                                if (info.offset.x < -swipeThreshold) {
+                                                    setCatDirection(1);
+                                                    setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
+                                                } else if (info.offset.x > swipeThreshold) {
+                                                    setCatDirection(-1);
+                                                    setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
+                                                }
+                                            }}
+                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center px-2"
+                                        >
+                                            {/* Category name */}
+                                            <div className="flex items-center gap-2 mb-4">
+                                                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--primary)' }}>
+                                                    {activeCat?.name}
+                                                </h3>
+                                            </div>
+                                            <div className="w-full" style={{ maxWidth: 360 }}>
+                                                <ProductCard product={activeCatProduct} onViewDetails={setSelectedProduct} />
+                                            </div>
+                                            <Link
+                                                to={`/menu?category=${activeCat?.id || activeCat?._id}`}
+                                                className="btn-primary w-full text-center py-3 mt-4 flex items-center justify-center gap-2"
+                                                style={{ textDecoration: 'none', maxWidth: 360 }}
+                                            >
+                                                Explore All {activeCat?.name} <FiArrowRight size={14} />
+                                            </Link>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Dot indicators */}
+                                <div className="flex justify-center gap-2 mt-5">
+                                    {validCategories.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => { setCatDirection(i > activeCatIdx ? 1 : -1); setActiveCatIdx(i); }}
+                                            aria-label={`Go to category ${i + 1}`}
+                                            style={{
+                                                width: i === activeCatIdx ? 22 : 8,
+                                                height: 8,
+                                                borderRadius: 4,
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                padding: 0,
+                                                transition: 'all 0.3s ease',
+                                                background: i === activeCatIdx ? 'var(--primary)' : 'var(--border)',
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="text-center py-8">
+                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                    No categories available yet.
+                                </p>
+                                <Link to="/menu" className="btn-primary inline-flex items-center gap-2 mt-4 px-6 py-2.5" style={{ textDecoration: 'none' }}>
+                                    Browse Menu <FiArrowRight size={14} />
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </section>
 
@@ -464,230 +649,6 @@ const HomePage = () => {
                     </div>
                 </section>
             )}
-
-            {/* ===== ABOUT SECTION ===== */}
-            <section className="py-6 md:py-10 px-4">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-8">
-                        <h2 className="section-title mb-4">About Mune's Kitchen</h2>
-                        <p className="section-subtitle max-w-2xl mx-auto">
-                            Where tradition meets modern freezing technology
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {[
-                            { icon: <FiClock size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Fast Service', desc: 'We ensure quick preparation and prompt delivery so your food reaches you hot, fresh, and right on time without unnecessary delays.' },
-                            { icon: <FiAward size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Secret Spices', desc: 'Our recipes are crafted with a proprietary blend of spices passed down through generations. Taste something truly unique.' },
-                            { icon: <FiShield size={36} className="mx-auto" style={{ color: 'var(--primary)' }} />, title: 'Advanced Freezing & Preservation', desc: 'Our meals are carefully prepared and preserved using advanced freezing techniques that lock in freshness, nutrients, and original taste for long-term storage without compromising quality.' },
-                        ].map((item, i) => (
-                            <motion.div
-                                key={item.title}
-                                className="card p-6 text-center"
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: i * 0.1 }}
-                                whileHover={{ y: -8 }}
-                            >
-                                <div className="mb-4">{item.icon}</div>
-                                <h3 className="font-display font-semibold text-lg mb-2" style={{ color: 'var(--text-main)' }}>
-                                    {item.title}
-                                </h3>
-                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{item.desc}</p>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* ===== CATEGORIES SECTION ===== */}
-            <section className="py-6 md:py-10 px-4" style={{ background: 'rgba(239,68,68,0.02)' }}>
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center mb-8">
-                        <h2 className="section-title mb-2">Explore Categories</h2>
-                        <p className="section-subtitle">Pick your favorite</p>
-                    </div>
-
-                    {/* Desktop/Tablet View */}
-                    <div className="hidden sm:grid grid-cols-3 gap-4 sm:gap-6">
-                        {categories.map((cat, i) => (
-                            <motion.div
-                                key={cat.id || i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.08 }}
-                                whileHover={{ y: -6 }}
-                            >
-                                <Link
-                                    to={`/menu?category=${cat.id}`}
-                                    className="flex flex-col items-center text-center p-6 rounded-2xl transition-all block"
-                                    style={{
-                                        background: 'var(--bg-card)',
-                                        border: '1.5px solid var(--border)',
-                                        color: 'var(--text-main)',
-                                        boxShadow: 'var(--shadow)',
-                                        textDecoration: 'none'
-                                    }}
-                                >
-                                    {cat.icon && (
-                                        <div className="text-4xl mb-3">{cat.icon}</div>
-                                    )}
-                                    <div className="font-bold text-sm">{cat.name}</div>
-                                    <div className="text-xs mt-1.5 px-3 py-0.5 rounded-full" style={{ color: 'var(--primary)', background: 'var(--primary-glow)', fontWeight: 600 }}>
-                                        Browse Items →
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    {/* ── Mobile Only Carousel ── */}
-                    <div className="block sm:hidden">
-                        {loading ? (
-                            <div className="text-center py-12">
-                                <div className="w-8 h-8 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid' }} />
-                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
-                            </div>
-                        ) : validCategories.length > 0 && activeCatProduct ? (
-                            <div style={{ position: 'relative' }}>
-                                {/* Counter pill */}
-                                <div className="flex justify-center mb-4">
-                                    <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                                        {activeCatIdx + 1} / {validCategories.length}
-                                    </span>
-                                </div>
-
-                                {/* Slide area */}
-                                <div className="relative overflow-hidden w-full" style={{ paddingBottom: 8 }}>
-                                    <AnimatePresence initial={false} custom={catDirection} mode="wait">
-                                        <motion.div
-                                            key={activeCatIdx}
-                                            custom={catDirection}
-                                            variants={{
-                                                enter: (dir) => ({
-                                                    x: dir > 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                }),
-                                                center: {
-                                                    x: 0,
-                                                    opacity: 1
-                                                },
-                                                exit: (dir) => ({
-                                                    x: dir < 0 ? '100%' : '-100%',
-                                                    opacity: 0
-                                                })
-                                            }}
-                                            initial="enter"
-                                            animate="center"
-                                            exit="exit"
-                                            transition={{
-                                                x: { type: "spring", stiffness: 300, damping: 30 },
-                                                opacity: { duration: 0.2 }
-                                            }}
-                                            drag="x"
-                                            dragConstraints={{ left: 0, right: 0 }}
-                                            dragElastic={0.6}
-                                            onDragEnd={(event, info) => {
-                                                const swipeThreshold = 50;
-                                                if (info.offset.x < -swipeThreshold) {
-                                                    setCatDirection(1);
-                                                    setActiveCatIdx((prev) => (prev + 1) % validCategories.length);
-                                                } else if (info.offset.x > swipeThreshold) {
-                                                    setCatDirection(-1);
-                                                    setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length);
-                                                }
-                                            }}
-                                            className="w-full cursor-grab active:cursor-grabbing flex flex-col items-center px-2"
-                                        >
-                                            {/* Category name with icon */}
-                                            <div className="flex items-center gap-2 mb-4">
-                                                {activeCat?.icon && <span className="text-2xl">{activeCat.icon}</span>}
-                                                <h3 className="font-display font-bold text-xl" style={{ color: 'var(--primary)' }}>
-                                                    {activeCat?.name}
-                                                </h3>
-                                            </div>
-                                            <div className="w-full" style={{ maxWidth: 360 }}>
-                                                <ProductCard product={activeCatProduct} onViewDetails={setSelectedProduct} />
-                                            </div>
-                                            <Link
-                                                to={`/menu?category=${activeCat?.id || activeCat?._id}`}
-                                                className="btn-primary w-full text-center py-3 mt-4 flex items-center justify-center gap-2"
-                                                style={{ textDecoration: 'none', maxWidth: 360 }}
-                                            >
-                                                Explore All {activeCat?.name} <FiArrowRight size={14} />
-                                            </Link>
-                                        </motion.div>
-                                    </AnimatePresence>
-                                </div>
-
-                                {/* Dot indicators */}
-                                <div className="flex justify-center gap-2 mt-5">
-                                    {validCategories.map((_, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => { setCatDirection(i > activeCatIdx ? 1 : -1); setActiveCatIdx(i); }}
-                                            aria-label={`Go to category ${i + 1}`}
-                                            style={{
-                                                width: i === activeCatIdx ? 22 : 8,
-                                                height: 8,
-                                                borderRadius: 4,
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                padding: 0,
-                                                transition: 'all 0.3s ease',
-                                                background: i === activeCatIdx ? 'var(--primary)' : 'var(--border)',
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-
-                                {/* Left / Right arrows */}
-                                <button
-                                    onClick={() => { setCatDirection(-1); setActiveCatIdx((prev) => (prev - 1 + validCategories.length) % validCategories.length); }}
-                                    aria-label="Previous Category"
-                                    style={{
-                                        position: 'absolute', top: '50%', left: 0,
-                                        transform: 'translateY(-50%)',
-                                        width: 36, height: 36, borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)',
-                                        boxShadow: 'var(--shadow-md)', cursor: 'pointer',
-                                        color: 'var(--text-main)', zIndex: 10,
-                                    }}
-                                >
-                                    <FiChevronLeft size={18} />
-                                </button>
-                                <button
-                                    onClick={() => { setCatDirection(1); setActiveCatIdx((prev) => (prev + 1) % validCategories.length); }}
-                                    aria-label="Next Category"
-                                    style={{
-                                        position: 'absolute', top: '50%', right: 0,
-                                        transform: 'translateY(-50%)',
-                                        width: 36, height: 36, borderRadius: '50%',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)',
-                                        boxShadow: 'var(--shadow-md)', cursor: 'pointer',
-                                        color: 'var(--text-main)', zIndex: 10,
-                                    }}
-                                >
-                                    <FiChevronRight size={18} />
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="text-center py-8">
-                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                                    No categories available yet.
-                                </p>
-                                <Link to="/menu" className="btn-primary inline-flex items-center gap-2 mt-4 px-6 py-2.5" style={{ textDecoration: 'none' }}>
-                                    Browse Menu <FiArrowRight size={14} />
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
 
             {/* ===== TOP PRODUCTS ===== */}
             <section className="py-6 md:py-10 px-4">

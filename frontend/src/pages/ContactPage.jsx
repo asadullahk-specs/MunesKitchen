@@ -124,6 +124,7 @@ const ContactPage = () => {
                                 <textarea
                                     className="form-input"
                                     rows={4}
+                                    style={{ resize: 'none' }}
                                     placeholder="Type your message here..."
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
@@ -154,14 +155,14 @@ const ContactPage = () => {
 
                         {/* Phone Card */}
                         <div className="card p-4 flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shrink-0 shadow-lg">
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
                                 <FiPhoneCall size={18} className="text-white" />
                             </div>
                             <div>
                                 <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-muted)' }}>
                                     Phone
                                 </p>
-                                <a href="tel:+923032683689" className="font-semibold text-sm hover:text-red-500 transition-colors" style={{ color: 'var(--text-main)' }}>
+                                <a href="tel:+923032683689" className="font-semibold text-sm hover:text-[var(--primary)] transition-colors" style={{ color: 'var(--text-main)' }}>
                                     +92 303 2683689
                                 </a>
                             </div>
@@ -169,14 +170,14 @@ const ContactPage = () => {
 
                         {/* Email Card */}
                         <div className="card p-4 flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shrink-0 shadow-lg">
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
                                 <FiMail size={18} className="text-white" />
                             </div>
                             <div>
                                 <p className="text-xs font-bold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-muted)' }}>
                                     Email
                                 </p>
-                                <a href="mailto:muneskitchen@gmail.com" className="font-semibold text-sm hover:text-red-500 transition-colors" style={{ color: 'var(--text-main)' }}>
+                                <a href="mailto:muneskitchen@gmail.com" className="font-semibold text-sm hover:text-[var(--primary)] transition-colors" style={{ color: 'var(--text-main)' }}>
                                     muneskitchen@gmail.com
                                 </a>
                             </div>
@@ -184,7 +185,7 @@ const ContactPage = () => {
 
                         {/* Location Card */}
                         <div className="card p-4 flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shrink-0 shadow-lg">
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>
                                 <FiMapPin size={18} className="text-white" />
                             </div>
                             <div>
@@ -213,8 +214,8 @@ const ContactPage = () => {
                         </a>
 
                         {/* Notice Card */}
-                        <div className="rounded-2xl p-4 text-sm flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', color: 'var(--text-muted)' }}>
-                            <FiClock size={16} className="animate-pulse shrink-0 text-red-500" />
+                        <div className="rounded-2xl p-4 text-sm flex items-center gap-2" style={{ background: 'var(--primary-glow)', border: '1px solid rgba(153,0,0,0.18)', color: 'var(--text-muted)' }}>
+                            <FiClock size={16} className="animate-pulse shrink-0" style={{ color: 'var(--primary)' }} />
                             <span>Please place orders at least 3 hours before your desired delivery time.</span>
                         </div>
 

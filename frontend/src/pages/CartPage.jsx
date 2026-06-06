@@ -19,7 +19,7 @@ const CartPage = () => {
 
     if (safeCart.length === 0) {
         return (
-            <div className="page-enter min-h-screen flex items-center justify-center px-4">
+            <div className="page-enter py-24 flex items-center justify-center px-4">
                 <div className="text-center">
                     <div
                         className="flex justify-center mb-5"
@@ -67,7 +67,7 @@ const CartPage = () => {
                                     ? item.image.startsWith('http')
                                         ? item.image
                                         : `${BACKEND}${item.image}`
-                                    : `https://placehold.co/100x100/ef4444/fff?text=Food`
+                                    : `https://placehold.co/100x100/6b7280/fff?text=Food`
 
                                 return (
                                     <motion.div
@@ -84,7 +84,7 @@ const CartPage = () => {
                                             alt={item.name}
                                             className="w-16 h-16 rounded-xl object-cover shrink-0"
                                             onError={(e) => {
-                                                e.target.src = `https://placehold.co/100x100/ef4444/fff?text=Food`
+                                                e.target.src = `https://placehold.co/100x100/6b7280/fff?text=Food`
                                             }}
                                         />
 

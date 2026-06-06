@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
-import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff, FiCamera } from 'react-icons/fi'
 import { getAdmins, createAdmin, updateAdmin, deleteAdmin } from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
 
@@ -14,6 +14,8 @@ const AdminSecurity = () => {
     const [form, setForm] = useState({ id: null, name: '', email: '', password: '' })
     const [isEditing, setIsEditing] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
+    const [profileImagePreview, setProfileImagePreview] = useState(null)
+    const fileInputRef = useRef(null)
 
     const [error, setError] = useState(null)
 
@@ -54,10 +56,11 @@ const AdminSecurity = () => {
 
         setSubmitting(true)
         try {
-            const payload = {
+        const payload = {
                 name: form.name.trim(),
                 email: form.email.trim(),
-                password: form.password ? form.password : undefined
+                password: form.password ? form.password : undefined,
+                ...(profileImagePreview ? { profile_image: profileImagePreview } : {})
             }
 
             if (isEditing) {
@@ -73,6 +76,7 @@ const AdminSecurity = () => {
             }
             setForm({ id: null, name: '', email: '', password: '' })
             setIsEditing(false)
+            setProfileImagePreview(null)
             fetchAdmins()
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to save admin account')
@@ -110,12 +114,26 @@ const AdminSecurity = () => {
             email: admin.email,
             password: '' // leave blank unless changing password
         })
+        setProfileImagePreview(admin.profile_image || null)
         setIsEditing(true)
     }
 
     const cancelEdit = () => {
         setForm({ id: null, name: '', email: '', password: '' })
         setIsEditing(false)
+        setProfileImagePreview(null)
+    }
+
+    const handleImageFile = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be under 2MB')
+            return
+        }
+        const reader = new FileReader()
+        reader.onload = (ev) => setProfileImagePreview(ev.target.result)
+        reader.readAsDataURL(file)
     }
 
     return (
@@ -123,7 +141,7 @@ const AdminSecurity = () => {
             {/* Header */}
             <div className="mb-6">
                 <div className="flex items-center gap-2 mb-1">
-                    <FiShield size={22} className="text-red-500" />
+                    <FiShield size={22} style={{ color: 'var(--primary)' }} />
                     <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Credential & Admin Management</h1>
                 </div>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -133,11 +151,11 @@ const AdminSecurity = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : error ? (
                 <div className="card p-8 text-center">
-                    <p className="text-sm font-medium mb-3" style={{ color: '#dc2626' }}>{error}</p>
+                    <p className="text-sm font-medium mb-3" style={{ color: 'var(--primary)' }}>{error}</p>
                     <button
                         onClick={fetchAdmins}
                         className="btn-primary px-5 py-2 text-sm"
@@ -154,6 +172,51 @@ const AdminSecurity = () => {
                                 {isEditing ? 'Edit Administrator Credentials' : 'Add New Administrator'}
                             </h3>
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Profile Image Upload - edit mode only */}
+                                {isEditing && (
+                                    <div>
+                                        <label className="form-label">Profile Photo (optional)</label>
+                                        <div className="flex items-center gap-3">
+                                            <div
+                                                className="w-14 h-14 rounded-full overflow-hidden border-2 shrink-0 flex items-center justify-center"
+                                                style={{ borderColor: 'var(--primary)', background: 'var(--bg-input)' }}
+                                            >
+                                                {profileImagePreview ? (
+                                                    <img src={profileImagePreview} alt="Preview" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <FiCamera size={18} style={{ color: 'var(--text-muted)' }} />
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col gap-1.5">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className="text-xs px-3 py-1.5 rounded-lg border font-medium transition-all"
+                                                    style={{ borderColor: 'var(--primary)', color: 'var(--primary)', background: 'var(--primary-glow)' }}
+                                                >
+                                                    Upload from Device
+                                                </button>
+                                                {profileImagePreview && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => { setProfileImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                                                        className="text-xs px-3 py-1 rounded-lg border transition-all"
+                                                        style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <input
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleImageFile}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                                 <div>
                                     <label className="form-label">Name *</label>
                                     <div className="relative">
@@ -258,7 +321,7 @@ const AdminSecurity = () => {
                                             </div>
                                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Email: {adminItem.email}</p>
                                             <p className="text-xs font-mono truncate" style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                                                Password (Bcrypt Hash): <span className="text-red-500 bg-red-500/5 px-1 py-0.5 rounded">{adminItem.passwordHash}</span>
+                                                Password (Bcrypt Hash): <span className="px-1 py-0.5 rounded" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>{adminItem.passwordHash}</span>
                                             </p>
                                         </div>
                                         <div className="flex gap-2 shrink-0 self-end md:self-center">

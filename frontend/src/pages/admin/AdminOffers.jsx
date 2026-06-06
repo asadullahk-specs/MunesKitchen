@@ -150,7 +150,7 @@ const AdminOffers = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <FiGift size={22} className="text-red-500" />
+                        <FiGift size={22} style={{ color: 'var(--primary)' }} />
                         <h1 className="font-bold text-2xl" style={{ color: 'var(--text-main)' }}>Promotional Offers</h1>
                     </div>
                     <p className="text-sm mt-0.5" style={{ color: 'var(--text-muted)' }}>
@@ -362,6 +362,7 @@ const AdminOffers = () => {
                                                 <textarea
                                                     className="form-input"
                                                     rows={3}
+                                                    style={{ resize: 'none' }}
                                                     placeholder="e.g. Get 2 pizzas and 1 drink at a special discounted price."
                                                     value={form.description}
                                                     onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -411,7 +412,7 @@ const AdminOffers = () => {
                                             {/* Calculated Discount Info */}
                                             <div className="p-3.5 rounded-xl flex items-center justify-between text-xs" style={{ background: 'var(--bg-deep)', border: '1px dashed var(--border)' }}>
                                                 <span style={{ color: 'var(--text-muted)' }}>Auto Calculated Discount:</span>
-                                                <span className="font-extrabold text-sm text-red-500">
+                                                <span className="font-extrabold text-sm" style={{ color: 'var(--primary)' }}>
                                                     {form.discount_percentage || 0}% OFF
                                                 </span>
                                             </div>
@@ -425,7 +426,8 @@ const AdminOffers = () => {
                                                 type="checkbox"
                                                 checked={form.is_active}
                                                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
-                                                className="accent-red-500 w-4 h-4"
+                                                className="w-4 h-4"
+                                                style={{ accentColor: 'var(--primary)' }}                                                
                                             />
                                             <span className="text-sm font-semibold" style={{ color: 'var(--text-main)' }}>
                                                 Publish and display this offer immediately on homepage slider

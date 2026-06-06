@@ -54,12 +54,18 @@ export const AuthProvider = ({ children }) => {
         API.post('/auth/logout').catch(() => { })
     }
 
+    const updateAdminData = (adminData) => {
+        setAdmin(adminData)
+        localStorage.setItem('mk_admin_data', JSON.stringify(adminData))
+    }
+
     return (
         <AuthContext.Provider value={{
             admin,
             loading,
             loginAdmin,
             logoutAdmin,
+            updateAdminData,
             isAuthenticated: !!admin
         }}>
             {children}

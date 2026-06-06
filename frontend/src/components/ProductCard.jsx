@@ -53,8 +53,8 @@ const ProductCard = ({ product, onViewDetails }) => {
                 {/* Category Badge */}
                 <div className="absolute top-3 right-3">
                     <span className="text-xs px-2 py-1 rounded-lg font-medium"
-                        style={{ background: 'var(--bg-glass)', backdropFilter: 'blur(8px)', color: 'var(--text-main)', border: '1px solid var(--border)' }}>
-                        {product.category?.name}
+                        style={{ background: 'var(--bg-card)', backdropFilter: 'blur(8px)', color: 'var(--text-main)', border: '1px solid var(--border)' }}>
+                        {product.category?.name || product.category_id?.name || 'Menu'}
                     </span>
                 </div>
             </div>

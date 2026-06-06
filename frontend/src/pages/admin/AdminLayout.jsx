@@ -66,7 +66,7 @@ const SidebarContent = ({ onClose }) => {
                     <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style={{ borderColor: 'var(--primary)' }}>
                         {admin?.profile_image ? (
                             <img
-                                src={admin.profile_image.startsWith('http') ? admin.profile_image : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${admin.profile_image.replace(/^\//, '')}`}
+                                src={admin.profile_image.startsWith('http') || admin.profile_image.startsWith('data:') ? admin.profile_image : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${admin.profile_image.replace(/^\//, '')}`}
                                 alt={admin.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { e.target.style.display = 'none'; }}

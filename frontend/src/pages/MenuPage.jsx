@@ -87,7 +87,7 @@ const MenuPage = () => {
 
     return (
         <motion.div
-            className="min-h-screen pt-12 pb-10 px-4"
+            className="min-h-screen pt-12 pb-24 sm:pb-16 px-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
@@ -117,7 +117,7 @@ const MenuPage = () => {
                     <input
                         type="text"
                         placeholder="Search our delicious items..."
-                        className="w-full px-5 py-3 rounded-2xl border transition-all text-sm pr-12 focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
+                        className="w-full px-5 py-3 rounded-2xl border transition-all text-sm pr-12 focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] outline-none"
                         style={{
                             background: 'var(--bg-card)',
                             borderColor: 'var(--border)',
@@ -129,7 +129,7 @@ const MenuPage = () => {
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center text-gray-400">
                         {searchQuery ? (
-                            <button type="button" onClick={() => setSearchQuery('')} className="hover:text-red-500 transition-colors">
+                            <button type="button" onClick={() => setSearchQuery('')} className="hover:text-[var(--primary)] transition-colors">
                                 <FiX size={16} />
                             </button>
                         ) : (
@@ -150,7 +150,7 @@ const MenuPage = () => {
                             onClick={() => handleCategoryChange('all')}
                             className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all"
                             style={{
-                                background: activeCategory === 'all' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'var(--bg-card)',
+                                background: activeCategory === 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory === 'all' ? 'white' : 'var(--text-muted)',
                                 border: activeCategory === 'all' ? 'none' : '1.5px solid var(--border)',
                                 boxShadow: activeCategory === 'all' ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
@@ -164,7 +164,7 @@ const MenuPage = () => {
                                 onClick={() => handleCategoryChange(String(cat.id))}
                                 className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all"
                                 style={{
-                                    background: activeCategory === String(cat.id) ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'var(--bg-card)',
+                                    background: activeCategory === String(cat.id) ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                     color: activeCategory === String(cat.id) ? 'white' : 'var(--text-muted)',
                                     border: activeCategory === String(cat.id) ? 'none' : '1.5px solid var(--border)',
                                     boxShadow: activeCategory === String(cat.id) ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
@@ -183,25 +183,25 @@ const MenuPage = () => {
                             onClick={() => handleCategoryChange('all')}
                             className="flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all"
                             style={{
-                                background: activeCategory === 'all' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'var(--bg-card)',
+                                background: activeCategory === 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory === 'all' ? 'white' : 'var(--text-muted)',
                                 border: activeCategory === 'all' ? 'none' : '1.5px solid var(--border)',
                                 boxShadow: activeCategory === 'all' ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
                             }}
                         >
-                            <FiGrid size={16} /> All Items
+                            All Items
                         </button>
                         <button
                             onClick={() => setFilterDrawerOpen(true)}
                             className="flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all"
                             style={{
-                                background: activeCategory !== 'all' ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'var(--bg-card)',
+                                background: activeCategory !== 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory !== 'all' ? 'white' : 'var(--text-muted)',
                                 border: activeCategory !== 'all' ? 'none' : '1.5px solid var(--border)',
                                 boxShadow: activeCategory !== 'all' ? 'var(--shadow-glow)' : 'var(--shadow-sm)',
                             }}
                         >
-                            <FiFilter size={16} /> Filter
+                            Filter Category
                         </button>
                     </div>
                 </div>
@@ -379,8 +379,8 @@ const MenuPage = () => {
                         />
                         {/* Slide-up Panel */}
                         <motion.div
-                            className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 rounded-t-[2.5rem] p-6 max-h-[80vh] overflow-y-auto sm:hidden border-t"
-                            style={{ borderColor: 'var(--border)', fontFamily: 'Poppins, sans-serif' }}
+                            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-[2.5rem] p-6 max-h-[80vh] overflow-y-auto sm:hidden border-t"
+                            style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', fontFamily: 'Poppins, sans-serif' }}
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
                             exit={{ y: '100%' }}

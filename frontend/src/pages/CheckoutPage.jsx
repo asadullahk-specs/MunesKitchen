@@ -184,14 +184,14 @@ const CheckoutPage = () => {
 
                                 <div>
                                     <label className="form-label">Full Address *</label>
-                                    <textarea className="form-input" rows={3}
+                                    <textarea className="form-input" rows={3} style={{ resize: 'none' }}
                                         placeholder="Street, area, landmarks..."
                                         value={address} onChange={(e) => setAddress(e.target.value)} />
                                 </div>
 
                                 <div>
                                     <label className="form-label">Additional Instructions</label>
-                                    <textarea className="form-input" rows={2}
+                                    <textarea className="form-input" rows={2} style={{ resize: 'none' }}
                                         placeholder="Any special requests?"
                                         value={instructions} onChange={(e) => setInstructions(e.target.value)} />
                                 </div>

@@ -294,12 +294,12 @@ const AdminReviews = () => {
                     </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <div style={{ position: 'relative' }}>
+                    <div style={{ position: 'relative' }} className="w-full sm:w-72">
                         <FiSearch size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                         <input
                             type="text"
-                            className="form-input"
-                            style={{ paddingLeft: 32, fontSize: 13, minWidth: 200 }}
+                            className="form-input w-full"
+                            style={{ paddingLeft: 32, fontSize: 13 }}
                             placeholder="Search by name, product, message..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
