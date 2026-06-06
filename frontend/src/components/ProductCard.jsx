@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiShoppingCart, FiEye, FiImage } from 'react-icons/fi';
+import { FiShoppingCart, FiEye, FiImage, FiPlus, FiMinus } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
@@ -10,6 +10,7 @@ const ProductCard = ({ product }) => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [imgError, setImgError] = useState(false);
+    const [qty, setQty] = useState(1);
 
     const imageUrl = product.image && !imgError
         ? product.image.startsWith('/uploads')
@@ -18,6 +19,11 @@ const ProductCard = ({ product }) => {
         : null;
 
     const categoryName = product.category?.name || product.category_id?.name || '';
+
+    const handleAddToCart = (e) => {
+        e.stopPropagation();
+        addToCart(product, qty);
+    };
 
     return (
         <motion.div
@@ -68,13 +74,12 @@ const ProductCard = ({ product }) => {
                         <span
                             className="text-xs px-2.5 py-0.5 font-bold"
                             style={{
-                                background: 'var(--primary-glow)',
-                                color: 'var(--primary)',
-                                backdropFilter: 'blur(8px)',
-                                border: '1px solid rgba(153, 0, 0, 0.25)',
+                                background: '#990000',
+                                color: '#ffffff',
                                 borderRadius: 4,
                                 fontSize: '0.68rem',
-                                boxShadow: '0 1px 6px rgba(0,0,0,0.1)',
+                                boxShadow: '0 1px 6px rgba(0,0,0,0.25)',
+                                letterSpacing: '0.02em',
                             }}
                         >
                             {categoryName}
@@ -99,35 +104,65 @@ const ProductCard = ({ product }) => {
                 </p>
 
                 {/* Smooth Expandable Actions Section below Price */}
-                <div className="overflow-hidden transition-all duration-300 max-h-0 opacity-0 group-hover:max-h-16 group-hover:opacity-100 group-hover:mt-3 flex items-center gap-2">
-                    <button
-                        onClick={(e) => { e.stopPropagation(); addToCart(product, 1); }}
-                        className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2 px-3 rounded transition-all"
-                        style={{
-                            background: 'linear-gradient(135deg, #990000, #7a0000)',
-                            color: 'white',
-                            border: 'none',
-                            cursor: 'pointer',
-                            boxShadow: '0 3px 12px rgba(153,0,0,0.35)',
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
-                        onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                    >
-                        <FiShoppingCart size={13} /> Add to Cart
-                    </button>
-                    <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/product/${product.id || product._id}`); }}
-                        className="flex items-center justify-center w-8 h-8 rounded transition-all shrink-0"
-                        style={{
-                            background: 'var(--primary-glow)',
-                            color: 'var(--primary)',
-                            border: '1.5px solid rgba(153, 0, 0, 0.25)',
-                            cursor: 'pointer',
-                        }}
-                        title="View Details"
-                    >
-                        <FiEye size={14} />
-                    </button>
+                <div className="overflow-hidden transition-all duration-300 max-h-0 opacity-0 group-hover:max-h-20 group-hover:opacity-100 group-hover:mt-3 flex flex-col gap-2">
+                    {/* Qty row */}
+                    <div className="flex items-center gap-2">
+                        <div
+                            className="flex items-center rounded overflow-hidden border"
+                            style={{ border: '1.5px solid var(--border)', background: 'var(--bg-input)' }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={e => { e.stopPropagation(); setQty(q => Math.max(1, q - 1)); }}
+                                className="flex items-center justify-center w-7 h-7 transition-colors hover:bg-[var(--primary-glow)]"
+                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-main)' }}
+                                aria-label="Decrease qty"
+                            >
+                                <FiMinus size={11} />
+                            </button>
+                            <span className="px-2 text-xs font-bold" style={{ color: 'var(--text-main)' }}>{qty}</span>
+                            <button
+                                onClick={e => { e.stopPropagation(); setQty(q => q + 1); }}
+                                className="flex items-center justify-center w-7 h-7 transition-colors hover:bg-[var(--primary-glow)]"
+                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-main)' }}
+                                aria-label="Increase qty"
+                            >
+                                <FiPlus size={11} />
+                            </button>
+                        </div>
+
+                        {/* Add to Cart */}
+                        <button
+                            onClick={handleAddToCart}
+                            className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-1.5 px-3 rounded transition-all"
+                            style={{
+                                background: 'linear-gradient(135deg, #990000, #7a0000)',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                boxShadow: '0 3px 12px rgba(153,0,0,0.35)',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-1px)'}
+                            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                        >
+                            <FiShoppingCart size={12} /> Add to Cart
+                        </button>
+
+                        {/* View Details */}
+                        <button
+                            onClick={e => { e.stopPropagation(); navigate(`/product/${product.id || product._id}`); }}
+                            className="flex items-center justify-center w-8 h-8 rounded transition-all shrink-0"
+                            style={{
+                                background: 'var(--primary-glow)',
+                                color: 'var(--primary)',
+                                border: '1.5px solid rgba(153, 0, 0, 0.25)',
+                                cursor: 'pointer',
+                            }}
+                            title="View Details"
+                        >
+                            <FiEye size={14} />
+                        </button>
+                    </div>
                 </div>
             </div>
         </motion.div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiMinus, FiShoppingCart, FiStar, FiChevronLeft, FiChevronRight, FiHeart, FiClock, FiActivity, FiLayers, FiInfo, FiMessageSquare, FiChevronDown, FiAward, FiTruck } from 'react-icons/fi';
@@ -30,6 +30,20 @@ const ProductPage = () => {
 
     const toggleAccordion = (tabId) => {
         setOpenAccordion(prev => ({ ...prev, [tabId]: !prev[tabId] }));
+    };
+
+    // Sticky bottom nav state (shows on small screens after scroll)
+    const [showStickyNav, setShowStickyNav] = useState(false);
+    useEffect(() => {
+        const handleScroll = () => setShowStickyNav(window.scrollY > 300);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToAccordion = (tabId) => {
+        setOpenAccordion(prev => ({ ...prev, [tabId]: true }));
+        const el = document.getElementById(`accordion-${tabId}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
     // Reviews states
@@ -155,6 +169,53 @@ const ProductPage = () => {
 
     return (
         <div className="min-h-screen bg-[var(--bg-deep)] pt-28 pb-16 px-4 sm:px-6 lg:px-8">
+            {/* ─── Sticky bottom pill nav — visible only on small screens when scrolled ─── */}
+            <AnimatePresence>
+                {showStickyNav && (
+                    <motion.div
+                        initial={{ y: 80, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 80, opacity: 0 }}
+                        transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+                        className="fixed bottom-4 left-1/2 z-50 sm:hidden"
+                        style={{ transform: 'translateX(-50%)', width: 'max-content', maxWidth: '95vw' }}
+                    >
+                        <div
+                            className="flex items-center gap-1 px-2 py-1.5 rounded-full shadow-2xl"
+                            style={{
+                                background: 'var(--bg-card)',
+                                border: '1.5px solid var(--border)',
+                                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+                            }}
+                        >
+                            {[
+                                { id: 'description', icon: <FiLayers size={14} />, label: 'Info' },
+                                { id: 'info', icon: <FiInfo size={14} />, label: 'Details' },
+                                { id: 'reviews', icon: <FiMessageSquare size={14} />, label: 'Reviews' },
+                                { id: 'brand', icon: <FiAward size={14} />, label: 'Brand' },
+                                { id: 'shipping', icon: <FiTruck size={14} />, label: 'Delivery' },
+                            ].map(tab => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => scrollToAccordion(tab.id)}
+                                    className="flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all"
+                                    style={{
+                                        background: openAccordion[tab.id] ? 'var(--primary)' : 'transparent',
+                                        color: openAccordion[tab.id] ? '#fff' : 'var(--text-muted)',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        minWidth: 48,
+                                    }}
+                                >
+                                    {tab.icon}
+                                    <span style={{ fontSize: '0.6rem', lineHeight: 1 }}>{tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="max-w-6xl mx-auto">
                 {/* Back button */}
                 <button
@@ -274,7 +335,7 @@ const ProductPage = () => {
                 {/* Collapsible Accordion Sections (Woodmart/Dinenos Style) */}
                 <div className="mb-16 space-y-4">
                     {/* PANEL 1: DESCRIPTION */}
-                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                    <div id="accordion-description" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('description')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -311,7 +372,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 2: ADDITIONAL INFORMATION */}
-                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                    <div id="accordion-info" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('info')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -362,7 +423,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 3: REVIEWS */}
-                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                    <div id="accordion-reviews" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('reviews')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -463,7 +524,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 4: ABOUT BRAND */}
-                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                    <div id="accordion-brand" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('brand')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -503,7 +564,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 5: SHIPPING & DELIVERY */}
-                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                    <div id="accordion-shipping" className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('shipping')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"

@@ -378,44 +378,37 @@ const HomePage = () => {
                         <p className="section-subtitle">Pick your favorite</p>
                     </div>
 
-                    {/* Desktop/Tablet View */}
-                    <div className="hidden sm:grid grid-cols-3 gap-4 sm:gap-6">
-                        {categories.map((cat, i) => (
-                            <motion.div
-                                key={cat.id || i}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: i * 0.08 }}
-                                whileHover={{ y: -6 }}
-                            >
-                                <Link
-                                    to={`/menu?category=${cat.id}`}
-                                    className="flex flex-col items-center justify-center text-center p-6 h-36 rounded-lg transition-all block group"
-                                    style={{
-                                        background: 'var(--bg-card)',
-                                        border: '1.5px solid var(--border)',
-                                        color: 'var(--text-main)',
-                                        boxShadow: 'var(--shadow)',
-                                        textDecoration: 'none'
-                                    }}
+                    {/* Desktop/Tablet View — ProductCard per category */}
+                    <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 gap-6">
+                        {validCategories.map((cat, i) => {
+                            const catProduct = allMenuProducts.find(p => {
+                                const pCatId = p.category_id?.id || p.category?.id;
+                                return String(pCatId) === String(cat.id || cat._id);
+                            });
+                            if (!catProduct) return null;
+                            return (
+                                <motion.div
+                                    key={cat.id || i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: i * 0.08 }}
+                                    className="flex flex-col"
                                 >
-                                    <div
-                                        className="w-14 h-14 rounded-full flex items-center justify-center text-3xl mb-3 transition-all duration-300 group-hover:scale-110"
-                                        style={{
-                                            background: 'var(--primary-glow)',
-                                            color: 'var(--primary)',
-                                            border: '1px solid rgba(153, 0, 0, 0.15)',
-                                        }}
-                                    >
-                                        {cat.icon || '🍽️'}
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="font-bold text-base" style={{ color: 'var(--text-main)' }}>{cat.name}</h3>
+                                        <Link
+                                            to={`/menu?category=${cat.id}`}
+                                            className="text-xs font-semibold flex items-center gap-1 hover:opacity-80 transition-opacity"
+                                            style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                                        >
+                                            See all <FiArrowRight size={12} />
+                                        </Link>
                                     </div>
-                                    <div className="font-bold text-sm tracking-wide transition-colors duration-300 group-hover:text-[var(--primary)]">
-                                        {cat.name}
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        ))}
+                                    <ProductCard product={catProduct} />
+                                </motion.div>
+                            );
+                        })}
                     </div>
 
                     {/* ── Mobile Only Carousel ── */}
