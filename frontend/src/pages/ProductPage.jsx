@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiPlus, FiMinus, FiShoppingCart, FiStar, FiChevronLeft, FiChevronRight, FiHeart, FiClock, FiActivity, FiLayers, FiInfo, FiMessageSquare } from 'react-icons/fi';
+import { FiPlus, FiMinus, FiShoppingCart, FiStar, FiChevronLeft, FiChevronRight, FiHeart, FiClock, FiActivity, FiLayers, FiInfo, FiMessageSquare, FiChevronDown, FiAward, FiTruck } from 'react-icons/fi';
 import { getProduct, getProducts } from '../api/products';
 import { getReviews } from '../api/reviews';
 import { useCart } from '../context/CartContext';
@@ -18,7 +18,19 @@ const ProductPage = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [qty, setQty] = useState(1);
-    const [activeTab, setActiveTab] = useState('description');
+    
+    // Accordion open/close states (Woodmart/Dinenos style)
+    const [openAccordion, setOpenAccordion] = useState({
+        description: true,
+        info: false,
+        reviews: false,
+        brand: false,
+        shipping: false
+    });
+
+    const toggleAccordion = (tabId) => {
+        setOpenAccordion(prev => ({ ...prev, [tabId]: !prev[tabId] }));
+    };
 
     // Reviews states
     const [reviews, setReviews] = useState([]);
@@ -259,165 +271,281 @@ const ProductPage = () => {
                         </div>
                     </motion.div>
                 </div>
-
-                {/* Tabbed Section */}
-                <div className="mb-16">
-                    <div className="flex flex-wrap items-center justify-between border-b border-[var(--border)] mb-8 gap-4">
-                        {/* Tab Headers */}
-                        <div className="flex flex-wrap gap-1 sm:gap-2">
-                            {[
-                                { id: 'description', label: 'Description', icon: <FiLayers size={15} /> },
-                                { id: 'info', label: 'Additional Info', icon: <FiInfo size={15} /> },
-                                { id: 'reviews', label: `Reviews (${reviewStats.total})`, icon: <FiMessageSquare size={15} /> },
-                                { id: 'related', label: 'Related Items', icon: <FiActivity size={15} /> },
-                                { id: 'explore', label: 'Explore Products', icon: <FiShoppingCart size={15} /> }
-                            ].map(tab => (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => handleTabClick(tab.id)}
-                                    className={`flex items-center gap-2 py-3 px-3 font-semibold text-sm transition-all border-b-2 outline-none whitespace-nowrap ${
-                                        (tab.id === 'related' || tab.id === 'explore')
-                                            ? 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                                            : activeTab === tab.id
-                                                ? 'border-[var(--primary)] text-[var(--primary)]'
-                                                : 'border-transparent text-[var(--text-muted)] hover:text-[var(--text-main)]'
-                                    }`}
-                                >
-                                    {tab.icon}
-                                    {tab.label}
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Want to Know More Button */}
-                        <Link
-                            to="/contact"
-                            className="btn-outline py-2 px-6 text-xs font-semibold mb-2"
+                {/* Collapsible Accordion Sections (Woodmart/Dinenos Style) */}
+                <div className="mb-16 space-y-4">
+                    {/* PANEL 1: DESCRIPTION */}
+                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                        <button
+                            onClick={() => toggleAccordion('description')}
+                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
+                            style={{ color: openAccordion.description ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
                         >
-                            Want to Know More?
-                        </Link>
+                            <div className="flex items-center gap-2.5">
+                                <FiLayers size={17} style={{ color: openAccordion.description ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <span>Description</span>
+                            </div>
+                            <FiChevronDown
+                                size={18}
+                                className={`transition-transform duration-300 ${openAccordion.description ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                            />
+                        </button>
+                        <AnimatePresence initial={false}>
+                            {openAccordion.description && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
+                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
+                                            <p className="whitespace-pre-line">
+                                                {product.long_description || product.description || 'No detailed description available.'}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
-                    {/* Tab Contents */}
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={activeTab}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            transition={{ duration: 0.2 }}
-                            className="bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm"
+                    {/* PANEL 2: ADDITIONAL INFORMATION */}
+                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                        <button
+                            onClick={() => toggleAccordion('info')}
+                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
+                            style={{ color: openAccordion.info ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
                         >
-                            {/* DESCRIPTION TAB */}
-                            {activeTab === 'description' && (
-                                <div className="prose max-w-none">
-                                    <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-main)' }}>Product details</h3>
-                                    <p className="text-[var(--text-muted)] mb-6 leading-relaxed">
-                                        {product.long_description || product.description || 'No detailed description available.'}
-                                    </p>
-                                </div>
-                            )}
-
-                            {/* ADDITIONAL INFO TAB */}
-                            {activeTab === 'info' && (
-                                <div>
-                                    <h3 className="text-xl font-bold mb-6" style={{ color: 'var(--text-main)' }}>Nutritional & Preparation Specifications</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                                        {[
-                                            { label: 'Ingredients', value: product.ingredients },
-                                            { label: 'Allergens', value: product.allergens },
-                                            { label: 'Serving Size', value: product.serving_size },
-                                            { label: 'Calories', value: product.calories ? `${product.calories} kcal` : null },
-                                            { label: 'Prep Time', value: product.prep_time },
-                                            { label: 'Spice Level', value: product.spice_level },
-                                            { label: 'Storage Info', value: product.storage_info },
-                                            { label: 'Additional Notes', value: product.additional_notes }
-                                        ].map((item, idx) => (
-                                            <div key={idx} className="flex justify-between py-3 border-b border-[var(--border)] items-center">
-                                                <span className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
-                                                <span className="text-sm font-medium text-[var(--text-main)] text-right max-w-[60%] truncate-2-lines">
-                                                    {item.value || 'N/A'}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* REVIEWS TAB */}
-                            {activeTab === 'reviews' && (
-                                <div className="space-y-12">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                        {/* Left: Ratings Breakdown */}
-                                        <div className="md:border-r border-[var(--border)] md:pr-8 flex flex-col justify-center">
-                                            <div className="text-center mb-6">
-                                                <span className="text-5xl font-black block" style={{ color: 'var(--text-main)' }}>
-                                                    {reviewStats.avgRating}
-                                                </span>
-                                                <div className="flex justify-center text-amber-400 my-2">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <FiStar key={i} size={18} fill={i < Math.round(reviewStats.avgRating) ? "currentColor" : "none"} />
-                                                    ))}
+                            <div className="flex items-center gap-2.5">
+                                <FiInfo size={17} style={{ color: openAccordion.info ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <span>Additional Information</span>
+                            </div>
+                            <FiChevronDown
+                                size={18}
+                                className={`transition-transform duration-300 ${openAccordion.info ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                            />
+                        </button>
+                        <AnimatePresence initial={false}>
+                            {openAccordion.info && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 pt-4">
+                                            {[
+                                                { label: 'Ingredients', value: product.ingredients },
+                                                { label: 'Allergens', value: product.allergens },
+                                                { label: 'Serving Size', value: product.serving_size },
+                                                { label: 'Calories', value: product.calories ? `${product.calories} kcal` : null },
+                                                { label: 'Prep Time', value: product.prep_time },
+                                                { label: 'Spice Level', value: product.spice_level },
+                                                { label: 'Storage Info', value: product.storage_info },
+                                                { label: 'Additional Notes', value: product.additional_notes }
+                                            ].map((item, idx) => (
+                                                <div key={idx} className="flex justify-between py-3 border-b border-[var(--border)] items-center">
+                                                    <span className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
+                                                    <span className="text-sm font-medium text-[var(--text-main)] text-right max-w-[60%] truncate-2-lines">
+                                                        {item.value || 'N/A'}
+                                                    </span>
                                                 </div>
-                                                <span className="text-sm text-[var(--text-muted)] block">Based on {reviewStats.total} approved reviews</span>
-                                            </div>
-
-                                            {/* Stars Breakdown progress bars */}
-                                            <div className="space-y-2.5">
-                                                {reviewStats.breakdown.map((item) => {
-                                                    const percent = reviewStats.total > 0 ? (item.count / reviewStats.total) * 100 : 0;
-                                                    return (
-                                                        <div key={item.star} className="flex items-center gap-3">
-                                                            <span className="text-xs font-semibold w-3 text-right">{item.star}</span>
-                                                            <FiStar size={11} className="text-amber-400 fill-current" />
-                                                            <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-amber-400 rounded-full"
-                                                                    style={{ width: `${percent}%` }}
-                                                                />
-                                                            </div>
-                                                            <span className="text-xs text-[var(--text-muted)] w-8 text-right">{item.count}</span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        {/* Right: Reviews List */}
-                                        <div className="md:col-span-2 space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                                            {reviewsLoading ? (
-                                                <p className="text-center text-sm text-[var(--text-muted)]">Loading reviews...</p>
-                                            ) : reviews.length === 0 ? (
-                                                <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
-                                            ) : (
-                                                reviews.map((rev) => (
-                                                    <div key={rev.id || rev._id} className="p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-deep)]">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
-                                                            <div className="flex text-amber-400">
-                                                                {[...Array(5)].map((_, i) => (
-                                                                    <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                        <p className="text-xs text-[var(--text-muted)] mb-2">
-                                                            {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
-                                                        </p>
-                                                        <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
-                                                    </div>
-                                                ))
-                                            )}
+                                            ))}
                                         </div>
                                     </div>
-
-                                    {/* Bottom: Review Submission Form */}
-                                    <div className="border-t border-[var(--border)] pt-8">
-                                        <ReviewForm productId={id} onSuccess={() => {}} />
-                                    </div>
-                                </div>
+                                </motion.div>
                             )}
-                        </motion.div>
-                    </AnimatePresence>
+                        </AnimatePresence>
+                    </div>
+
+                    {/* PANEL 3: REVIEWS */}
+                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                        <button
+                            onClick={() => toggleAccordion('reviews')}
+                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
+                            style={{ color: openAccordion.reviews ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        >
+                            <div className="flex items-center gap-2.5">
+                                <FiMessageSquare size={17} style={{ color: openAccordion.reviews ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <span>Reviews ({reviewStats.total})</span>
+                            </div>
+                            <FiChevronDown
+                                size={18}
+                                className={`transition-transform duration-300 ${openAccordion.reviews ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                            />
+                        </button>
+                        <AnimatePresence initial={false}>
+                            {openAccordion.reviews && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
+                                        <div className="space-y-8 pt-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                {/* Left: Ratings Breakdown */}
+                                                <div className="md:border-r border-[var(--border)] md:pr-8 flex flex-col justify-center">
+                                                    <div className="text-center mb-6">
+                                                        <span className="text-5xl font-black block" style={{ color: 'var(--text-main)' }}>
+                                                            {reviewStats.avgRating}
+                                                        </span>
+                                                        <div className="flex justify-center text-amber-400 my-2">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <FiStar key={i} size={18} fill={i < Math.round(reviewStats.avgRating) ? "currentColor" : "none"} />
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-sm text-[var(--text-muted)] block">Based on {reviewStats.total} approved reviews</span>
+                                                    </div>
+
+                                                    {/* Stars Breakdown progress bars */}
+                                                    <div className="space-y-2.5">
+                                                        {reviewStats.breakdown.map((item) => {
+                                                            const percent = reviewStats.total > 0 ? (item.count / reviewStats.total) * 100 : 0;
+                                                            return (
+                                                                <div key={item.star} className="flex items-center gap-3">
+                                                                    <span className="text-xs font-semibold w-3 text-right">{item.star}</span>
+                                                                    <FiStar size={11} className="text-amber-400 fill-current" />
+                                                                    <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-full overflow-hidden">
+                                                                        <div
+                                                                            className="h-full bg-amber-400 rounded-full"
+                                                                            style={{ width: `${percent}%` }}
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-xs text-[var(--text-muted)] w-8 text-right">{item.count}</span>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+
+                                                {/* Right: Reviews List */}
+                                                <div className="md:col-span-2 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                                    {reviewsLoading ? (
+                                                        <p className="text-center text-sm text-[var(--text-muted)]">Loading reviews...</p>
+                                                    ) : reviews.length === 0 ? (
+                                                        <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
+                                                    ) : (
+                                                        reviews.map((rev) => (
+                                                            <div key={rev.id || rev._id} className="p-4 rounded-xl border border-[var(--border)] bg-[var(--bg-deep)]">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
+                                                                    <div className="flex text-amber-400">
+                                                                        {[...Array(5)].map((_, i) => (
+                                                                            <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                                <p className="text-xs text-[var(--text-muted)] mb-2">
+                                                                    {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
+                                                                </p>
+                                                                <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
+                                                            </div>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Bottom: Review Submission Form */}
+                                            <div className="border-t border-[var(--border)] pt-8">
+                                                <ReviewForm productId={id} onSuccess={() => {}} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* PANEL 4: ABOUT BRAND */}
+                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                        <button
+                            onClick={() => toggleAccordion('brand')}
+                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
+                            style={{ color: openAccordion.brand ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        >
+                            <div className="flex items-center gap-2.5">
+                                <FiAward size={17} style={{ color: openAccordion.brand ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <span>About Brand</span>
+                            </div>
+                            <FiChevronDown
+                                size={18}
+                                className={`transition-transform duration-300 ${openAccordion.brand ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                            />
+                        </button>
+                        <AnimatePresence initial={false}>
+                            {openAccordion.brand && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
+                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
+                                            <p className="mb-3">
+                                                <strong>Mune's Kitchen</strong> is a premium, home-based culinary destination specializing in masterfully crafted, fresh, and frozen delicacies.
+                                            </p>
+                                            <p>
+                                                We believe in the power of fresh ingredients, time-honored family recipes, and hygienic preparation methods. From hot-selling BBQ and rolls to homemade frozen snacks, every bite is curated to offer an exceptional dining experience right at your home.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* PANEL 5: SHIPPING & DELIVERY */}
+                    <div className="border border-[var(--border)] rounded-lg overflow-hidden bg-[var(--bg-card)]">
+                        <button
+                            onClick={() => toggleAccordion('shipping')}
+                            className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
+                            style={{ color: openAccordion.shipping ? 'var(--primary)' : 'var(--text-main)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        >
+                            <div className="flex items-center gap-2.5">
+                                <FiTruck size={17} style={{ color: openAccordion.shipping ? 'var(--primary)' : 'var(--text-muted)' }} />
+                                <span>Shipping & Delivery</span>
+                            </div>
+                            <FiChevronDown
+                                size={18}
+                                className={`transition-transform duration-300 ${openAccordion.shipping ? 'rotate-180 text-[var(--primary)]' : 'text-[var(--text-muted)]'}`}
+                            />
+                        </button>
+                        <AnimatePresence initial={false}>
+                            {openAccordion.shipping && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: 'easeInOut' }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="p-6 pt-0 border-t border-[var(--border)]">
+                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
+                                            <ul className="list-disc pl-5 space-y-2">
+                                                <li>
+                                                    <strong>Lahore Delivery:</strong> We deliver to all selected sectors of Lahore (including DHA, Gulberg, Johar Town, Model Town, Cavalry Ground, etc.).
+                                                </li>
+                                                <li>
+                                                    <strong>Pre-order Requirement:</strong> Please place your orders at least 3 hours in advance to guarantee freshly prepared items.
+                                                </li>
+                                                <li>
+                                                    <strong>Delivery Fees:</strong> Standard charges apply depending on your selected neighborhood, which will be automatically calculated during checkout.
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* RELATED ITEMS SECTION (Always Visible) */}

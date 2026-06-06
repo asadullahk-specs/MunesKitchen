@@ -391,7 +391,7 @@ const HomePage = () => {
                             >
                                 <Link
                                     to={`/menu?category=${cat.id}`}
-                                    className="flex flex-col items-center justify-center text-center p-6 h-28 rounded-lg transition-all block"
+                                    className="flex flex-col items-center justify-center text-center p-6 h-36 rounded-lg transition-all block group"
                                     style={{
                                         background: 'var(--bg-card)',
                                         border: '1.5px solid var(--border)',
@@ -400,7 +400,19 @@ const HomePage = () => {
                                         textDecoration: 'none'
                                     }}
                                 >
-                                    <div className="font-bold text-base">{cat.name}</div>
+                                    <div
+                                        className="w-14 h-14 rounded-full flex items-center justify-center text-3xl mb-3 transition-all duration-300 group-hover:scale-110"
+                                        style={{
+                                            background: 'var(--primary-glow)',
+                                            color: 'var(--primary)',
+                                            border: '1px solid rgba(153, 0, 0, 0.15)',
+                                        }}
+                                    >
+                                        {cat.icon || '🍽️'}
+                                    </div>
+                                    <div className="font-bold text-sm tracking-wide transition-colors duration-300 group-hover:text-[var(--primary)]">
+                                        {cat.name}
+                                    </div>
                                 </Link>
                             </motion.div>
                         ))}
@@ -531,93 +543,95 @@ const HomePage = () => {
                             <p className="section-subtitle">Mouth-watering deals crafted just for you!</p>
                         </div>
 
-                        <div className="relative overflow-hidden w-full min-h-[280px]" style={{ position: 'relative' }}>
-                            <AnimatePresence initial={false} custom={offerDirection} mode="wait">
-                                <motion.div
-                                    key={activeOfferIdx}
-                                    custom={offerDirection}
-                                    variants={{
-                                        enter: (dir) => ({
-                                            x: dir > 0 ? '100%' : '-100%',
-                                            opacity: 0
-                                        }),
-                                        center: {
-                                            x: 0,
-                                            opacity: 1
-                                        },
-                                        exit: (dir) => ({
-                                            x: dir < 0 ? '100%' : '-100%',
-                                            opacity: 0
-                                        })
-                                    }}
-                                    initial="enter"
-                                    animate="center"
-                                    exit="exit"
-                                    transition={{
-                                        x: { type: "spring", stiffness: 300, damping: 30 },
-                                        opacity: { duration: 0.2 }
-                                    }}
-                                    className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md"
-                                    style={{ background: 'var(--bg-card)' }}
-                                >
-                                    {/* Offer Image */}
-                                    <div className="w-full md:w-1/3 aspect-video md:aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
-                                        {offers[activeOfferIdx].image ? (
-                                            <img
-                                                src={offers[activeOfferIdx].image.startsWith('http') ? offers[activeOfferIdx].image : `${BACKEND}/${offers[activeOfferIdx].image.replace(/^\//, '')}`}
-                                                alt={offers[activeOfferIdx].name}
-                                                className="w-full h-full object-cover"
-                                            />
-                                        ) : (
-                                            <FiGift size={48} style={{ color: 'var(--primary)', opacity: 0.4 }} />
-                                        )}
-                                    </div>
+                        <div className="relative w-full px-10 md:px-0">
+                            <div className="overflow-hidden w-full min-h-[300px] pb-4">
+                                <AnimatePresence initial={false} custom={offerDirection} mode="wait">
+                                    <motion.div
+                                        key={activeOfferIdx}
+                                        custom={offerDirection}
+                                        variants={{
+                                            enter: (dir) => ({
+                                                x: dir > 0 ? '100%' : '-100%',
+                                                opacity: 0
+                                            }),
+                                            center: {
+                                                x: 0,
+                                                opacity: 1
+                                            },
+                                            exit: (dir) => ({
+                                                x: dir < 0 ? '100%' : '-100%',
+                                                opacity: 0
+                                            })
+                                        }}
+                                        initial="enter"
+                                        animate="center"
+                                        exit="exit"
+                                        transition={{
+                                            x: { type: "spring", stiffness: 300, damping: 30 },
+                                            opacity: { duration: 0.2 }
+                                        }}
+                                        className="w-full flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md"
+                                        style={{ background: 'var(--bg-card)' }}
+                                    >
+                                        {/* Offer Image */}
+                                        <div className="w-full md:w-1/3 aspect-video md:aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                                            {offers[activeOfferIdx].image ? (
+                                                <img
+                                                    src={offers[activeOfferIdx].image.startsWith('http') ? offers[activeOfferIdx].image : `${BACKEND}/${offers[activeOfferIdx].image.replace(/^\//, '')}`}
+                                                    alt={offers[activeOfferIdx].name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <FiGift size={48} style={{ color: 'var(--primary)', opacity: 0.4 }} />
+                                            )}
+                                        </div>
 
-                                    {/* Offer Details */}
-                                    <div className="flex-1 text-center md:text-left flex flex-col justify-between h-full py-2">
-                                        <div>
-                                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
-                                                <h3 className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>
-                                                    {offers[activeOfferIdx].name}
-                                                </h3>
-                                                {offers[activeOfferIdx].discount_percentage > 0 && (
-                                                    <span className="badge-hot font-extrabold">
-                                                        {offers[activeOfferIdx].discount_percentage}% OFF
+                                        {/* Offer Details */}
+                                        <div className="flex-1 text-center md:text-left flex flex-col justify-between h-full py-2">
+                                            <div>
+                                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
+                                                    <h3 className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>
+                                                        {offers[activeOfferIdx].name}
+                                                    </h3>
+                                                    {offers[activeOfferIdx].discount_percentage > 0 && (
+                                                        <span className="badge-hot font-extrabold">
+                                                            {offers[activeOfferIdx].discount_percentage}% OFF
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                                                    {offers[activeOfferIdx].description || 'No description available for this deal.'}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
+                                                <div className="text-center sm:text-left">
+                                                    <span className="text-xs text-[var(--text-muted)] line-through block">
+                                                        Rs. {offers[activeOfferIdx].original_price}
                                                     </span>
-                                                )}
-                                            </div>
-                                            <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                                                {offers[activeOfferIdx].description || 'No description available for this deal.'}
-                                            </p>
-                                        </div>
+                                                    <span className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
+                                                        Rs. {offers[activeOfferIdx].discounted_price}
+                                                    </span>
+                                                </div>
 
-                                        <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-                                            <div className="text-center sm:text-left">
-                                                <span className="text-xs text-[var(--text-muted)] line-through block">
-                                                    Rs. {offers[activeOfferIdx].original_price}
-                                                </span>
-                                                <span className="text-2xl font-black" style={{ color: 'var(--primary)' }}>
-                                                    Rs. {offers[activeOfferIdx].discounted_price}
-                                                </span>
-                                            </div>
-
-                                            <div className="flex gap-2">
-                                                <Link to="/menu" className="btn-primary text-xs py-2 px-5">
-                                                    Explore Menu
-                                                </Link>
-                                                <a
-                                                    href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offers[activeOfferIdx].name)}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="btn-outline text-xs py-2 px-5 flex items-center gap-1.5"
-                                                >
-                                                    <FiPhone size={12} /> WhatsApp Order
-                                                </a>
+                                                <div className="flex gap-2">
+                                                    <Link to="/menu" className="btn-primary text-xs py-2 px-5">
+                                                        Explore Menu
+                                                    </Link>
+                                                    <a
+                                                        href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offers[activeOfferIdx].name)}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="btn-outline text-xs py-2 px-5 flex items-center gap-1.5"
+                                                    >
+                                                        <FiPhone size={12} /> WhatsApp Order
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                            </AnimatePresence>
+                                    </motion.div>
+                                </AnimatePresence>
+                            </div>
 
                             {/* Left/Right Arrows */}
                             {offers.length > 1 && (
