@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiPhone, FiStar, FiChevronLeft, FiChevronRight, FiClock, FiAward, FiShield, FiPhoneCall, FiImage, FiGift } from 'react-icons/fi';
@@ -54,18 +54,18 @@ const ReviewCard = ({ review }) => {
     if (!review) return null;
 
     return (
-        <div 
-            className="flex flex-col h-full w-full overflow-hidden" 
-            style={{ 
+        <div
+            className="flex flex-col h-full w-full overflow-hidden"
+            style={{
                 background: 'var(--bg-card)',
-                border: '1.5px solid var(--border)', 
+                border: '1.5px solid var(--border)',
                 borderRadius: 'var(--radius)',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
             }}
         >
-            {/* Image area */}
+            {/* Image area — fixed height so all cards are consistent */}
             {displayImages.length > 0 ? (
-                <div className="relative overflow-hidden shrink-0" style={{ aspectRatio: '4/3', background: 'var(--primary-glow)' }}>
+                <div className="relative overflow-hidden shrink-0" style={{ height: '160px', background: 'var(--primary-glow)' }}>
                     <img
                         src={displayImages[imgIdx]}
                         alt={`Review photo ${imgIdx + 1}`}
@@ -98,8 +98,8 @@ const ReviewCard = ({ review }) => {
                     )}
                 </div>
             ) : (
-                /* No images at all — show a neutral placeholder box with same aspect ratio */
-                <div className="relative shrink-0 overflow-hidden flex items-center justify-center" style={{ aspectRatio: '4/3', background: 'var(--primary-glow)' }}>
+                /* No images — fixed height placeholder */
+                <div className="relative shrink-0 overflow-hidden flex items-center justify-center" style={{ height: '160px', background: 'var(--primary-glow)' }}>
                     <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.3 }} />
                 </div>
             )}
@@ -128,7 +128,7 @@ const ReviewCard = ({ review }) => {
                         "{review.message || ''}"
                     </p>
                 </div>
-                
+
                 {/* Date footer */}
                 <div className="text-[10px] text-right font-medium" style={{ color: 'var(--text-muted)', opacity: 0.8 }}>
                     {new Date(review.created_at || review.createdAt || Date.now()).toLocaleDateString('en-GB')}
@@ -149,7 +149,7 @@ const HomePage = () => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [activeIdx, setActiveIdx] = useState(0);
     const [direction, setDirection] = useState(0);
-    
+
     // Category Carousel States (Mobile Only)
     const [activeCatIdx, setActiveCatIdx] = useState(0);
     const [catDirection, setCatDirection] = useState(0);
@@ -157,6 +157,19 @@ const HomePage = () => {
     // Offers Carousel States
     const [activeOfferIdx, setActiveOfferIdx] = useState(0);
     const [offerDirection, setOfferDirection] = useState(0);
+
+    // Scroll refs for mobile scrolling with arrows
+    const catScrollRef = useRef(null);
+    const offersScrollRef = useRef(null);
+    const topProdsScrollRef = useRef(null);
+    const reviewsScrollRef = useRef(null);
+
+    const handleScrollRef = (ref, dir) => {
+        if (ref.current) {
+            const scrollAmount = dir === 'left' ? -296 : 296;
+            ref.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        }
+    };
 
     useEffect(() => {
         const load = async () => {
@@ -220,121 +233,151 @@ const HomePage = () => {
         <div>
             {/* ===== HERO SECTION ===== */}
             <section
-                className="relative overflow-hidden flex items-center justify-center min-h-[60vh] sm:min-h-[75vh] md:min-h-[85vh]"
+                className="relative overflow-hidden flex items-end md:items-center"
                 style={{
                     backgroundImage: 'url(/hero-bg.jpg)',
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center',
+                    backgroundPosition: 'center top',
                     backgroundRepeat: 'no-repeat',
+                    minHeight: 'clamp(560px, 88vh, 900px)',
                 }}
             >
-                {/* Dark cinematic overlay */}
-                <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.65) 60%, rgba(0,0,0,0.78) 100%)' }} />
+                {/* Left-heavy overlay for text legibility */}
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(110deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.65) 55%, rgba(0,0,0,0.32) 100%)' }} />
+                {/* Bottom fade */}
+                <div className="absolute bottom-0 left-0 right-0 h-28" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.45), transparent)' }} />
 
-                {/* Centered Content */}
-                <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center py-10 sm:py-16 md:py-20">
-                    <motion.p
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] mb-5"
-                        style={{ color: 'rgba(255,255,255,0.65)' }}
-                    >
-                        <FiClock size={11} className="inline mr-1.5 animate-pulse" style={{ verticalAlign: 'middle' }} />
-                        Order at least 3 hours in advance
-                    </motion.p>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 24 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.7, delay: 0.1 }}
-                        className="font-extrabold text-white leading-tight mb-4"
-                        style={{ fontSize: 'clamp(2.4rem, 8vw, 5rem)', lineHeight: 1.1, textShadow: '0 2px 20px rgba(0,0,0,0.4)' }}
-                    >
-                        Where{' '}
-                        <span style={{ color: '#ef4444', fontStyle: 'italic' }}>Freshness</span>
-                        <br />
-                        Meets Freezing
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-sm sm:text-base mb-2 italic"
-                        style={{ color: 'rgba(255,255,255,0.72)', fontFamily: 'Georgia, serif' }}
-                    >
-                        Taste the mystery, Savor the excellence.
-                    </motion.p>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.25 }}
-                        className="text-xs sm:text-sm mb-10 max-w-lg mx-auto"
-                        style={{ color: 'rgba(255,255,255,0.55)' }}
-                    >
-                        Every dish is masterfully prepared with fresh ingredients and secret spices.
-                        Any issues? Call us at{' '}
-                        <span className="font-semibold" style={{ color: '#ff8c5a' }}>+92 303 2683689</span>
-                    </motion.p>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.35 }}
-                        className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10"
-                    >
-                        <Link
-                            to="/menu"
-                            className="btn-primary text-sm px-10 py-3.5 flex items-center gap-2"
-                            style={{ boxShadow: '0 6px 24px rgba(153,0,0,0.5)', letterSpacing: '0.02em' }}
+                {/* Content — LEFT aligned, premium bold typography */}
+                <div className="relative z-10 w-full max-w-6xl mx-auto px-6 sm:px-10 pb-16 pt-32 md:py-0">
+                    <div className="max-w-2xl">
+                    {/* Eyebrow label with gold accent line */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="flex items-center gap-3 mb-6"
                         >
-                            Explore Menu <FiArrowRight size={15} />
-                        </Link>
-                        <a
-                            href="https://wa.me/923032683689"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm px-10 py-3.5 flex items-center gap-2 font-semibold rounded-full transition-all"
+                            <div className="h-0.5 w-10 rounded-full" style={{ background: '#BC9C22' }} />
+                            <span
+                                className="text-xs font-bold uppercase tracking-[0.28em]"
+                                style={{ color: '#BC9C22' }}
+                            >
+                                <FiClock size={10} className="inline mr-1.5 animate-pulse" style={{ verticalAlign: 'middle' }} />
+                                Order at least 3 hours in advance
+                            </span>
+                        </motion.div>
+
+
+                        {/* Main H1 — very large bold, left-aligned */}
+                        <motion.h1
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.7, delay: 0.12 }}
+                            className="font-extrabold text-white mb-5"
                             style={{
-                                background: 'rgba(255,255,255,0.1)',
-                                color: 'white',
-                                border: '2px solid rgba(255,255,255,0.4)',
-                                backdropFilter: 'blur(8px)',
-                                textDecoration: 'none',
-                                letterSpacing: '0.02em',
+                                fontSize: 'clamp(3rem, 8vw, 5.8rem)',
+                                lineHeight: 1.05,
+                                textShadow: '0 3px 24px rgba(0,0,0,0.5)',
+                                letterSpacing: '-0.015em',
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.2)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'; }}
                         >
-                            <FiPhone size={14} /> Order on WhatsApp
-                        </a>
-                    </motion.div>
+                            Where{' '}
+                            <span style={{ color: '#BC9C22', fontStyle: 'italic' }}>Freshness</span>
+                            <br />
+                            Meets Freezing
+                        </motion.h1>
 
-                    {/* Call pill */}
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.92 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.5 }}
-                        className="inline-flex items-center gap-3 px-5 py-3 rounded-xl"
-                        style={{
-                            background: 'rgba(255,255,255,0.08)',
-                            backdropFilter: 'blur(12px)',
-                            border: '1px solid rgba(255,255,255,0.18)',
-                        }}
-                    >
-                        <div
-                            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                            style={{ background: '#990000', color: 'white' }}
+                        {/* Tagline */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.22 }}
+                            className="text-base sm:text-lg italic mb-3"
+                            style={{ color: 'rgba(255,255,255,0.78)', fontFamily: 'Georgia, serif' }}
                         >
-                            <FiPhoneCall size={15} />
-                        </div>
-                        <div className="text-left">
-                            <div className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.6)' }}>Call for Delivery</div>
-                            <div className="font-bold text-sm text-white">+92 303 2683689</div>
-                        </div>
-                    </motion.div>
+                            Taste the mystery, Savor the excellence.
+                        </motion.p>
+
+                        {/* Description */}
+                        <motion.p
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            className="text-sm sm:text-base mb-10 max-w-lg"
+                            style={{ color: 'rgba(255,255,255,0.58)', lineHeight: 1.75 }}
+                        >
+                            Every dish is masterfully prepared with fresh ingredients and secret spices.
+                            For orders, call{' '}
+                            <span className="font-semibold" style={{ color: '#ff8c5a' }}>+92 303 2683689</span>
+                        </motion.p>
+
+                        {/* CTA Buttons */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                            className="flex flex-wrap items-center gap-4 mb-10"
+                        >
+                            <Link
+                                to="/menu"
+                                className="btn-primary flex items-center gap-2"
+                                style={{
+                                    fontSize: '0.9rem',
+                                    padding: '14px 30px',
+                                    boxShadow: '0 8px 28px rgba(153,0,0,0.55)',
+                                    letterSpacing: '0.03em',
+                                }}
+                            >
+                                Explore Menu <FiArrowRight size={15} />
+                            </Link>
+                            <a
+                                href="https://wa.me/923032683689"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 font-semibold transition-all"
+                                style={{
+                                    fontSize: '0.9rem',
+                                    padding: '13px 28px',
+                                    background: 'rgba(255,255,255,0.08)',
+                                    color: 'white',
+                                    border: '2px solid rgba(255,255,255,0.35)',
+                                    backdropFilter: 'blur(10px)',
+                                    textDecoration: 'none',
+                                    letterSpacing: '0.02em',
+                                    borderRadius: '10px',
+                                    transition: 'all 0.25s ease',
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.65)'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.35)'; }}
+                            >
+                                <FiPhone size={14} /> Order on WhatsApp
+                            </a>
+                        </motion.div>
+
+                        {/* Phone pill */}
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.92 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, delay: 0.54 }}
+                            className="inline-flex items-center gap-3 px-5 py-3 rounded-xl"
+                            style={{
+                                background: 'rgba(255,255,255,0.07)',
+                                backdropFilter: 'blur(14px)',
+                                border: '1px solid rgba(255,255,255,0.16)',
+                            }}
+                        >
+                            <div
+                                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{ background: 'linear-gradient(135deg, #990000, #7a0000)', color: 'white', boxShadow: '0 3px 10px rgba(153,0,0,0.4)' }}
+                            >
+                                <FiPhoneCall size={16} />
+                            </div>
+                            <div className="text-left">
+                                <div className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.55)' }}>Call for Delivery</div>
+                                <div className="font-bold text-sm text-white">+92 303 2683689</div>
+                            </div>
+                        </motion.div>
+                    </div>
                 </div>
             </section>
 
@@ -383,7 +426,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Desktop/Tablet View — ProductCard per category */}
-                    <div className="hidden sm:grid grid-cols-2 md:grid-cols-4 gap-6 justify-items-start">
+                    <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
                         {validCategories.map((cat, i) => {
                             const catProduct = allMenuProducts.find(p => {
                                 const pCatId = p.category_id?.id || p.category?.id;
@@ -397,9 +440,9 @@ const HomePage = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: i * 0.08 }}
-                                    className="flex flex-col"
+                                    className="flex flex-col w-full"
                                 >
-                                    <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center justify-between mb-3 px-1">
                                         <h3 className="font-bold text-base" style={{ color: 'var(--text-main)' }}>{cat.name}</h3>
                                         <Link
                                             to={`/menu?category=${cat.id}`}
@@ -409,13 +452,13 @@ const HomePage = () => {
                                             See all <FiArrowRight size={12} />
                                         </Link>
                                     </div>
-                                    <ProductCard product={catProduct} />
+                                    <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
                                 </motion.div>
                             );
                         })}
                     </div>
 
-                    {/* ── Mobile Only Horizontally Scrollable Row ── */}
+                    {/* ── Mobile Only Horizontally Scrollable Row with Arrows ── */}
                     <div className="block sm:hidden">
                         {loading ? (
                             <div className="text-center py-12">
@@ -423,29 +466,87 @@ const HomePage = () => {
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
                             </div>
                         ) : validCategories.length > 0 ? (
-                            <div className="mobile-scroll-container px-4 -mx-4">
-                                {validCategories.map((cat, i) => {
-                                    const catProduct = allMenuProducts.find(p => {
-                                        const pCatId = p.category_id?.id || p.category?.id;
-                                        return String(pCatId) === String(cat.id || cat._id);
-                                    });
-                                    if (!catProduct) return null;
-                                    return (
-                                        <div key={cat.id || i} className="mobile-scroll-item flex flex-col">
-                                            <div className="flex items-center justify-between mb-3 px-1">
-                                                <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[150px]">{cat.name}</h3>
-                                                <Link
-                                                    to={`/menu?category=${cat.id}`}
-                                                    className="text-xs font-semibold flex items-center gap-0.5"
-                                                    style={{ color: 'var(--primary)', textDecoration: 'none' }}
-                                                >
-                                                    See all <FiArrowRight size={10} />
-                                                </Link>
+                            <div className="relative w-full">
+                                {/* Left Arrow */}
+                                {validCategories.length > 1 && (
+                                    <button
+                                        onClick={() => handleScrollRef(catScrollRef, 'left')}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Left"
+                                    >
+                                        <FiChevronLeft size={16} />
+                                    </button>
+                                )}
+
+                                <div ref={catScrollRef} className="mobile-scroll-container px-4 -mx-4">
+                                    {validCategories.map((cat, i) => {
+                                        const catProduct = allMenuProducts.find(p => {
+                                            const pCatId = p.category_id?.id || p.category?.id;
+                                            return String(pCatId) === String(cat.id || cat._id);
+                                        });
+                                        if (!catProduct) return null;
+                                        return (
+                                            <div key={cat.id || i} className="mobile-scroll-item flex flex-col">
+                                                <div className="flex items-center justify-between mb-3 px-1">
+                                                    <h3 className="font-bold text-sm text-[var(--text-main)] truncate max-w-[150px]">{cat.name}</h3>
+                                                    <Link
+                                                        to={`/menu?category=${cat.id}`}
+                                                        className="text-xs font-semibold flex items-center gap-0.5"
+                                                        style={{ color: 'var(--primary)', textDecoration: 'none' }}
+                                                    >
+                                                        See all <FiArrowRight size={10} />
+                                                    </Link>
+                                                </div>
+                                                <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
                                             </div>
-                                            <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
-                                        </div>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Right Arrow */}
+                                {validCategories.length > 1 && (
+                                    <button
+                                        onClick={() => handleScrollRef(catScrollRef, 'right')}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Right"
+                                    >
+                                        <FiChevronRight size={16} />
+                                    </button>
+                                )}
                             </div>
                         ) : (
                             <div className="text-center py-8">
@@ -462,7 +563,7 @@ const HomePage = () => {
             </section>
 
             {/* ===== EXCLUSIVE OFFERS SECTION ===== */}
-            {offers.length > 0 && (
+            {/* {offers.length > 0 && (
                 <section 
                     className="relative py-12 px-4 overflow-hidden" 
                     style={{ 
@@ -476,11 +577,11 @@ const HomePage = () => {
                     
                     <div className="relative z-10 max-w-4xl mx-auto">
                         <div className="text-center mb-8">
-                            <h2 className="section-title mb-3 text-white">PROMO OFFERS & BANNERS</h2>
-                            <p className="section-subtitle text-gray-300">Mouth-watering deals crafted just for you!</p>
+                            <h2 className="section-title mb-3" style={{ color: 'white' }}>PROMO OFFERS & BANNERS</h2>
+                            <p className="section-subtitle" style={{ color: '#d1d5db' }}>Mouth-watering deals crafted just for you!</p>
                         </div>
 
-                        {/* Desktop View (md and up) */}
+                        
                         <div className="hidden md:block relative w-full">
                             <div className="overflow-hidden w-full min-h-[300px] pb-4">
                                 <AnimatePresence initial={false} custom={offerDirection} mode="wait">
@@ -511,7 +612,7 @@ const HomePage = () => {
                                         className="w-full flex flex-row items-center gap-6 p-6 sm:p-8 rounded-lg glass border border-[var(--border)] shadow-md animate-none"
                                         style={{ background: 'var(--bg-card)' }}
                                     >
-                                        {/* Offer Image */}
+                                        
                                         <div className="w-1/3 aspect-square rounded-xl overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
                                             {offers[activeOfferIdx].image ? (
                                                 <img
@@ -524,7 +625,7 @@ const HomePage = () => {
                                             )}
                                         </div>
 
-                                        {/* Offer Details */}
+                                        
                                         <div className="flex-1 text-left flex flex-col justify-between h-full py-2">
                                             <div>
                                                 <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -542,7 +643,7 @@ const HomePage = () => {
                                                 </p>
                                             </div>
 
-                                            <div className="flex flex-row items-center gap-6">
+                                            <div className="flex flex-col md:flex-col lg:flex-row items-start lg:items-center justify-between gap-4 w-full">
                                                 <div>
                                                     <span className="text-xs text-[var(--text-muted)] line-through block">
                                                         Rs. {offers[activeOfferIdx].original_price}
@@ -552,15 +653,15 @@ const HomePage = () => {
                                                     </span>
                                                 </div>
 
-                                                <div className="flex gap-2">
-                                                    <Link to="/menu" className="btn-primary text-xs py-2.5 px-5">
+                                                <div className="flex flex-col md:flex-col lg:flex-row gap-2 w-full lg:w-auto">
+                                                    <Link to="/menu" className="btn-primary text-xs py-2.5 px-5 text-center justify-center w-full lg:w-auto">
                                                         Explore Menu
                                                     </Link>
                                                     <a
                                                         href={`https://wa.me/923032683689?text=Hi,%20I'd%20like%20to%20order%20the%20promo%20offer:%20${encodeURIComponent(offers[activeOfferIdx].name)}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="btn-outline text-xs py-2.5 px-5 flex items-center gap-1.5"
+                                                        className="btn-outline text-xs py-2.5 px-5 flex items-center justify-center gap-1.5 w-full lg:w-auto"
                                                     >
                                                         <FiPhone size={12} /> WhatsApp Order
                                                     </a>
@@ -571,7 +672,7 @@ const HomePage = () => {
                                 </AnimatePresence>
                             </div>
 
-                            {/* Left/Right Arrows */}
+                            
                             {offers.length > 1 && (
                                 <>
                                     <button
@@ -584,7 +685,7 @@ const HomePage = () => {
                                             position: 'absolute', top: '50%', left: -18,
                                             transform: 'translateY(-50%)',
                                             width: 36, height: 36, borderRadius: '50%',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            display: 'flex', alignItems: 'center', justify: 'center',
                                             background: 'var(--bg-card)', border: '1.5px solid var(--border)',
                                             boxShadow: 'var(--shadow-md)', cursor: 'pointer',
                                             color: 'var(--text-main)', zIndex: 10,
@@ -603,7 +704,7 @@ const HomePage = () => {
                                             position: 'absolute', top: '50%', right: -18,
                                             transform: 'translateY(-50%)',
                                             width: 36, height: 36, borderRadius: '50%',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            display: 'flex', alignItems: 'center', justify: 'center',
                                             background: 'var(--bg-card)', border: '1.5px solid var(--border)',
                                             boxShadow: 'var(--shadow-md)', cursor: 'pointer',
                                             color: 'var(--text-main)', zIndex: 10,
@@ -615,7 +716,7 @@ const HomePage = () => {
                                 </>
                             )}
 
-                            {/* Dot indicators */}
+                            
                             {offers.length > 1 && (
                                 <div className="flex justify-center gap-2 mt-5">
                                     {offers.map((_, i) => (
@@ -639,9 +740,36 @@ const HomePage = () => {
                             )}
                         </div>
 
-                        {/* Mobile/Tablet View (less than md) — scrollable cards */}
-                        <div className="block md:hidden">
-                            <div className="mobile-scroll-container px-4 -mx-4">
+                        
+                        <div className="block md:hidden relative w-full">
+                            {offers.length > 1 && (
+                                <button
+                                    onClick={() => handleScrollRef(offersScrollRef, 'left')}
+                                    style={{
+                                        position: 'absolute',
+                                        left: '-8px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        zIndex: 10,
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: 'var(--bg-card)',
+                                        border: '1.5px solid var(--border)',
+                                        boxShadow: 'var(--shadow-sm)',
+                                        cursor: 'pointer',
+                                        color: 'var(--text-main)'
+                                    }}
+                                    aria-label="Scroll Left"
+                                >
+                                    <FiChevronLeft size={16} />
+                                </button>
+                            )}
+
+                            <div ref={offersScrollRef} className="mobile-scroll-container px-4 -mx-4">
                                 {offers.map((offer, idx) => {
                                     const imgUrl = offer.image 
                                         ? (offer.image.startsWith('http') ? offer.image : `${BACKEND}/${offer.image.replace(/^\//, '')}`)
@@ -652,7 +780,7 @@ const HomePage = () => {
                                             className="mobile-scroll-item glass border border-[var(--border)] rounded-xl p-4 flex flex-col justify-between"
                                             style={{ background: 'var(--bg-card)', width: '280px' }}
                                         >
-                                            {/* Image */}
+                                            
                                             <div className="aspect-video w-full rounded-lg overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0 mb-3">
                                                 {imgUrl ? (
                                                     <img src={imgUrl} alt={offer.name} className="w-full h-full object-cover" />
@@ -661,7 +789,7 @@ const HomePage = () => {
                                                 )}
                                             </div>
 
-                                            {/* Details */}
+                                            
                                             <div className="flex-grow flex flex-col justify-between gap-3">
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1.5">
@@ -708,10 +836,38 @@ const HomePage = () => {
                                     );
                                 })}
                             </div>
+
+                           
+                            {offers.length > 1 && (
+                                <button
+                                    onClick={() => handleScrollRef(offersScrollRef, 'right')}
+                                    style={{
+                                        position: 'absolute',
+                                        right: '-8px',
+                                        top: '50%',
+                                        transform: 'translateY(-50%)',
+                                        zIndex: 10,
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: 'var(--bg-card)',
+                                        border: '1.5px solid var(--border)',
+                                        boxShadow: 'var(--shadow-sm)',
+                                        cursor: 'pointer',
+                                        color: 'var(--text-main)'
+                                    }}
+                                    aria-label="Scroll Right"
+                                >
+                                    <FiChevronRight size={16} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </section>
-            )}
+            )} */}
 
             {/* ===== TOP PRODUCTS ===== */}
             <section className="py-6 md:py-10 px-4">
@@ -720,21 +876,79 @@ const HomePage = () => {
                         <h2 className="section-title mb-3">Top Products</h2>
                         <p className="section-subtitle">Our best-selling frozen favorites</p>
                     </div>
-                    <div className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory flex-nowrap sm:flex-wrap sm:grid-cols-2 lg:grid-cols-4 gap-6 no-scrollbar pb-4 px-4 -mx-4 sm:px-0 sm:mx-0">
-                        {loading
-                            ? Array(4).fill(0).map((_, i) => (
-                                <div key={i} className="snap-center shrink-0 w-[280px] sm:w-auto">
-                                    <SkeletonCard />
-                                </div>
-                            ))
-                            : products.map((product) => (
-                                <div key={product.id} className="snap-center shrink-0 w-[280px] sm:w-auto">
-                                    <ProductCard
-                                        product={product}
-                                        onViewDetails={setSelectedProduct}
-                                    />
-                                </div>
-                            ))}
+                    <div className="relative w-full">
+                        {/* Left Arrow (Mobile only) */}
+                        {products.length > 1 && (
+                            <button
+                                onClick={() => handleScrollRef(topProdsScrollRef, 'left')}
+                                style={{
+                                    position: 'absolute',
+                                    left: '-8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: 10,
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'var(--bg-card)',
+                                    border: '1.5px solid var(--border)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-main)'
+                                }}
+                                className="flex sm:hidden"
+                                aria-label="Scroll Left"
+                            >
+                                <FiChevronLeft size={16} />
+                            </button>
+                        )}
+
+                        <div ref={topProdsScrollRef} className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory flex-nowrap sm:flex-wrap sm:grid-cols-2 lg:grid-cols-4 gap-6 no-scrollbar pb-4 px-4 -mx-4 sm:px-0 sm:mx-0">
+                            {loading
+                                ? Array(4).fill(0).map((_, i) => (
+                                    <div key={i} className="snap-center shrink-0 w-[280px] sm:w-auto">
+                                        <SkeletonCard />
+                                    </div>
+                                ))
+                                : products.map((product) => (
+                                    <div key={product.id} className="snap-center shrink-0 w-[280px] sm:w-auto">
+                                        <ProductCard
+                                            product={product}
+                                            onViewDetails={setSelectedProduct}
+                                        />
+                                    </div>
+                                ))}
+                        </div>
+
+                        {/* Right Arrow (Mobile only) */}
+                        {products.length > 1 && (
+                            <button
+                                onClick={() => handleScrollRef(topProdsScrollRef, 'right')}
+                                style={{
+                                    position: 'absolute',
+                                    right: '-8px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    zIndex: 10,
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'var(--bg-card)',
+                                    border: '1.5px solid var(--border)',
+                                    boxShadow: 'var(--shadow-sm)',
+                                    cursor: 'pointer',
+                                    color: 'var(--text-main)'
+                                }}
+                                className="flex sm:hidden"
+                                aria-label="Scroll Right"
+                            >
+                                <FiChevronRight size={16} />
+                            </button>
+                        )}
                     </div>
                     <div className="text-center mt-10">
                         <Link to="/menu" className="btn-outline flex items-center justify-center gap-2 max-w-xs mx-auto">
@@ -745,25 +959,27 @@ const HomePage = () => {
             </section>
 
             {/* ===== TESTIMONIALS ===== */}
-            <section 
-                className="relative py-12 md:py-16 px-4 overflow-hidden" 
-                style={{ 
-                    backgroundImage: 'url(/hero-bg.jpg)',
+            <section
+                className="relative py-12 md:py-16 px-4 overflow-hidden"
+                style={{
+                    backgroundImage: 'url(/reviewsBg.png)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat'
                 }}
             >
-                <div className="absolute inset-0 bg-black/85 backdrop-blur-[1px]" />
-                
+                <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)' }} />
                 <div className="relative z-10 max-w-6xl mx-auto">
-                    <div className="text-center mb-8">
-                        <h2 className="section-title mb-3 text-white">CUSTOMERS FEEDBACK</h2>
-                        <p className="section-subtitle text-gray-300">Real feedback from people who ordered from Mune's Kitchen</p>
-                    </div>
+                <div className="text-center mb-8">
+                    <h2 className="section-title mb-3" style={{ color: 'white' }}>CUSTOMERS FEEDBACK</h2>
+                    <p className="section-subtitle" style={{ color: '#d1d5db' }}>Real feedback from people who ordered from Mune's Kitchen</p>
+                </div>
 
-                    {/* Rating summary + breakdown */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                {/* Rating summary + breakdown on left, reviews on right */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 items-start">
+                    {/* Left Column: Stats Cards (4.7 card + Stars breakdown card stacked vertically) */}
+                    <div className="lg:col-span-1 flex flex-col gap-6">
+                        {/* 4.7 card */}
                         <div className="card p-6 flex flex-col items-center justify-center text-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             <div className="font-display text-6xl font-bold gradient-text mb-2">
                                 {Number(reviewStats.avgRating).toFixed(1)}
@@ -781,6 +997,7 @@ const HomePage = () => {
                             </div>
                         </div>
 
+                        {/* Stars breakdown card */}
                         <div className="card p-6 flex flex-col gap-2 justify-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             {reviewStats.breakdown.map(({ star, count }) => (
                                 <div key={star} className="flex items-center gap-3">
@@ -802,32 +1019,57 @@ const HomePage = () => {
                         </div>
                     </div>
 
-                    {/* ===== REVIEWS: grid (≤3) or carousel (>3) on Desktop, scrollable on Mobile ===== */}
-                    <div className="mb-8">
+                    {/* Right Column: Reviews Grid/Swiper */}
+                    <div className="lg:col-span-2">
                         {reviews.length === 0 ? (
                             <p className="text-center py-8 text-gray-400">
                                 No reviews yet. Be the first to share your experience!
                             </p>
                         ) : (
                             <>
-                                {/* Mobile View — Horizontally Scrollable Row */}
-                                <div className="block sm:hidden">
-                                    <div className="mobile-scroll-container px-4 -mx-4">
+                                {/* Mobile View — Horizontally Scrollable Row with Arrows */}
+                                <div className="block sm:hidden relative w-full">
+                                    {reviews.length > 1 && (
+                                        <button
+                                            onClick={() => handleScrollRef(reviewsScrollRef, 'left')}
+                                            style={{
+                                                position: 'absolute', left: '-8px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center',
+                                                background: 'var(--bg-card)', border: '1.5px solid var(--border)', boxShadow: 'var(--shadow-sm)',
+                                                cursor: 'pointer', color: 'var(--text-main)'
+                                            }}
+                                            aria-label="Scroll Left"
+                                        >
+                                            <FiChevronLeft size={16} />
+                                        </button>
+                                    )}
+                                    <div ref={reviewsScrollRef} className="mobile-scroll-container px-4 -mx-4">
                                         {reviews.map((review, i) => (
                                             <div key={review.id || i} className="mobile-scroll-item">
                                                 <ReviewCard review={review} />
                                             </div>
                                         ))}
                                     </div>
+                                    {reviews.length > 1 && (
+                                        <button
+                                            onClick={() => handleScrollRef(reviewsScrollRef, 'right')}
+                                            style={{
+                                                position: 'absolute', right: '-8px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center',
+                                                background: 'var(--bg-card)', border: '1.5px solid var(--border)', boxShadow: 'var(--shadow-sm)',
+                                                cursor: 'pointer', color: 'var(--text-main)'
+                                            }}
+                                            aria-label="Scroll Right"
+                                        >
+                                            <FiChevronRight size={16} />
+                                        </button>
+                                    )}
                                 </div>
 
                                 {/* Desktop View — grid or swiper */}
                                 <div className="hidden sm:block">
-                                    {reviews.length <= 3 ? (
-                                        <div className={`grid gap-6 ${reviews.length === 1 ? 'grid-cols-1 max-w-md mx-auto' :
-                                            reviews.length === 2 ? 'grid-cols-1 sm:grid-cols-2 max-w-2xl mx-auto' :
-                                                'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                                            }`}>
+                                    {reviews.length <= 2 ? (
+                                        <div className={`grid gap-6 ${reviews.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : 'grid-cols-1 sm:grid-cols-2'}`}>
                                             {reviews.map((review, i) => (
                                                 <ReviewCard key={review.id || i} review={review} isStatic={true} />
                                             ))}
@@ -907,7 +1149,13 @@ const HomePage = () => {
                             </>
                         )}
                     </div>
+                </div>
+            </div>
+            </section>
 
+            {/* ===== SUBMIT REVIEW FORM ===== */}
+            <section className="py-12 px-4 bg-[var(--bg-deep)] border-t border-[var(--border)]">
+                <div className="max-w-2xl mx-auto">
                     <ReviewForm onSuccess={handleNewReview} />
                 </div>
             </section>
@@ -923,10 +1171,11 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {selectedProduct && (
-                <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
-            )}
-        </div>
+
+    { selectedProduct && (
+        <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
+    )}
+        </div >
     );
 };
 

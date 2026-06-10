@@ -80,29 +80,36 @@ const MenuPage = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
         >
-            {/* Hero Banner Section */}
-            <div 
-                className="relative w-full py-16 md:py-24 text-center px-4 overflow-hidden mb-10"
-                style={{ 
-                    backgroundImage: 'url(/hero-bg.jpg)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat'
+            {/* Hero Banner Section — clean, no background image */}
+            <div
+                className="relative w-full py-14 md:py-20 text-center px-4 overflow-hidden mb-10"
+                style={{
+                    background: 'var(--bg-deep)',
+                    borderBottom: '1px solid var(--border)',
                 }}
             >
-                <div className="absolute inset-0 bg-black/75 backdrop-blur-[1px]" />
+                {/* Subtle decorative gradient accent */}
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(153,0,0,0.08) 0%, transparent 70%)' }} />
                 <div className="relative z-10 max-w-4xl mx-auto">
+                    <motion.p
+                        className="text-xs font-bold uppercase tracking-[0.3em] mb-3"
+                        style={{ color: 'var(--primary)' }}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                    >
+                        Explore Our Menu
+                    </motion.p>
                     <motion.h1
-                        className="font-extrabold text-white leading-tight mb-3"
-                        style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}
+                        className="font-extrabold leading-tight mb-3"
+                        style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)', color: 'var(--text-main)' }}
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        Our Menu
+                        Our <span style={{ color: 'var(--primary)' }}>Menu</span>
                     </motion.h1>
                     <motion.p
-                        className="text-gray-300 font-medium tracking-wide"
-                        style={{ fontSize: 'clamp(0.9rem, 3vw, 1.1rem)' }}
+                        className="font-medium tracking-wide"
+                        style={{ fontSize: 'clamp(0.9rem, 3vw, 1.1rem)', color: 'var(--text-muted)' }}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}

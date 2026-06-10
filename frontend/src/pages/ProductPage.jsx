@@ -454,9 +454,40 @@ const ProductPage = () => {
                                     <ProductCard key={p.id || p._id} product={p} />
                                 ))}
                             </div>
-
                             {/* Mobile View — horizontal scroll row */}
-                            <div className="block sm:hidden">
+                            <div className="block sm:hidden relative w-full">
+                                {/* Left Arrow */}
+                                {relatedProducts.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (relatedScrollRef.current) {
+                                                relatedScrollRef.current.scrollBy({ left: -296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Left"
+                                    >
+                                        <FiChevronLeft size={16} />
+                                    </button>
+                                )}
+
                                 <div
                                     ref={relatedScrollRef}
                                     className="mobile-scroll-container px-4 -mx-4 pb-2"
@@ -467,11 +498,43 @@ const ProductPage = () => {
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* Right Arrow */}
+                                {relatedProducts.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (relatedScrollRef.current) {
+                                                relatedScrollRef.current.scrollBy({ left: 296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Right"
+                                    >
+                                        <FiChevronRight size={16} />
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}
                 </div>
-
+ 
                 {/* EXPLORE PRODUCTS SECTION (Always Visible) */}
                 <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
@@ -485,9 +548,41 @@ const ProductPage = () => {
                                     <ProductCard key={p.id || p._id} product={p} />
                                 ))}
                             </div>
-
+ 
                             {/* Mobile View — horizontal scroll row */}
-                            <div className="block sm:hidden">
+                            <div className="block sm:hidden relative w-full">
+                                {/* Left Arrow */}
+                                {exploreProducts.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (exploreScrollRef.current) {
+                                                exploreScrollRef.current.scrollBy({ left: -296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Left"
+                                    >
+                                        <FiChevronLeft size={16} />
+                                    </button>
+                                )}
+
                                 <div
                                     ref={exploreScrollRef}
                                     className="mobile-scroll-container px-4 -mx-4 pb-2"
@@ -498,6 +593,38 @@ const ProductPage = () => {
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* Right Arrow */}
+                                {exploreProducts.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (exploreScrollRef.current) {
+                                                exploreScrollRef.current.scrollBy({ left: 296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Right"
+                                    >
+                                        <FiChevronRight size={16} />
+                                    </button>
+                                )}
                             </div>
                         </>
                     )}

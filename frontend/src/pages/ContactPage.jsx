@@ -52,7 +52,7 @@ const ContactPage = () => {
             transition={{ duration: 0.4 }}
         >
 
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-6xl mx-auto">
 
                 <div className="text-center mb-12">
                     <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--primary)' }}>
@@ -66,10 +66,10 @@ const ContactPage = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
 
                     {/* Contact Form — first on all screen sizes */}
-                    <div className="card p-6">
+                    <div className="card p-6 sm:p-7 flex flex-col">
 
                         <h2 className="font-display font-bold text-xl mb-6" style={{ color: 'var(--text-main)' }}>
                             Send a Message
@@ -153,6 +153,12 @@ const ContactPage = () => {
                     {/* Contact Details — second on all screen sizes */}
                     <div className="flex flex-col gap-4">
 
+                        {/* Section Header */}
+                        <div className="card p-5 flex flex-col justify-center" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', border: 'none' }}>
+                            <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: 'rgba(255,255,255,0.7)' }}>Contact Information</p>
+                            <h3 className="font-bold text-lg text-white">We'd love to hear from you</h3>
+                            <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.65)' }}>Reach us through any of the channels below</p>
+                        </div>
                         {/* Phone Card */}
                         <div className="card p-4 flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg" style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))' }}>

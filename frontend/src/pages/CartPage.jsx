@@ -42,8 +42,8 @@ const CartPage = () => {
     }
 
     return (
-        <div className="animate-fadeIn min-h-screen py-6 px-4 sm:px-6">
-            <div className="max-w-5xl mx-auto">
+        <div className="animate-fadeIn min-h-screen py-6 px-3 sm:px-4">
+            <div className="max-w-6xl mx-auto">
 
                 <div className="flex items-center justify-between mb-8">
                     <h1 className="font-bold text-3xl" style={{ color: 'var(--text-main)' }}>
@@ -58,9 +58,9 @@ const CartPage = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-                    <div className="lg:col-span-2 space-y-4">
+                    <div className="lg:col-span-3 space-y-4">
                         <AnimatePresence>
                             {safeCart.map((item) => {
                                 const imgUrl = item.image
@@ -140,7 +140,7 @@ const CartPage = () => {
                         </AnimatePresence>
                     </div>
 
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-2">
                         <div className="card p-5 lg:sticky lg:top-24">
                             <h2
                                 className="font-bold text-lg mb-5"
