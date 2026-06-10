@@ -150,7 +150,7 @@ const CheckoutPage = () => {
                                     </div>
                                     <div>
                                         <label className="form-label">Phone *</label>
-                                        <input className="form-input" placeholder="+92 300 0000000"
+                                        <input className="form-input" placeholder="+92 3XX XXXXXXX"
                                             value={phone} onChange={(e) => setPhone(e.target.value)} />
                                     </div>
                                 </div>

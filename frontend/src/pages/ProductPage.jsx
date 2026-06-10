@@ -18,7 +18,7 @@ const ProductPage = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [qty, setQty] = useState(1);
-    
+
     // Accordion open/close states — single-active (opening one closes others)
     const [openAccordion, setOpenAccordion] = useState('description');
 
@@ -39,7 +39,7 @@ const ProductPage = () => {
 
     useEffect(() => {
         if (!id) return;
-        
+
         const fetchProductData = async () => {
             setLoading(true);
             setReviewsLoading(true);
@@ -140,7 +140,7 @@ const ProductPage = () => {
                     className="flex items-center gap-2 text-sm font-medium mb-6 transition-colors hover:text-[var(--primary)]"
                     style={{ color: 'var(--text-muted)' }}
                 >
-                    <FiChevronLeft size={16} /> Back to menu
+                    <FiChevronLeft size={16} /> Back to page
                 </button>
 
                 {/* 2-Column Top Section */}
@@ -431,7 +431,7 @@ const ProductPage = () => {
 
                                             {/* Bottom: Review Submission Form */}
                                             <div className="border-t border-[var(--border)] pt-8">
-                                                <ReviewForm productId={id} onSuccess={() => {}} />
+                                                <ReviewForm productId={id} onSuccess={() => { }} />
                                             </div>
                                         </div>
                                     </div>
@@ -534,7 +534,7 @@ const ProductPage = () => {
                         </>
                     )}
                 </div>
- 
+
                 {/* EXPLORE PRODUCTS SECTION (Always Visible) */}
                 <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-lg border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
@@ -548,7 +548,7 @@ const ProductPage = () => {
                                     <ProductCard key={p.id || p._id} product={p} />
                                 ))}
                             </div>
- 
+
                             {/* Mobile View — horizontal scroll row */}
                             <div className="block sm:hidden relative w-full">
                                 {/* Left Arrow */}

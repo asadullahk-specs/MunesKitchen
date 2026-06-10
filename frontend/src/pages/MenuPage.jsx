@@ -17,7 +17,7 @@ const MenuPage = () => {
     const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
     const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    
+
     // scroll refs for mobile category rows
     const scrollRefs = useRef({});
 
@@ -35,7 +35,7 @@ const MenuPage = () => {
         setLoading(true);
         const params = { show_on_menu: true };
         if (activeCategory !== 'all') params.category_id = activeCategory;
-        
+
         getProducts(params)
             .then((res) => setProducts(res.data.data))
             .catch(() => { })
@@ -86,10 +86,18 @@ const MenuPage = () => {
                 style={{
                     background: 'var(--bg-deep)',
                     borderBottom: '1px solid var(--border)',
+                    backgroundImage: 'url(/menu-bg.png)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center center',
+                    backgroundRepeat: 'no-repeat'
                 }}
             >
+                {/* Blackish overlay on background image */}
+                <div className="absolute inset-0 bg-black/55" />
+
                 {/* Subtle decorative gradient accent */}
                 <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(153,0,0,0.08) 0%, transparent 70%)' }} />
+
                 <div className="relative z-10 max-w-4xl mx-auto">
                     <motion.p
                         className="text-xs font-bold uppercase tracking-[0.3em] mb-3"
@@ -99,14 +107,16 @@ const MenuPage = () => {
                     >
                         Explore Our Menu
                     </motion.p>
+
                     <motion.h1
                         className="font-extrabold leading-tight mb-3"
                         style={{ fontSize: 'clamp(2.2rem, 6vw, 3.8rem)', color: 'var(--text-main)' }}
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        Our <span style={{ color: 'var(--primary)' }}>Menu</span>
+                        <span style={{ color: 'rgb(188, 156, 34)' }}>Our</span> <span style={{ color: 'var(--primary)' }}>Menu</span>
                     </motion.h1>
+
                     <motion.p
                         className="font-medium tracking-wide"
                         style={{ fontSize: 'clamp(0.9rem, 3vw, 1.1rem)', color: 'var(--text-muted)' }}
@@ -114,7 +124,7 @@ const MenuPage = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.1 }}
                     >
-                        Fresh, frozen, and ready to cook
+                        Our best treats are waiting for you
                     </motion.p>
                 </div>
             </div>
@@ -125,7 +135,7 @@ const MenuPage = () => {
                 <div className="max-w-md mx-auto mb-8 relative">
                     <input
                         type="text"
-                        placeholder="Search our delicious items..."
+                        placeholder="Search..."
                         className="w-full px-5 py-3 rounded-2xl border transition-all text-sm pr-12 focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] outline-none"
                         style={{
                             background: 'var(--bg-card)',
@@ -222,7 +232,7 @@ const MenuPage = () => {
                     </div>
                 ) : filteredProductsList.length === 0 ? (
                     <div className="text-center py-20">
-                        <div className="text-6xl mb-4">🍱</div>
+                        <div className="text-6xl mb-4"><img className='h-[100px] mx-auto' src="../../public/new1.png" alt="" /></div>
                         <h3 className="font-display text-xl font-semibold mb-2" style={{ color: 'var(--text-main)' }}>
                             No items found
                         </h3>
@@ -366,7 +376,7 @@ const MenuPage = () => {
                                     <FiX size={18} />
                                 </button>
                             </div>
-                            
+
                             <div className="space-y-2">
                                 <button
                                     onClick={() => handleCategoryChange('all')}
