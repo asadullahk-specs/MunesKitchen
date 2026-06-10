@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
-import { FiPhoneCall, FiMail, FiMapPin, FiSend, FiClock } from 'react-icons/fi'
+import { FiPhoneCall, FiMail, FiMapPin, FiSend, FiClock, FiInfo } from 'react-icons/fi'
 import API from '../api/axios'
 
 const ContactPage = () => {
@@ -223,6 +223,12 @@ const ContactPage = () => {
                         <div className="rounded-2xl p-4 text-sm flex items-center gap-2" style={{ background: 'var(--primary-glow)', border: '1px solid rgba(153,0,0,0.18)', color: 'var(--text-muted)' }}>
                             <FiClock size={16} className="animate-pulse shrink-0" style={{ color: 'var(--primary)' }} />
                             <span>Please place orders at least 3 hours before your desired delivery time.</span>
+                        </div>
+
+                        {/* Notice Card 2 (Cooked catering options) */}
+                        <div className="rounded-2xl p-4 text-sm flex items-center gap-2" style={{ background: 'var(--primary-glow)', border: '1px solid rgba(153,0,0,0.18)', color: 'var(--text-muted)' }}>
+                            <FiInfo size={16} className="shrink-0" style={{ color: 'var(--primary)' }} />
+                            <span>Custom cooked options are also available for institutions, schools, offices, and events. Standard preparation and cooking charges apply.</span>
                         </div>
 
                     </div>

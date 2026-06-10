@@ -259,7 +259,7 @@ const HomePage = () => {
                             transition={{ duration: 0.5 }}
                             className="flex items-center gap-3 mb-5"
                         >
-                            <div className="h-0.5 w-10 rounded-full" style={{ background: '#BC9C22' }} />
+                            {/* <div className="h-0.5 w-10 rounded-full" style={{ background: '#BC9C22' }} /> */}
                             <span
                                 className="text-xs font-bold uppercase tracking-[0.28em]"
                                 style={{ color: '#BC9C22' }}
@@ -961,203 +961,161 @@ const HomePage = () => {
 
             {/* ===== TESTIMONIALS ===== */}
             <section
-                className="relative py-12 md:py-16 px-4 overflow-hidden"
+                className="relative py-12 md:py-20 px-4 overflow-hidden w-full"
                 style={{
                     backgroundImage: 'url(/reviewsBg.png)',
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center center',
+                    backgroundPosition: 'bottom center',
                     backgroundRepeat: 'no-repeat'
                 }}
             >
-                <div className="absolute inset-0" style={{ background: 'rgba(0,0,0,0.78)' }} />
-                <div className="relative z-10 max-w-6xl mx-auto">
+                {/* Dark background overlay */}
+                <div className="absolute inset-0 bg-black/65" />
+
+                <div className="relative z-10 max-w-7xl mx-auto px-0 sm:px-4 md:px-6">
+
+                    {/* FIX: Heading Group matching your Top Products Styles exactly */}
                     <div className="text-center mb-8">
-                        <h2 className="section-title mb-3" style={{ color: 'white' }}>CUSTOMERS FEEDBACK</h2>
-                        <p className="section-subtitle" style={{ color: '#d1d5db' }}>See what people say about the products of Mune's Kitchen</p>
+                        <h2 className="section-title mb-3 text-white uppercase">CUSTOMERS FEEDBACK</h2>
+                        <p className="section-subtitle text-gray-300">See what people say about the products of Mune's Kitchen</p>
                     </div>
 
-                    {/* Rating summary + breakdown on left, reviews on right */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12 items-start">
-                        {/* Left Column: Stats Cards (4.7 card + Stars breakdown card stacked vertically) */}
-                        <div className="lg:col-span-1 flex flex-col gap-6">
-                            {/* 4.7 card */}
-                            <div className="card p-6 flex flex-col items-center justify-center text-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
-                                <div className="font-display text-6xl font-bold gradient-text mb-2">
-                                    {Number(reviewStats.avgRating).toFixed(1)}
+                    {/* Master Responsive Layout Grid */}
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 md:gap-8 lg:gap-12 items-stretch">
+
+                        {/* ================= LEFT/TOP WORKSPACE CONTAINER ================= */}
+                        <div className="xl:col-span-5 w-full flex flex-col md:flex-row xl:flex-col gap-6 justify-between items-stretch">
+
+                            {/* Stats Container Block */}
+                            <div className="flex flex-col sm:flex-row md:flex-col gap-4 w-full md:w-2/5 xl:w-full justify-between items-stretch">
+
+                                {/* 4.7 Numeric Rating Summary Card */}
+                                <div className="card p-5 flex flex-col items-center justify-center text-center w-full sm:w-1/2 md:w-full flex-1 min-h-[135px] rounded-xl backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
+                                    <div className="font-display text-4xl sm:text-5xl font-bold gradient-text mb-1">
+                                        {Number(reviewStats.avgRating).toFixed(1)}
+                                    </div>
+                                    <div className="flex gap-1 mb-2">
+                                        {[1, 2, 3, 4, 5].map((s) => (
+                                            <FiStar key={s} size={16}
+                                                fill={s <= Math.round(reviewStats.avgRating) ? '#f59e0b' : 'none'}
+                                                stroke={s <= Math.round(reviewStats.avgRating) ? '#f59e0b' : 'var(--text-muted)'}
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="text-xs font-semibold text-[var(--text-muted)]">
+                                        Based on {reviewStats.total} reviews
+                                    </div>
                                 </div>
-                                <div className="flex gap-1 mb-2">
-                                    {[1, 2, 3, 4, 5].map((s) => (
-                                        <FiStar key={s} size={20}
-                                            fill={s <= Math.round(reviewStats.avgRating) ? '#f59e0b' : 'none'}
-                                            stroke={s <= Math.round(reviewStats.avgRating) ? '#f59e0b' : 'var(--text-muted)'}
-                                        />
+
+                                {/* Progress Bar Breakdown Card */}
+                                <div className="card p-4 sm:p-5 flex flex-col gap-2.5 justify-center w-full sm:w-1/2 md:w-full flex-1 min-h-[145px] rounded-xl backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
+                                    {reviewStats.breakdown.map(({ star, count }) => (
+                                        <div key={star} className="flex items-center gap-2 text-xs">
+                                            <span className="w-7 sm:w-8 flex items-center justify-end gap-0.5 text-right shrink-0 text-gray-300" style={{ color: 'var(--text-muted)' }}>
+                                                {star} <FiStar size={10} fill="#f59e0b" stroke="#f59e0b" className="shrink-0" />
+                                            </span>
+                                            <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
+                                                <div
+                                                    className="h-full rounded-full transition-all duration-700"
+                                                    style={{
+                                                        width: reviewStats.total > 0 ? `${(count / reviewStats.total) * 100}%` : '0%',
+                                                        background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
+                                                    }}
+                                                />
+                                            </div>
+                                            <span className="w-5 font-semibold text-right shrink-0 text-gray-300" style={{ color: 'var(--text-muted)' }}>{count}</span>
+                                        </div>
                                     ))}
                                 </div>
-                                <div className="text-sm font-semibold text-[var(--text-muted)]">
-                                    Based on {reviewStats.total} reviews
-                                </div>
                             </div>
 
-                            {/* Stars breakdown card */}
-                            <div className="card p-6 flex flex-col gap-2 justify-center" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
-                                {reviewStats.breakdown.map(({ star, count }) => (
-                                    <div key={star} className="flex items-center gap-3">
-                                        <span className="text-sm w-12 flex items-center justify-end gap-1 text-right" style={{ color: 'var(--text-muted)' }}>
-                                            {star} <FiStar size={11} fill="#f59e0b" stroke="#f59e0b" style={{ transform: 'translateY(-1px)' }} />
-                                        </span>
-                                        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
-                                            <div
-                                                className="h-full rounded-full transition-all duration-700"
+                            {/* Swiper / Dynamic Carousel Slider Area */}
+                            <div className="flex flex-col justify-center w-full md:w-3/5 xl:w-full min-h-[260px]">
+                                {reviews.length === 0 ? (
+                                    <p className="text-center py-8 text-gray-400 bg-[var(--bg-card)] rounded-xl border border-[var(--border)] w-full text-sm px-4">
+                                        No reviews yet. Be the first to share your experience!
+                                    </p>
+                                ) : (
+                                    <div className="w-full relative px-10 sm:px-12 flex items-center h-full">
+                                        {/* Left Navigation Arrow */}
+                                        {reviews.length > 1 && (
+                                            <button
                                                 style={{
-                                                    width: reviewStats.total > 0 ? `${(count / reviewStats.total) * 100}%` : '0%',
-                                                    background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
+                                                    position: 'absolute', left: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                    width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                                                    justifyContent: 'center', // <-- FIXED HERE
+                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
                                                 }}
-                                            />
+                                                onClick={() => {
+                                                    setDirection(-1);
+                                                    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
+                                                }}
+                                                aria-label="Previous review"
+                                            >
+                                                <FiChevronLeft size={18} />
+                                            </button>
+                                        )}
+
+                                        {/* Carousel Content Frame */}
+                                        <div className="w-full overflow-hidden flex items-center">
+                                            <AnimatePresence initial={false} custom={direction} mode="wait">
+                                                <motion.div
+                                                    key={activeIdx}
+                                                    custom={direction}
+                                                    variants={{
+                                                        enter: (dir) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
+                                                        center: { x: 0, opacity: 1 },
+                                                        exit: (dir) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 })
+                                                    }}
+                                                    initial="enter"
+                                                    animate="center"
+                                                    exit="exit"
+                                                    transition={{
+                                                        x: { type: "spring", stiffness: 300, damping: 30 },
+                                                        opacity: { duration: 0.2 }
+                                                    }}
+                                                    drag="x"
+                                                    dragConstraints={{ left: 0, right: 0 }}
+                                                    dragElastic={0.6}
+                                                    className="w-full cursor-grab active:cursor-grabbing"
+                                                >
+                                                    <ReviewCard review={reviews[activeIdx]} />
+                                                </motion.div>
+                                            </AnimatePresence>
                                         </div>
-                                        <span className="text-sm w-6 font-semibold" style={{ color: 'var(--text-muted)' }}>{count}</span>
+
+                                        {/* Right Navigation Arrow */}
+                                        {reviews.length > 1 && (
+                                            <button
+                                                style={{
+                                                    position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                    width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                                                    justifyContent: 'center', // <-- FIXED HERE
+                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
+                                                }}
+                                                onClick={() => {
+                                                    setDirection(1);
+                                                    setActiveIdx((prev) => (prev + 1) % reviews.length);
+                                                }}
+                                                aria-label="Next review"
+                                            >
+                                                <FiChevronRight size={18} />
+                                            </button>
+                                        )}
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
 
-                        {/* Right Column: Reviews Grid/Swiper */}
-                        <div className="lg:col-span-2">
-                            {reviews.length === 0 ? (
-                                <p className="text-center py-8 text-gray-400">
-                                    No reviews yet. Be the first to share your experience!
-                                </p>
-                            ) : (
-                                <>
-                                    {/* Mobile View — Horizontally Scrollable Row with Arrows */}
-                                    <div className="block sm:hidden relative w-full">
-                                        {reviews.length > 1 && (
-                                            <button
-                                                onClick={() => handleScrollRef(reviewsScrollRef, 'left')}
-                                                style={{
-                                                    position: 'absolute', left: '-8px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center',
-                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', boxShadow: 'var(--shadow-sm)',
-                                                    cursor: 'pointer', color: 'var(--text-main)'
-                                                }}
-                                                aria-label="Scroll Left"
-                                            >
-                                                <FiChevronLeft size={16} />
-                                            </button>
-                                        )}
-                                        <div ref={reviewsScrollRef} className="mobile-scroll-container px-4 -mx-4">
-                                            {reviews.map((review, i) => (
-                                                <div key={review.id || i} className="mobile-scroll-item">
-                                                    <ReviewCard review={review} />
-                                                </div>
-                                            ))}
-                                        </div>
-                                        {reviews.length > 1 && (
-                                            <button
-                                                onClick={() => handleScrollRef(reviewsScrollRef, 'right')}
-                                                style={{
-                                                    position: 'absolute', right: '-8px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justify: 'center',
-                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', boxShadow: 'var(--shadow-sm)',
-                                                    cursor: 'pointer', color: 'var(--text-main)'
-                                                }}
-                                                aria-label="Scroll Right"
-                                            >
-                                                <FiChevronRight size={16} />
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    {/* Desktop View — grid or swiper */}
-                                    <div className="hidden sm:block">
-                                        {reviews.length <= 2 ? (
-                                            <div className={`grid gap-6 ${reviews.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                                                {reviews.map((review, i) => (
-                                                    <ReviewCard key={review.id || i} review={review} isStatic={true} />
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="reviews-swiper-wrapper">
-                                                <div className="relative overflow-hidden w-full">
-                                                    <AnimatePresence initial={false} custom={direction} mode="wait">
-                                                        <motion.div
-                                                            key={activeIdx}
-                                                            custom={direction}
-                                                            variants={{
-                                                                enter: (dir) => ({
-                                                                    x: dir > 0 ? '100%' : '-100%',
-                                                                    opacity: 0
-                                                                }),
-                                                                center: {
-                                                                    x: 0,
-                                                                    opacity: 1
-                                                                },
-                                                                exit: (dir) => ({
-                                                                    x: dir < 0 ? '100%' : '-100%',
-                                                                    opacity: 0
-                                                                })
-                                                            }}
-                                                            initial="enter"
-                                                            animate="center"
-                                                            exit="exit"
-                                                            transition={{
-                                                                x: { type: "spring", stiffness: 300, damping: 30 },
-                                                                opacity: { duration: 0.2 }
-                                                            }}
-                                                            drag="x"
-                                                            dragConstraints={{ left: 0, right: 0 }}
-                                                            dragElastic={0.6}
-                                                            onDragEnd={(event, info) => {
-                                                                const swipeThreshold = 50;
-                                                                if (info.offset.x < -swipeThreshold) {
-                                                                    setDirection(1);
-                                                                    setActiveIdx((prev) => (prev + 1) % reviews.length);
-                                                                } else if (info.offset.x > swipeThreshold) {
-                                                                    setDirection(-1);
-                                                                    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
-                                                                }
-                                                            }}
-                                                            className="w-full cursor-grab active:cursor-grabbing"
-                                                        >
-                                                            <ReviewCard review={reviews[activeIdx]} />
-                                                        </motion.div>
-                                                    </AnimatePresence>
-                                                </div>
-
-                                                {/* Custom navigation arrows */}
-                                                <button
-                                                    className="reviews-prev swiper-nav-btn"
-                                                    onClick={() => {
-                                                        setDirection(-1);
-                                                        setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
-                                                    }}
-                                                    aria-label="Previous reviews"
-                                                >
-                                                    <FiChevronLeft size={20} />
-                                                </button>
-                                                <button
-                                                    className="reviews-next swiper-nav-btn"
-                                                    onClick={() => {
-                                                        setDirection(1);
-                                                        setActiveIdx((prev) => (prev + 1) % reviews.length);
-                                                    }}
-                                                    aria-label="Next reviews"
-                                                >
-                                                    <FiChevronRight size={20} />
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
+                        {/* ================= RIGHT/BOTTOM WORKSPACE: REVIEWS INPUT FORM ================= */}
+                        {/* FIX: Increased width sizing structure to fill and sync height columns symmetrically */}
+                        <div className="xl:col-span-7 flex flex-col justify-between h-full w-full mt-4 xl:mt-0 px-2 sm:px-4 lg:px-6">
+                            <div className="w-full h-full flex flex-col justify-center py-2">
+                                <ReviewForm onSuccess={handleNewReview} />
+                            </div>
                         </div>
+
                     </div>
-                </div>
-            </section>
-
-            {/* ===== SUBMIT REVIEW FORM ===== */}
-            <section className="py-12 px-4 bg-[var(--bg-deep)] border-t border-[var(--border)]">
-                <div className="max-w-2xl mx-auto">
-                    <ReviewForm onSuccess={handleNewReview} />
                 </div>
             </section>
 
