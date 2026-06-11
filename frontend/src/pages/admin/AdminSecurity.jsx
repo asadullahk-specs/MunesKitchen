@@ -10,7 +10,6 @@ const AdminSecurity = () => {
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
 
-    // Form States
     const [form, setForm] = useState({ id: null, name: '', email: '', password: '' })
     const [isEditing, setIsEditing] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
@@ -112,7 +111,7 @@ const AdminSecurity = () => {
             id: admin.id,
             name: admin.name,
             email: admin.email,
-            password: '' // leave blank unless changing password
+            password: ''
         })
         setProfileImagePreview(admin.profile_image || null)
         setIsEditing(true)
@@ -151,15 +150,12 @@ const AdminSecurity = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-t-transparent rounded-[7px]-[7px] animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : error ? (
                 <div className="card p-8 text-center">
                     <p className="text-sm font-medium mb-3" style={{ color: 'var(--primary)' }}>{error}</p>
-                    <button
-                        onClick={fetchAdmins}
-                        className="btn-primary px-5 py-2 text-sm"
-                    >
+                    <button onClick={fetchAdmins} className="btn-primary px-5 py-2 text-sm">
                         Retry
                     </button>
                 </div>
@@ -178,8 +174,8 @@ const AdminSecurity = () => {
                                         <label className="form-label">Profile Photo (optional)</label>
                                         <div className="flex items-center gap-3">
                                             <div
-                                                className="w-14 h-14 rounded-[7px]-[7px] overflow-hidden border-2 shrink-0 flex items-center justify-center"
-                                                style={{ borderColor: 'var(--primary)', background: 'var(--bg-input)' }}
+                                                className="w-14 h-14 overflow-hidden border-2 shrink-0 flex items-center justify-center"
+                                                style={{ borderRadius: '7px', borderColor: 'var(--primary)', background: 'var(--bg-input)' }}
                                             >
                                                 {profileImagePreview ? (
                                                     <img src={profileImagePreview} alt="Preview" className="w-full h-full object-cover" />
@@ -191,8 +187,8 @@ const AdminSecurity = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="text-xs px-3 py-1.5 rounded-[7px]-[7px] border font-medium transition-all"
-                                                    style={{ borderColor: 'var(--primary)', color: 'var(--primary)', background: 'var(--primary-glow)' }}
+                                                    className="text-xs px-3 py-1.5 border font-medium transition-all"
+                                                    style={{ borderRadius: '7px', borderColor: 'var(--primary)', color: 'var(--primary)', background: 'var(--primary-glow)' }}
                                                 >
                                                     Upload from Device
                                                 </button>
@@ -200,8 +196,8 @@ const AdminSecurity = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => { setProfileImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                                                        className="text-xs px-3 py-1 rounded-[7px]-[7px] border transition-all"
-                                                        style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                                                        className="text-xs px-3 py-1 border transition-all"
+                                                        style={{ borderRadius: '7px', borderColor: 'var(--border)', color: 'var(--text-muted)' }}
                                                     >
                                                         Remove
                                                     </button>
@@ -217,14 +213,17 @@ const AdminSecurity = () => {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Name Field */}
                                 <div>
                                     <label className="form-label">Name *</label>
                                     <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
                                             <FiUser size={14} />
                                         </span>
                                         <input
-                                            className="form-input pl-10"
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px' }}
                                             placeholder="Full Name"
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -232,14 +231,17 @@ const AdminSecurity = () => {
                                         />
                                     </div>
                                 </div>
+
+                                {/* Email Field */}
                                 <div>
                                     <label className="form-label">Email Address *</label>
                                     <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
                                             <FiMail size={14} />
                                         </span>
                                         <input
-                                            className="form-input pl-10"
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px' }}
                                             type="email"
                                             placeholder="admin@muneskitchen.com"
                                             value={form.email}
@@ -248,16 +250,19 @@ const AdminSecurity = () => {
                                         />
                                     </div>
                                 </div>
+
+                                {/* Password Field */}
                                 <div>
                                     <label className="form-label">
                                         {isEditing ? 'New Password (leave empty to keep current)' : 'Password *'}
                                     </label>
                                     <div className="relative">
-                                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-gray-400">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
                                             <FiLock size={14} />
                                         </span>
                                         <input
-                                            className="form-input pl-10 pr-10"
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px', paddingRight: '40px' }}
                                             type={showPassword ? 'text' : 'password'}
                                             placeholder={isEditing ? '••••••••' : 'Password (min 6 chars)'}
                                             value={form.password}
@@ -267,14 +272,15 @@ const AdminSecurity = () => {
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(p => !p)}
-                                            className="absolute inset-y-0 right-0 pr-3.5 flex items-center"
-                                            style={{ color: 'var(--text-muted)' }}
+                                            className="absolute inset-y-0 right-0 flex items-center"
+                                            style={{ paddingRight: '12px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
                                             tabIndex={-1}
                                         >
                                             {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                                         </button>
                                     </div>
                                 </div>
+
                                 <div className="flex gap-2 pt-2">
                                     <button type="submit" disabled={submitting} className="btn-primary flex-1 justify-center">
                                         {submitting ? 'Saving...' : isEditing ? 'Update Credentials' : 'Add Admin Account'}
@@ -283,8 +289,8 @@ const AdminSecurity = () => {
                                         <button
                                             type="button"
                                             onClick={cancelEdit}
-                                            className="px-4 py-2 rounded-[7px]-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
-                                            style={{ color: 'var(--text-main)' }}
+                                            className="px-4 py-2 border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
+                                            style={{ borderRadius: '7px', color: 'var(--text-main)' }}
                                         >
                                             Cancel
                                         </button>
@@ -299,7 +305,7 @@ const AdminSecurity = () => {
                         <div className="card overflow-hidden">
                             <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border)' }}>
                                 <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>Active Administrators</h3>
-                                <span className="text-xs px-2.5 py-1 rounded-[7px]-[7px] font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                                <span className="text-xs px-2.5 py-1 font-semibold" style={{ borderRadius: '7px', background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                     {admins.length} Accounts
                                 </span>
                             </div>
@@ -314,20 +320,21 @@ const AdminSecurity = () => {
                                             <div className="flex items-center gap-2">
                                                 <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{adminItem.name}</p>
                                                 {adminItem.id === currentAdmin?.id && (
-                                                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-[7px]-[7px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" style={{ borderRadius: '7px' }}>
                                                         You
                                                     </span>
                                                 )}
                                             </div>
                                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Email: {adminItem.email}</p>
                                             <p className="text-xs font-mono truncate" style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                                                Password (Bcrypt Hash): <span className="px-1 py-0.5 rounded-[7px]" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>{adminItem.passwordHash}</span>
+                                                Password (Bcrypt Hash): <span className="px-1 py-0.5" style={{ borderRadius: '7px', color: 'var(--primary)', background: 'var(--primary-glow)' }}>{adminItem.passwordHash}</span>
                                             </p>
                                         </div>
                                         <div className="flex gap-2 shrink-0 self-end md:self-center">
                                             <button
                                                 onClick={() => startEdit(adminItem)}
-                                                className="p-2 rounded-[7px]-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
+                                                className="p-2 transition-all hover:bg-amber-500/10 text-amber-500"
+                                                style={{ borderRadius: '7px' }}
                                                 title="Edit Credentials"
                                             >
                                                 <FiEdit2 size={14} />
@@ -335,10 +342,11 @@ const AdminSecurity = () => {
                                             <button
                                                 onClick={() => handleDelete(adminItem.id, adminItem.name)}
                                                 disabled={adminItem.id === currentAdmin?.id || admins.length <= 1}
-                                                className={`p-2 rounded-[7px]-[7px] transition-all ${adminItem.id === currentAdmin?.id || admins.length <= 1
-                                                        ? 'opacity-30 cursor-not-allowed text-gray-400'
-                                                        : 'hover:bg-red-500/10 text-red-500'
+                                                className={`p-2 transition-all ${adminItem.id === currentAdmin?.id || admins.length <= 1
+                                                    ? 'opacity-30 cursor-not-allowed text-gray-400'
+                                                    : 'hover:bg-red-500/10 text-red-500'
                                                     }`}
+                                                style={{ borderRadius: '7px' }}
                                                 title="Delete Account"
                                             >
                                                 <FiTrash2 size={14} />
