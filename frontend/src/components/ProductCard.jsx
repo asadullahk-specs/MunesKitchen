@@ -20,10 +20,6 @@ const ProductCard = ({ product }) => {
 
     const categoryName = product.category?.name || product.category_id?.name || '';
 
-    // Don't show serving_size if it's trivially "1", "1 Pc", "1 Pcs", or empty
-    const servingStr = product.serving_size ? String(product.serving_size).trim().toLowerCase() : '';
-    const showServingSize = servingStr !== '' && servingStr !== '1' && servingStr !== '1 pc' && servingStr !== '1 pcs';
-
     const handleAddToCart = (e) => {
         e.stopPropagation();
         addToCart(product, qty);
@@ -96,7 +92,7 @@ const ProductCard = ({ product }) => {
             {/* ── Info Section ── */}
             <div className="px-3.5 py-3 flex flex-col flex-1 justify-between">
 
-                {/* Name + serving_size on same row */}
+                {/* Name */}
                 <div className="flex items-start justify-between gap-2 mb-2">
                     <h3
                         className="font-bold text-sm leading-snug text-[var(--text-main)] line-clamp-2"
@@ -104,14 +100,6 @@ const ProductCard = ({ product }) => {
                     >
                         {product.name}
                     </h3>
-                    {showServingSize && (
-                        <span
-                            className="text-[10px] shrink-0 font-bold px-1.5 py-0.5 rounded-[7px] bg-[var(--primary-glow)] border border-[var(--border)]"
-                            style={{ color: 'var(--primary)', height: 'fit-content' }}
-                        >
-                            {product.serving_size}
-                        </span>
-                    )}
                 </div>
 
                 {/* Price + Qty always visible */}
