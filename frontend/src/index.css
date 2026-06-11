@@ -19,7 +19,7 @@
   --shadow-hover: 0 12px 40px rgba(153, 0, 0, 0.15);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
   --shadow-glow: 0 4px 20px rgba(153, 0, 0, 0.25);
-  --radius: 12px;
+  --radius: 7px;
   --nav-height: 68px;
   --nav-top: 12px;
 }
@@ -726,8 +726,13 @@ input[type="number"]::-webkit-inner-spin-button {
   background: var(--primary);
 }
 
-.review-img-prev { left: 8px; }
-.review-img-next { right: 8px; }
+.review-img-prev {
+  left: 8px;
+}
+
+.review-img-next {
+  right: 8px;
+}
 
 .review-img-dots {
   position: absolute;
@@ -805,11 +810,17 @@ input[type="number"]::-webkit-inner-spin-button {
   pointer-events: none;
 }
 
-.reviews-prev { left: 0; }
-.reviews-next { right: 0; }
+.reviews-prev {
+  left: 0;
+}
+
+.reviews-next {
+  right: 0;
+}
 
 /* Prevent horizontal scrolling globally & remove scrollbars */
-html, body {
+html,
+body {
   max-width: 100%;
   overflow-x: hidden !important;
 }
@@ -818,6 +829,7 @@ html, body {
 .no-scrollbar::-webkit-scrollbar {
   display: none !important;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
@@ -829,6 +841,7 @@ html, body {
   color: var(--primary);
   border: 1px solid rgba(153, 0, 0, 0.25);
 }
+
 .dark .status-cancelled {
   background: rgba(153, 0, 0, 0.08);
   color: #fb7185;
@@ -836,7 +849,8 @@ html, body {
 }
 
 /* Ensure no textareas can be manually resized */
-textarea.form-input, textarea.input-field {
+textarea.form-input,
+textarea.input-field {
   resize: none !important;
 }
 
@@ -857,6 +871,7 @@ textarea.form-input, textarea.input-field {
 .mobile-scroll-container::-webkit-scrollbar {
   display: none !important;
 }
+
 .mobile-scroll-container {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
@@ -865,7 +880,8 @@ textarea.form-input, textarea.input-field {
 .mobile-scroll-item {
   flex-shrink: 0 !important;
   scroll-snap-align: center !important;
-  width: 280px !important; /* Unified width on phone */
+  width: 280px !important;
+  /* Unified width on phone */
 }
 
 /* Utility: hide scrollbar while keeping scroll functionality */
@@ -873,6 +889,7 @@ textarea.form-input, textarea.input-field {
   -ms-overflow-style: none !important;
   scrollbar-width: none !important;
 }
+
 .no-scrollbar::-webkit-scrollbar {
   display: none !important;
 }

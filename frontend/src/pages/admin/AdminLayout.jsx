@@ -61,9 +61,9 @@ const SidebarContent = ({ onClose }) => {
                 )}
             </div>
 
-            <div className="p-4 mx-3 mt-4 rounded-2xl" style={{ background: 'var(--primary-glow)', border: '1px solid var(--border)' }}>
+            <div className="p-4 mx-3 mt-4 rounded-[7px]-[7px]" style={{ background: 'var(--primary-glow)', border: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 border-2" style={{ borderColor: 'var(--primary)' }}>
+                    <div className="w-10 h-10 rounded-[7px]-[7px] overflow-hidden shrink-0 border-2" style={{ borderColor: 'var(--primary)' }}>
                         {admin?.profile_image ? (
                             <img
                                 src={admin.profile_image.startsWith('http') || admin.profile_image.startsWith('data:') ? admin.profile_image : `${import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}/${admin.profile_image.replace(/^\//, '')}`}

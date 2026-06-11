@@ -46,7 +46,7 @@ const AdminSecurity = () => {
         e.preventDefault()
         if (!form.name.trim()) return toast.error('Name is required')
         if (!form.email.trim()) return toast.error('Email is required')
-        
+
         if (!isEditing && (!form.password || form.password.length < 6)) {
             return toast.error('Password must be at least 6 characters')
         }
@@ -56,7 +56,7 @@ const AdminSecurity = () => {
 
         setSubmitting(true)
         try {
-        const payload = {
+            const payload = {
                 name: form.name.trim(),
                 email: form.email.trim(),
                 password: form.password ? form.password : undefined,
@@ -151,7 +151,7 @@ const AdminSecurity = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-[7px]-[7px] animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : error ? (
                 <div className="card p-8 text-center">
@@ -178,7 +178,7 @@ const AdminSecurity = () => {
                                         <label className="form-label">Profile Photo (optional)</label>
                                         <div className="flex items-center gap-3">
                                             <div
-                                                className="w-14 h-14 rounded-full overflow-hidden border-2 shrink-0 flex items-center justify-center"
+                                                className="w-14 h-14 rounded-[7px]-[7px] overflow-hidden border-2 shrink-0 flex items-center justify-center"
                                                 style={{ borderColor: 'var(--primary)', background: 'var(--bg-input)' }}
                                             >
                                                 {profileImagePreview ? (
@@ -191,7 +191,7 @@ const AdminSecurity = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => fileInputRef.current?.click()}
-                                                    className="text-xs px-3 py-1.5 rounded-lg border font-medium transition-all"
+                                                    className="text-xs px-3 py-1.5 rounded-[7px]-[7px] border font-medium transition-all"
                                                     style={{ borderColor: 'var(--primary)', color: 'var(--primary)', background: 'var(--primary-glow)' }}
                                                 >
                                                     Upload from Device
@@ -200,7 +200,7 @@ const AdminSecurity = () => {
                                                     <button
                                                         type="button"
                                                         onClick={() => { setProfileImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                                                        className="text-xs px-3 py-1 rounded-lg border transition-all"
+                                                        className="text-xs px-3 py-1 rounded-[7px]-[7px] border transition-all"
                                                         style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
                                                     >
                                                         Remove
@@ -283,7 +283,7 @@ const AdminSecurity = () => {
                                         <button
                                             type="button"
                                             onClick={cancelEdit}
-                                            className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
+                                            className="px-4 py-2 rounded-[7px]-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
                                             style={{ color: 'var(--text-main)' }}
                                         >
                                             Cancel
@@ -299,7 +299,7 @@ const AdminSecurity = () => {
                         <div className="card overflow-hidden">
                             <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border)' }}>
                                 <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>Active Administrators</h3>
-                                <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                                <span className="text-xs px-2.5 py-1 rounded-[7px]-[7px] font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                     {admins.length} Accounts
                                 </span>
                             </div>
@@ -314,20 +314,20 @@ const AdminSecurity = () => {
                                             <div className="flex items-center gap-2">
                                                 <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{adminItem.name}</p>
                                                 {adminItem.id === currentAdmin?.id && (
-                                                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                    <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded-[7px]-[7px] bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                                                         You
                                                     </span>
                                                 )}
                                             </div>
                                             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Email: {adminItem.email}</p>
                                             <p className="text-xs font-mono truncate" style={{ color: 'var(--text-muted)', fontSize: 11 }}>
-                                                Password (Bcrypt Hash): <span className="px-1 py-0.5 rounded" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>{adminItem.passwordHash}</span>
+                                                Password (Bcrypt Hash): <span className="px-1 py-0.5 rounded-[7px]" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>{adminItem.passwordHash}</span>
                                             </p>
                                         </div>
                                         <div className="flex gap-2 shrink-0 self-end md:self-center">
                                             <button
                                                 onClick={() => startEdit(adminItem)}
-                                                className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
+                                                className="p-2 rounded-[7px]-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
                                                 title="Edit Credentials"
                                             >
                                                 <FiEdit2 size={14} />
@@ -335,11 +335,10 @@ const AdminSecurity = () => {
                                             <button
                                                 onClick={() => handleDelete(adminItem.id, adminItem.name)}
                                                 disabled={adminItem.id === currentAdmin?.id || admins.length <= 1}
-                                                className={`p-2 rounded-xl transition-all ${
-                                                    adminItem.id === currentAdmin?.id || admins.length <= 1
+                                                className={`p-2 rounded-[7px]-[7px] transition-all ${adminItem.id === currentAdmin?.id || admins.length <= 1
                                                         ? 'opacity-30 cursor-not-allowed text-gray-400'
                                                         : 'hover:bg-red-500/10 text-red-500'
-                                                }`}
+                                                    }`}
                                                 title="Delete Account"
                                             >
                                                 <FiTrash2 size={14} />

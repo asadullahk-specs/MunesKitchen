@@ -41,7 +41,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {/* Header */}
             <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center font-display font-bold text-white"
+                    <div className="w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center font-display font-bold text-white"
                         style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
                         M
                     </div>
@@ -50,7 +50,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                         <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Admin Panel</div>
                     </div>
                 </div>
-                <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center"
+                <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
                     style={{ color: 'var(--text-muted)' }}>
                     <FiX />
                 </button>
@@ -66,7 +66,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                             end={item.exact}
                             onClick={onClose}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive ? 'text-white' : ''}`
+                                `flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all ${isActive ? 'text-white' : ''}`
                             }
                             style={({ isActive }) => ({
                                 background: isActive ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'transparent',
@@ -84,12 +84,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {/* Footer */}
             <div className="p-4 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)' }}>
                 <Link to="/" onClick={onClose}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all"
                     style={{ color: 'var(--text-muted)' }}>
                     <FiExternalLink /> Main Website
                 </Link>
                 <button onClick={handleLogout}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all w-full text-left"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all w-full text-left"
                     style={{ color: '#ef4444' }}>
                     <FiLogOut /> Logout
                 </button>

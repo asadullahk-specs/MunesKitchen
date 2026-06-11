@@ -139,7 +139,7 @@ const AdminOffers = () => {
         return `${BACKEND_URL}/${img.replace(/^\//, '')}`;
     };
 
-    const filteredOffers = offers.filter(o => 
+    const filteredOffers = offers.filter(o =>
         o.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (o.description && o.description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
@@ -160,7 +160,7 @@ const AdminOffers = () => {
                 <div className="flex items-center gap-2">
                     <button
                         onClick={fetchAllOffers}
-                        className="p-2.5 rounded-xl border flex items-center justify-center transition-all"
+                        className="p-2.5 rounded-[7px]-[7px] border flex items-center justify-center transition-all"
                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
                         title="Refresh"
                     >
@@ -175,14 +175,14 @@ const AdminOffers = () => {
             {/* Search and Filters */}
             <div className="mb-6">
                 <div className="relative">
-                    <FiSearch size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
                     <input
                         type="text"
-                        className="form-input pl-10"
-                        placeholder="Search offers by title, description or code..."
+                        className="form-input pr-9"
+                        placeholder="Search"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    <FiSearch size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)', pointerEvents: 'none' }} />
                 </div>
             </div>
 
@@ -191,10 +191,10 @@ const AdminOffers = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="card p-4 animate-pulse space-y-4">
-                            <div className="w-full h-40 bg-gray-200 dark:bg-gray-800 rounded-2xl" />
-                            <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-2/3" />
-                            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-full" />
-                            <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded w-1/3" />
+                            <div className="w-full h-40 bg-gray-200 dark:bg-gray-800 rounded-[7px]-[7px]" />
+                            <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded-[7px] w-2/3" />
+                            <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded-[7px] w-full" />
+                            <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded-[7px] w-1/3" />
                         </div>
                     ))}
                 </div>
@@ -233,7 +233,7 @@ const AdminOffers = () => {
 
                                 {/* Percent badge */}
                                 {offer.discount_percentage > 0 && (
-                                    <span className="absolute top-3 left-3 bg-red-500 text-white text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-md">
+                                    <span className="absolute top-3 left-3 bg-red-500 text-white text-[11px] font-black uppercase tracking-wider px-2.5 py-1 rounded-[7px]-[7px] shadow-md">
                                         {offer.discount_percentage}% OFF
                                     </span>
                                 )}
@@ -241,7 +241,7 @@ const AdminOffers = () => {
                                 {/* Status Toggle Badge */}
                                 <button
                                     onClick={() => toggleStatus(offer)}
-                                    className="absolute top-3 right-3 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full shadow-md transition-all active:scale-95"
+                                    className="absolute top-3 right-3 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-[7px]-[7px] shadow-md transition-all active:scale-95"
                                     style={{
                                         background: offer.is_active ? '#059669' : '#4b5563',
                                         color: '#ffffff'
@@ -280,7 +280,7 @@ const AdminOffers = () => {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => openEdit(offer)}
-                                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                                            className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center transition-all hover:scale-110"
                                             style={{ background: 'rgba(217,119,6,0.1)', color: '#d97706' }}
                                             title="Edit"
                                         >
@@ -288,7 +288,7 @@ const AdminOffers = () => {
                                         </button>
                                         <button
                                             onClick={() => handleDelete(offer.id)}
-                                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+                                            className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center transition-all hover:scale-110"
                                             style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}
                                             title="Delete"
                                         >
@@ -313,7 +313,7 @@ const AdminOffers = () => {
                         exit={{ opacity: 0 }}
                     >
                         <motion.div
-                            className="w-full sm:max-w-xl rounded-t-3xl sm:rounded-2xl overflow-hidden"
+                            className="w-full sm:max-w-xl rounded-[7px]-t-[7px] sm:rounded-[7px]-[7px] overflow-hidden"
                             style={{
                                 background: 'var(--bg-card)',
                                 border: '1px solid var(--border)',
@@ -331,7 +331,7 @@ const AdminOffers = () => {
                                 </h2>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                    className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
                                     style={{ color: 'var(--text-muted)', background: 'var(--bg-deep)' }}
                                 >
                                     <FiX size={16} />
@@ -410,7 +410,7 @@ const AdminOffers = () => {
                                             </div>
 
                                             {/* Calculated Discount Info */}
-                                            <div className="p-3.5 rounded-xl flex items-center justify-between text-xs" style={{ background: 'var(--bg-deep)', border: '1px dashed var(--border)' }}>
+                                            <div className="p-3.5 rounded-[7px]-[7px] flex items-center justify-between text-xs" style={{ background: 'var(--bg-deep)', border: '1px dashed var(--border)' }}>
                                                 <span style={{ color: 'var(--text-muted)' }}>Auto Calculated Discount:</span>
                                                 <span className="font-extrabold text-sm" style={{ color: 'var(--primary)' }}>
                                                     {form.discount_percentage || 0}% OFF
@@ -427,7 +427,7 @@ const AdminOffers = () => {
                                                 checked={form.is_active}
                                                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
                                                 className="w-4 h-4"
-                                                style={{ accentColor: 'var(--primary)' }}                                                
+                                                style={{ accentColor: 'var(--primary)' }}
                                             />
                                             <span className="text-sm font-semibold" style={{ color: 'var(--text-main)' }}>
                                                 Publish and display this offer immediately on homepage slider
@@ -441,7 +441,7 @@ const AdminOffers = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowModal(false)}
-                                        className="px-5 py-2.5 rounded-xl border text-sm font-semibold transition-colors"
+                                        className="px-5 py-2.5 rounded-[7px]-[7px] border text-sm font-semibold transition-colors"
                                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-main)' }}
                                     >
                                         Cancel

@@ -16,7 +16,7 @@ const StatCard = ({ icon, label, value, color, delay }) => (
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
                 <p className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>{value}</p>
             </div>
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+            <div className="w-11 h-11 rounded-[7px]-[7px] flex items-center justify-center"
                 style={{ background: `${color}15`, color }}>
                 {icon}
             </div>
@@ -95,7 +95,7 @@ const AdminDashboard = () => {
                             <XAxis dataKey="month" stroke="var(--text-soft)" fontSize={11} />
                             <YAxis stroke="var(--text-soft)" fontSize={11} />
                             <Tooltip
-                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--text-main)' }}
+                                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '7px', color: 'var(--text-main)' }}
                                 formatter={(val) => [`Rs. ${val.toLocaleString()}`, 'Revenue']}
                             />
                             <Area type="monotone" dataKey="revenue" stroke="#ef4444" fill="url(#revenueGrad)" strokeWidth={2} />
@@ -115,7 +115,7 @@ const AdminDashboard = () => {
                                 <XAxis type="number" stroke="var(--text-soft)" fontSize={11} />
                                 <YAxis type="category" dataKey="name" stroke="var(--text-soft)" fontSize={10} width={100} />
                                 <Tooltip
-                                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '12px', color: 'var(--text-main)' }}
+                                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '7px', color: 'var(--text-main)' }}
                                 />
                                 <Bar dataKey="total_sold" fill="#ef4444" radius={[0, 6, 6, 0]} name="Units Sold" />
                             </BarChart>

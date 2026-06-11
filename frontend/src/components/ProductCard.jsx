@@ -35,7 +35,7 @@ const ProductCard = ({ product }) => {
             style={{
                 background: 'var(--bg-card)',
                 border: '1.5px solid var(--border)',
-                borderRadius: 'var(--radius)',
+                borderRadius: '7px',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
             }}
             initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ const ProductCard = ({ product }) => {
                             style={{
                                 background: '#990000',
                                 color: '#ffffff',
-                                borderRadius: 4,
+                                borderRadius: 7,
                                 fontSize: '0.68rem',
                                 boxShadow: '0 1px 6px rgba(0,0,0,0.25)',
                                 letterSpacing: '0.02em',
@@ -106,7 +106,7 @@ const ProductCard = ({ product }) => {
                     </h3>
                     {showServingSize && (
                         <span
-                            className="text-[10px] shrink-0 font-bold px-1.5 py-0.5 rounded bg-[var(--primary-glow)] border border-[var(--border)]"
+                            className="text-[10px] shrink-0 font-bold px-1.5 py-0.5 rounded-[7px] bg-[var(--primary-glow)] border border-[var(--border)]"
                             style={{ color: 'var(--primary)', height: 'fit-content' }}
                         >
                             {product.serving_size}
@@ -122,7 +122,7 @@ const ProductCard = ({ product }) => {
 
                     {/* Qty +/- control — always visible */}
                     <div
-                        className="flex items-center rounded overflow-hidden"
+                        className="flex items-center rounded-[7px] overflow-hidden"
                         style={{ border: '1.5px solid var(--border)', background: 'var(--bg-input)' }}
                         onClick={e => e.stopPropagation()}
                     >
@@ -159,7 +159,7 @@ const ProductCard = ({ product }) => {
                 <div className="flex gap-2 mt-2.5 lg:max-h-0 lg:opacity-0 lg:overflow-hidden lg:transition-all lg:duration-300 lg:mt-0 lg:group-hover:max-h-16 lg:group-hover:opacity-100 lg:group-hover:mt-2.5">
                     <button
                         onClick={handleAddToCart}
-                        className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2 px-3 rounded transition-all"
+                        className="flex-1 flex items-center justify-center gap-1.5 text-xs font-semibold py-2 px-3 rounded-[7px] transition-all"
                         style={{
                             background: 'linear-gradient(135deg, #990000, #7a0000)',
                             color: 'white',
@@ -175,7 +175,7 @@ const ProductCard = ({ product }) => {
 
                     <button
                         onClick={e => { e.stopPropagation(); navigate(`/product/${product.id || product._id}`); }}
-                        className="flex items-center justify-center w-8 h-8 rounded transition-all shrink-0"
+                        className="flex items-center justify-center w-8 h-8 rounded-[7px] transition-all shrink-0"
                         style={{
                             background: 'var(--primary-glow)',
                             color: 'var(--primary)',

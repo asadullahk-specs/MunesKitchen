@@ -41,7 +41,7 @@ const AdminLogin = () => {
             style={{ background: 'var(--bg-deep)' }}
         >
             <div
-                className="w-full max-w-sm rounded-2xl p-8"
+                className="w-full max-w-sm rounded-[7px]-[7px] p-8"
                 style={{
                     background: 'var(--bg-card)',
                     border: '1px solid var(--border)',
@@ -50,7 +50,7 @@ const AdminLogin = () => {
             >
                 <div className="text-center mb-8">
                     <div
-                        className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-lg"
+                        className="w-16 h-16 rounded-[7px]-[7px] flex items-center justify-center mx-auto mb-4 overflow-hidden shadow-lg"
                     >
                         <img
                             src="/logo.png"
@@ -110,7 +110,7 @@ const AdminLogin = () => {
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">
-                                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
                                 Logging in...
                             </span>
                         ) : (

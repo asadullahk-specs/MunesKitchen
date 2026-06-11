@@ -31,7 +31,7 @@ const ProductModal = ({ product, onClose }) => {
                 onClick={(e) => e.target === e.currentTarget && onClose()}
             >
                 <motion.div
-                    className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl overflow-hidden"
+                    className="w-full sm:max-w-lg rounded-[7px]-t-[7px] sm:rounded-[7px]-[7px] overflow-hidden"
                     style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
                     initial={{ y: '100%', opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -50,7 +50,7 @@ const ProductModal = ({ product, onClose }) => {
                         )}
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center"
+                            className="absolute top-4 right-4 w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center"
                             style={{ background: 'rgba(0,0,0,0.5)', color: 'white' }}
                         >
                             <FiX size={18} />
@@ -88,7 +88,7 @@ const ProductModal = ({ product, onClose }) => {
 
                         {/* Quantity + Add */}
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center rounded-xl overflow-hidden"
+                            <div className="flex items-center rounded-[7px]-[7px] overflow-hidden"
                                 style={{ border: '2px solid var(--border)' }}>
                                 <button onClick={() => setQty((q) => Math.max(1, q - 1))}
                                     className="w-11 h-11 flex items-center justify-center transition-colors"

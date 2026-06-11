@@ -12,7 +12,7 @@ const ProtectedRoute = ({ children }) => {
             >
                 <div className="flex flex-col items-center gap-4">
                     <div
-                        className="w-12 h-12 rounded-full border-4 border-t-transparent animate-spin"
+                        className="w-12 h-12 rounded-[7px]-[7px] border-4 border-t-transparent animate-spin"
                         style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
                     />
                     <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>

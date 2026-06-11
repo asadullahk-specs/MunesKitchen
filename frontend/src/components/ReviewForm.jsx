@@ -234,7 +234,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                                         style={{
                                             width: 80, height: 80,
                                             objectFit: 'cover',
-                                            borderRadius: 10,
+                                            borderRadius: 7,
                                             border: '1.5px solid var(--border)',
                                         }}
                                     />
@@ -268,7 +268,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                                 onClick={() => fileInputRef.current?.click()}
                                 style={{
                                     width: 80, height: 80,
-                                    borderRadius: 10,
+                                    borderRadius: 7,
                                     border: '1.5px dashed var(--border)',
                                     background: 'var(--bg-input)',
                                     cursor: 'pointer',
@@ -290,7 +290,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
                 <button type="submit" disabled={loading} className="btn-primary justify-center py-3">
                     {loading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
                     ) : (
                         <><FiSend /> Submit Review</>
                     )}

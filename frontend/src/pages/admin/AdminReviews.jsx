@@ -28,7 +28,7 @@ const StatusBadge = ({ status }) => {
     const cfg = STATUS_CFG[status] || STATUS_CFG.pending;
     return (
         <span style={{
-            padding: '3px 10px', borderRadius: 50, fontSize: 11, fontWeight: 600,
+            padding: '3px 10px', borderRadius: 7, fontSize: 11, fontWeight: 600,
             background: cfg.bg, color: cfg.color,
             border: `1px solid ${cfg.border}`, textTransform: 'capitalize',
             whiteSpace: 'nowrap',
@@ -42,18 +42,18 @@ const formatDateTime = (dateStr) => {
     if (!dateStr) return '';
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return '';
-    
+
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
-    
+
     let hours = d.getHours();
     const minutes = String(d.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12;
     hours = hours ? hours : 12;
     const strHours = String(hours).padStart(2, '0');
-    
+
     return `${day}/${month}/${year} ${strHours}:${minutes} ${ampm}`;
 };
 
@@ -117,7 +117,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                     display: 'inline-flex', alignItems: 'center', gap: 5, width: 'fit-content',
                     background: 'rgba(153,0,0,0.06)', color: 'var(--primary)',
                     border: '1px solid rgba(153,0,0,0.15)',
-                    padding: '3px 10px', borderRadius: 50, fontSize: 11, fontWeight: 600,
+                    padding: '3px 10px', borderRadius: 7, fontSize: 11, fontWeight: 600,
                 }}>
                     {review.product_name}
                 </div>
@@ -141,7 +141,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                                 alt={`review-img-${i + 1}`}
                                 style={{
                                     width: 60, height: 60, objectFit: 'cover',
-                                    borderRadius: 8, border: '1.5px solid var(--border)',
+                                    borderRadius: 7, border: '1.5px solid var(--border)',
                                     cursor: 'pointer', transition: 'opacity 0.2s',
                                 }}
                                 onError={e => { e.target.style.display = 'none'; }}
@@ -150,7 +150,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                     ))}
                     {displayImages.length > 5 && (
                         <div style={{
-                            width: 60, height: 60, borderRadius: 8, border: '1.5px solid var(--border)',
+                            width: 60, height: 60, borderRadius: 7, border: '1.5px solid var(--border)',
                             background: 'var(--bg-input)', display: 'flex', alignItems: 'center',
                             justifyContent: 'center', fontSize: 12, color: 'var(--text-muted)', fontWeight: 600,
                         }}>+{displayImages.length - 5}</div>
@@ -174,7 +174,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                         onClick={() => onAction(review.id, 'approved')}
                         className="flex items-center justify-center gap-1.5 w-full sm:w-auto"
                         style={{
-                            padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                            padding: '7px 14px', borderRadius: 7, fontSize: 12, fontWeight: 600,
                             background: 'rgba(5,150,105,0.1)', color: '#059669',
                             border: '1px solid rgba(5,150,105,0.3)', cursor: busy ? 'not-allowed' : 'pointer',
                             opacity: busy ? 0.6 : 1, transition: 'all 0.2s',
@@ -189,7 +189,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                         onClick={() => onAction(review.id, 'rejected')}
                         className="flex items-center justify-center gap-1.5 w-full sm:w-auto"
                         style={{
-                            padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                            padding: '7px 14px', borderRadius: 7, fontSize: 12, fontWeight: 600,
                             background: 'rgba(217,119,6,0.1)', color: '#d97706',
                             border: '1px solid rgba(217,119,6,0.3)', cursor: busy ? 'not-allowed' : 'pointer',
                             opacity: busy ? 0.6 : 1, transition: 'all 0.2s',
@@ -203,7 +203,7 @@ const ReviewCard = ({ review, onAction, busy }) => {
                     onClick={() => onAction(review.id, 'delete')}
                     className="flex items-center justify-center gap-1.5 w-full sm:w-auto"
                     style={{
-                        padding: '7px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600,
+                        padding: '7px 14px', borderRadius: 7, fontSize: 12, fontWeight: 600,
                         background: 'rgba(220,38,38,0.08)', color: '#dc2626',
                         border: '1px solid rgba(220,38,38,0.2)', cursor: busy ? 'not-allowed' : 'pointer',
                         opacity: busy ? 0.6 : 1, transition: 'all 0.2s',
@@ -295,21 +295,21 @@ const AdminReviews = () => {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <div style={{ position: 'relative' }} className="w-full sm:w-72">
-                        <FiSearch size={13} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                         <input
                             type="text"
                             className="form-input w-full"
-                            style={{ paddingLeft: 32, fontSize: 13 }}
-                            placeholder="Search by name, product, message..."
+                            style={{ paddingRight: 32, fontSize: 13 }}
+                            placeholder="Search"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
+                        <FiSearch size={13} style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
                     </div>
                     <button
                         onClick={fetchReviews}
                         style={{
                             display: 'flex', alignItems: 'center', gap: 6,
-                            padding: '8px 16px', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                            padding: '8px 16px', borderRadius: 7, fontSize: 13, fontWeight: 600,
                             background: 'var(--bg-card)', color: 'var(--text-muted)',
                             border: '1px solid var(--border)', cursor: 'pointer', transition: 'all 0.2s',
                         }}
@@ -337,7 +337,7 @@ const AdminReviews = () => {
             <div
                 className="flex flex-col sm:flex-row gap-1.5 mb-5 w-full sm:w-fit"
                 style={{
-                    padding: '6px', borderRadius: 14,
+                    padding: '6px', borderRadius: 7,
                     background: 'var(--bg-card)', border: '1px solid var(--border)',
                 }}
             >
@@ -350,7 +350,7 @@ const AdminReviews = () => {
                             onClick={() => setTab(t)}
                             className="flex items-center justify-center gap-1 w-full sm:w-auto"
                             style={{
-                                padding: '7px 12px', borderRadius: 10, fontSize: 12, fontWeight: 600,
+                                padding: '7px 12px', borderRadius: 7, fontSize: 12, fontWeight: 600,
                                 border: 'none', cursor: 'pointer', transition: 'all 0.2s',
                                 textTransform: 'capitalize',
                                 background: active ? (t === 'all' ? 'var(--primary)' : cfg.bg) : 'transparent',
@@ -361,7 +361,7 @@ const AdminReviews = () => {
                             {t} {counts[t] > 0 && (
                                 <span style={{
                                     marginLeft: 4, background: active ? 'rgba(255,255,255,0.25)' : 'var(--bg-deep)',
-                                    borderRadius: 50, padding: '1px 6px', fontSize: 10,
+                                    borderRadius: 7, padding: '1px 6px', fontSize: 10,
                                 }}>
                                     {counts[t]}
                                 </span>
@@ -376,10 +376,10 @@ const AdminReviews = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
                     {Array(4).fill(0).map((_, i) => (
                         <div key={i} className="card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            <div className="skeleton" style={{ height: 40, borderRadius: 10 }} />
-                            <div className="skeleton" style={{ height: 16, borderRadius: 8, width: '60%' }} />
-                            <div className="skeleton" style={{ height: 60, borderRadius: 10 }} />
-                            <div className="skeleton" style={{ height: 32, borderRadius: 8 }} />
+                            <div className="skeleton" style={{ height: 40, borderRadius: 7 }} />
+                            <div className="skeleton" style={{ height: 16, borderRadius: 7, width: '60%' }} />
+                            <div className="skeleton" style={{ height: 60, borderRadius: 7 }} />
+                            <div className="skeleton" style={{ height: 32, borderRadius: 7 }} />
                         </div>
                     ))}
                 </div>

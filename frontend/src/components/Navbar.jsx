@@ -46,7 +46,7 @@ const Navbar = () => {
                     width: 'calc(100% - 32px)',
                     maxWidth: '1200px',
                     height: '68px',
-                    borderRadius: '20px',
+                    borderRadius: '7px',
                     background: 'var(--bg-card)',
                     backdropFilter: 'blur(20px)',
                     border: '1px solid var(--border)',

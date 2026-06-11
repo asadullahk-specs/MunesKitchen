@@ -176,7 +176,7 @@ const OrderTrackingPage = () => {
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={downloadPDF}
-                            className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-xl shadow-md"
+                            className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-[7px]-[7px] shadow-md"
                         >
                             Download Receipt
                         </button>
@@ -212,7 +212,7 @@ const OrderTrackingPage = () => {
 
                         {/* Customer & Delivery Information Grid */}
                         <div
-                            className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm p-5 rounded-xl border transition-all"
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm p-5 rounded-[7px]-[7px] border transition-all"
                             style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}
                         >
                             <div>
@@ -357,7 +357,7 @@ const OrderTrackingPage = () => {
                             </div>
                         </div>
 
-                        <div style={{ margin: '25px 0', padding: '20px', backgroundColor: '#fef2f2', borderLeft: '4px solid #990000', borderRadius: '8px' }}>
+                        <div style={{ margin: '25px 0', padding: '20px', backgroundColor: '#fef2f2', borderLeft: '4px solid #990000', borderRadius: '7px' }}>
                             <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '700', color: '#990000' }}>
                                 Thank You for Your Order!
                             </h3>
@@ -367,7 +367,7 @@ const OrderTrackingPage = () => {
                         </div>
 
                         {/* Customer Profile Layout Formatted & Fixed Fields */}
-                        <div style={{ display: 'table', width: '100%', margin: '25px 0', border: '1px solid #e2e8f0', borderRadius: '10px', overflow: 'hidden' }}>
+                        <div style={{ display: 'table', width: '100%', margin: '25px 0', border: '1px solid #e2e8f0', borderRadius: '7px', overflow: 'hidden' }}>
                             <div style={{ display: 'table-row', backgroundColor: '#f8fafc' }}>
                                 <div style={{ display: 'table-cell', padding: '12px 15px', width: '50%', borderBottom: '1px solid #e2e8f0', fontSize: '11px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase' }}>
                                     Customer & Destination Profile
@@ -482,11 +482,11 @@ const OrderTrackingPage = () => {
                             </div>
 
                             <div style={{ display: 'flex', gap: '20px' }}>
-                                <div style={{ textAlign: 'center', backgroundColor: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                <div style={{ textAlign: 'center', backgroundColor: '#f8fafc', padding: '8px', borderRadius: '7px', border: '1px solid #e2e8f0' }}>
                                     {homeQrImage && <img src={homeQrImage} alt="Main App QR" style={{ width: '65px', height: '65px' }} />}
                                     <span style={{ display: 'block', fontSize: '9px', fontWeight: '700', color: '#64748b', marginTop: '4px', textTransform: 'uppercase' }}>Our Menu</span>
                                 </div>
-                                <div style={{ textAlign: 'center', backgroundColor: '#f8fafc', padding: '8px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                                <div style={{ textAlign: 'center', backgroundColor: '#f8fafc', padding: '8px', borderRadius: '7px', border: '1px solid #e2e8f0' }}>
                                     {trackQrImage && <img src={trackQrImage} alt="Track Order QR" style={{ width: '65px', height: '65px' }} />}
                                     <span style={{ display: 'block', fontSize: '9px', fontWeight: '800', color: '#990000', marginTop: '4px', textTransform: 'uppercase' }}>Track Live</span>
                                 </div>

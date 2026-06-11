@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
-import { 
-    FiDollarSign, FiPlus, FiTrash2, FiSave, FiEdit3, 
-    FiActivity, FiPieChart, FiTrendingUp, FiShoppingBag, FiInfo 
+import {
+    FiDollarSign, FiPlus, FiTrash2, FiSave, FiEdit3,
+    FiActivity, FiPieChart, FiTrendingUp, FiShoppingBag, FiInfo
 } from 'react-icons/fi';
 import { getProducts } from '../../api/products';
 import { getCosting, upsertCosting } from '../../api/costings';
@@ -173,7 +173,7 @@ const AdminCosting = () => {
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box' }} className="admin-page-wrapper page-enter">
-            
+
             {/* Page Title */}
             <div style={{ marginBottom: 24 }}>
                 <h1 style={{ fontSize: 'clamp(1.2rem, 3vw, 1.6rem)', fontWeight: 800, color: 'var(--text-main)', margin: 0 }}>
@@ -190,9 +190,9 @@ const AdminCosting = () => {
                     <FiShoppingBag size={18} style={{ color: 'var(--primary)' }} />
                     <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-main)' }}>Select Menu Item</span>
                 </div>
-                
+
                 {loadingProducts ? (
-                    <div className="skeleton h-10 w-full rounded-xl" />
+                    <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
                 ) : (
                     <select
                         className="form-input input-field"
@@ -214,10 +214,10 @@ const AdminCosting = () => {
                 <div>
                     {/* Step 2: Cost & Profit Summary Cards */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16, marginBottom: 24 }}>
-                        
+
                         {/* Selling Price */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0" 
+                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                 Rs.
                             </div>
@@ -231,7 +231,7 @@ const AdminCosting = () => {
 
                         {/* Production Cost */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0" 
+                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{ background: 'rgba(217, 119, 6, 0.12)', color: '#d97706' }}>
                                 <FiActivity />
                             </div>
@@ -245,20 +245,20 @@ const AdminCosting = () => {
 
                         {/* Profit Amount */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0" 
-                                style={{ 
-                                    background: totals.profitAmount >= 0 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(220, 38, 38, 0.12)', 
-                                    color: totals.profitAmount >= 0 ? '#059669' : '#dc2626' 
+                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                                style={{
+                                    background: totals.profitAmount >= 0 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(220, 38, 38, 0.12)',
+                                    color: totals.profitAmount >= 0 ? '#059669' : '#dc2626'
                                 }}>
                                 <FiDollarSign />
                             </div>
                             <div>
                                 <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', margin: 0 }}>Net Profit</p>
-                                <p style={{ 
-                                    fontSize: 20, 
-                                    fontWeight: 800, 
-                                    color: totals.profitAmount >= 0 ? '#059669' : '#dc2626', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: 20,
+                                    fontWeight: 800,
+                                    color: totals.profitAmount >= 0 ? '#059669' : '#dc2626',
+                                    margin: 0
                                 }}>
                                     Rs. {totals.profitAmount.toLocaleString()}
                                 </p>
@@ -267,20 +267,20 @@ const AdminCosting = () => {
 
                         {/* Profit Margin */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl shrink-0" 
-                                style={{ 
-                                    background: totals.profitMargin >= 30 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(217, 119, 6, 0.12)', 
-                                    color: totals.profitMargin >= 30 ? '#059669' : '#d97706' 
+                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                                style={{
+                                    background: totals.profitMargin >= 30 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(217, 119, 6, 0.12)',
+                                    color: totals.profitMargin >= 30 ? '#059669' : '#d97706'
                                 }}>
                                 <FiTrendingUp />
                             </div>
                             <div>
                                 <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', margin: 0 }}>Profit Margin</p>
-                                <p style={{ 
-                                    fontSize: 20, 
-                                    fontWeight: 800, 
-                                    color: totals.profitMargin >= 30 ? '#059669' : '#d97706', 
-                                    margin: 0 
+                                <p style={{
+                                    fontSize: 20,
+                                    fontWeight: 800,
+                                    color: totals.profitMargin >= 30 ? '#059669' : '#d97706',
+                                    margin: 0
                                 }}>
                                     {totals.profitMargin.toFixed(1)}%
                                 </p>
@@ -298,19 +298,19 @@ const AdminCosting = () => {
                                     Recipe Ingredients & Components ({ingredients.length})
                                 </span>
                             </div>
-                            <button onClick={handleAddIngredient} className="btn-primary flex items-center gap-1 text-xs py-2 px-4 rounded-xl">
+                            <button onClick={handleAddIngredient} className="btn-primary flex items-center gap-1 text-xs py-2 px-4 rounded-[7px]-[7px]">
                                 <FiPlus size={14} /> Add Ingredient
                             </button>
                         </div>
 
                         {loadingCosting ? (
                             <div style={{ padding: '30px 0' }} className="space-y-3">
-                                <div className="skeleton h-10 w-full rounded-xl" />
-                                <div className="skeleton h-10 w-full rounded-xl" />
-                                <div className="skeleton h-10 w-full rounded-xl" />
+                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
+                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
+                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
                             </div>
                         ) : ingredients.length === 0 ? (
-                            <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-deep)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
+                            <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-deep)', borderRadius: '7px', border: '1px dashed var(--border)' }}>
                                 <FiInfo size={32} style={{ color: 'var(--text-muted)', marginBottom: 8, opacity: 0.6 }} />
                                 <p style={{ color: 'var(--text-muted)', fontSize: 13, margin: 0 }}>
                                     No ingredients added yet for this item. Click "Add Ingredient" to start calculations!
@@ -337,10 +337,10 @@ const AdminCosting = () => {
                                                         <input
                                                             type="text"
                                                             className="form-input input-field"
-                                                         placeholder="e.g. Chicken, Sauce, Packaging..."
+                                                            placeholder="e.g. Chicken, Sauce, Packaging..."
                                                             value={ing.name}
                                                             onChange={(e) => handleUpdateIngredient(ing.tempId, 'name', e.target.value)}
-                                                            style={{ padding: '8px 12px', borderRadius: '8px' }}
+                                                            style={{ padding: '8px 12px', borderRadius: '7px' }}
                                                         />
                                                     </td>
                                                     <td style={{ padding: '10px 8px' }}>
@@ -352,7 +352,7 @@ const AdminCosting = () => {
                                                             placeholder="0"
                                                             value={ing.quantity}
                                                             onChange={(e) => handleUpdateIngredient(ing.tempId, 'quantity', e.target.value)}
-                                                            style={{ padding: '8px 12px', borderRadius: '8px' }}
+                                                            style={{ padding: '8px 12px', borderRadius: '7px' }}
                                                         />
                                                     </td>
                                                     <td style={{ padding: '10px 8px' }}>
@@ -364,22 +364,22 @@ const AdminCosting = () => {
                                                             placeholder="0"
                                                             value={ing.cost}
                                                             onChange={(e) => handleUpdateIngredient(ing.tempId, 'cost', e.target.value)}
-                                                            style={{ padding: '8px 12px', borderRadius: '8px' }}
+                                                            style={{ padding: '8px 12px', borderRadius: '7px' }}
                                                         />
                                                     </td>
                                                     <td style={{ padding: '10px 12px', textAlign: 'right', fontWeight: 700, color: 'var(--text-main)' }}>
                                                         Rs. {lineTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                                     </td>
                                                     <td style={{ padding: '10px 8px', textAlign: 'center' }}>
-                                                        <button 
+                                                        <button
                                                             onClick={() => handleDeleteIngredient(ing.tempId)}
-                                                            style={{ 
-                                                                background: 'rgba(239, 68, 68, 0.1)', 
+                                                            style={{
+                                                                background: 'rgba(239, 68, 68, 0.1)',
                                                                 color: '#ef4444',
                                                                 border: 'none',
                                                                 width: '32px',
                                                                 height: '32px',
-                                                                borderRadius: '8px',
+                                                                borderRadius: '7px',
                                                                 display: 'inline-flex',
                                                                 alignItems: 'center',
                                                                 justifyContent: 'center',
@@ -408,10 +408,10 @@ const AdminCosting = () => {
                             <button
                                 onClick={handleSaveCosting}
                                 disabled={saving || loadingCosting}
-                                className="btn-primary flex items-center gap-2 py-3 px-6 rounded-xl"
+                                className="btn-primary flex items-center gap-2 py-3 px-6 rounded-[7px]-[7px]"
                             >
                                 {saving ? (
-                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
                                 ) : (
                                     <><FiSave size={16} /> Save Costing Profile</>
                                 )}

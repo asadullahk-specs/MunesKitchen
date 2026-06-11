@@ -29,7 +29,7 @@ const AdminTopbar = ({ onMenuToggle }) => {
             <div className="flex items-center gap-3">
                 <button
                     onClick={onMenuToggle}
-                    className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center"
+                    className="lg:hidden w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center"
                     style={{ background: 'var(--bg-deep)', color: 'var(--text-muted)' }}
                 >
                     <FiMenu size={18} />
@@ -41,7 +41,7 @@ const AdminTopbar = ({ onMenuToggle }) => {
 
             <div className="flex items-center gap-3">
                 <button onClick={toggleTheme}
-                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    className="w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center"
                     style={{ background: 'var(--bg-deep)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
                     <motion.div key={theme} initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} transition={{ duration: 0.3 }}>
                         {theme === 'dark' ? <FiSun size={16} /> : <FiMoon size={16} />}
@@ -49,7 +49,7 @@ const AdminTopbar = ({ onMenuToggle }) => {
                 </button>
 
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white"
+                    <div className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center text-sm font-bold text-white"
                         style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
                         {admin?.name?.charAt(0) || 'A'}
                     </div>

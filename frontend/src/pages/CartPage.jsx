@@ -82,7 +82,7 @@ const CartPage = () => {
                                         <img
                                             src={imgUrl}
                                             alt={item.name}
-                                            className="w-16 h-16 rounded-xl object-cover shrink-0"
+                                            className="w-16 h-16 rounded-[7px]-[7px] object-cover shrink-0"
                                             onError={(e) => {
                                                 e.target.src = `https://placehold.co/100x100/6b7280/fff?text=Food`
                                             }}

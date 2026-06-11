@@ -190,7 +190,7 @@ const AdminSettings = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
-                                className="flex items-center gap-2 px-5 py-3 text-xs font-semibold rounded-xl transition-all"
+                                className="flex items-center gap-2 px-5 py-3 text-xs font-semibold rounded-[7px]-[7px] transition-all"
                                 style={{
                                     background: activeTab === tab.id ? 'var(--primary)' : 'transparent',
                                     color: activeTab === tab.id ? '#ffffff' : 'var(--text-muted)',
@@ -207,7 +207,7 @@ const AdminSettings = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-[7px]-[7px] animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -247,7 +247,7 @@ const AdminSettings = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setDeliveryForm({ id: null, name: '', charge: '' })}
-                                                className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
+                                                className="px-4 py-2 rounded-[7px]-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
                                                 style={{ color: 'var(--text-main)' }}
                                             >
                                                 Cancel
@@ -282,7 +282,7 @@ const AdminSettings = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setFoodForm({ id: null, name: '' })}
-                                                className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
+                                                className="px-4 py-2 rounded-[7px]-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
                                                 style={{ color: 'var(--text-main)' }}
                                             >
                                                 Cancel
@@ -314,7 +314,7 @@ const AdminSettings = () => {
                                         <div className="flex gap-2 items-center">
                                             <input
                                                 type="color"
-                                                className="w-10 h-10 border-0 rounded-lg cursor-pointer"
+                                                className="w-10 h-10 border-0 rounded-[7px]-[7px] cursor-pointer"
                                                 value={expenseForm.color}
                                                 onChange={(e) => setExpenseForm({ ...expenseForm, color: e.target.value })}
                                             />
@@ -334,7 +334,7 @@ const AdminSettings = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => setExpenseForm({ id: null, name: '', color: '#ef4444' })}
-                                                className="px-4 py-2 rounded-xl border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
+                                                className="px-4 py-2 rounded-[7px]-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 transition-all text-xs"
                                                 style={{ color: 'var(--text-main)' }}
                                             >
                                                 Cancel
@@ -352,7 +352,7 @@ const AdminSettings = () => {
                             <div className="card overflow-hidden">
                                 <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border)' }}>
                                     <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>Delivery Areas</h3>
-                                    <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                                    <span className="text-xs px-2.5 py-1 rounded-[7px]-[7px] font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                         {deliveryAreas.length} Total
                                     </span>
                                 </div>
@@ -373,14 +373,14 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setDeliveryForm({ id: area.id || area._id, name: area.name, charge: (area.charge !== undefined && area.charge !== null) ? String(area.charge) : '0' })}
-                                                        className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeliveryDelete(area.id || area._id)}
-                                                        className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >
                                                         <FiTrash2 size={14} />
@@ -397,7 +397,7 @@ const AdminSettings = () => {
                             <div className="card overflow-hidden">
                                 <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border)' }}>
                                     <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>Food Categories</h3>
-                                    <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                                    <span className="text-xs px-2.5 py-1 rounded-[7px]-[7px] font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                         {foodCategories.length} Total
                                     </span>
                                 </div>
@@ -420,14 +420,14 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setFoodForm({ id: cat.id || cat._id, name: cat.name })}
-                                                        className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleFoodDelete(cat.id || cat._id)}
-                                                        className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >
                                                         <FiTrash2 size={14} />
@@ -444,7 +444,7 @@ const AdminSettings = () => {
                             <div className="card overflow-hidden">
                                 <div className="p-4 border-b flex justify-between items-center" style={{ borderColor: 'var(--border)' }}>
                                     <h3 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>Expense Categories</h3>
-                                    <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
+                                    <span className="text-xs px-2.5 py-1 rounded-[7px]-[7px] font-semibold" style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                         {expenseCategories.length} Total
                                     </span>
                                 </div>
@@ -457,7 +457,7 @@ const AdminSettings = () => {
                                         expenseCategories.map((cat) => (
                                             <div key={cat.id || cat._id} className="flex items-center justify-between p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-4 h-4 rounded-full border border-black/10 shrink-0" style={{ background: cat.color || '#ef4444' }} />
+                                                    <div className="w-4 h-4 rounded-[7px]-[7px] border border-black/10 shrink-0" style={{ background: cat.color || '#ef4444' }} />
                                                     <div>
                                                         <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{cat.name}</p>
                                                         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
@@ -468,14 +468,14 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setExpenseForm({ id: cat.id || cat._id, name: cat.name, color: cat.color || '#ef4444' })}
-                                                        className="p-2 rounded-xl transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleExpenseDelete(cat.id || cat._id)}
-                                                        className="p-2 rounded-xl transition-all hover:bg-red-500/10 text-red-500"
+                                                        className="p-2 rounded-[7px]-[7px] transition-all hover:bg-red-500/10 text-red-500"
                                                         title="Delete"
                                                     >
                                                         <FiTrash2 size={14} />

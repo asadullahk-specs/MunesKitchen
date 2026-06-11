@@ -136,7 +136,7 @@ const MenuPage = () => {
                     <input
                         type="text"
                         placeholder="Search..."
-                        className="w-full px-5 py-3 rounded-2xl border transition-all text-sm pr-12 focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] outline-none"
+                        className="w-full px-5 py-3 rounded-[7px]-[7px] border transition-all text-sm pr-12 focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] outline-none"
                         style={{
                             background: 'var(--bg-card)',
                             borderColor: 'var(--border)',
@@ -167,7 +167,7 @@ const MenuPage = () => {
                     >
                         <button
                             onClick={() => handleCategoryChange('all')}
-                            className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all"
+                            className="px-5 py-2.5 rounded-[7px]-[7px] font-medium text-sm transition-all"
                             style={{
                                 background: activeCategory === 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory === 'all' ? 'white' : 'var(--text-muted)',
@@ -181,7 +181,7 @@ const MenuPage = () => {
                             <button
                                 key={cat.id}
                                 onClick={() => handleCategoryChange(String(cat.id))}
-                                className="px-5 py-2.5 rounded-xl font-medium text-sm transition-all"
+                                className="px-5 py-2.5 rounded-[7px]-[7px] font-medium text-sm transition-all"
                                 style={{
                                     background: activeCategory === String(cat.id) ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                     color: activeCategory === String(cat.id) ? 'white' : 'var(--text-muted)',
@@ -200,7 +200,7 @@ const MenuPage = () => {
                     <div className="grid grid-cols-2 gap-3">
                         <button
                             onClick={() => handleCategoryChange('all')}
-                            className="flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all"
+                            className="flex items-center justify-center gap-2 py-3 rounded-[7px]-[7px] font-semibold text-sm transition-all"
                             style={{
                                 background: activeCategory === 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory === 'all' ? 'white' : 'var(--text-muted)',
@@ -212,7 +212,7 @@ const MenuPage = () => {
                         </button>
                         <button
                             onClick={() => setFilterDrawerOpen(true)}
-                            className="flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm transition-all"
+                            className="flex items-center justify-center gap-2 py-3 rounded-[7px]-[7px] font-semibold text-sm transition-all"
                             style={{
                                 background: activeCategory !== 'all' ? 'linear-gradient(135deg, var(--primary), var(--primary-dark))' : 'var(--bg-card)',
                                 color: activeCategory !== 'all' ? 'white' : 'var(--text-muted)',
@@ -260,7 +260,7 @@ const MenuPage = () => {
                                         <h2 className="font-display font-bold text-lg" style={{ color: 'var(--primary)' }}>
                                             {group.name}
                                         </h2>
-                                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
+                                        <span className="text-xs px-2 py-0.5 rounded-[7px]-[7px]" style={{ background: 'var(--primary-glow)', color: 'var(--primary)', fontWeight: 600 }}>
                                             {group.products.length} {group.products.length === 1 ? 'item' : 'items'}
                                         </span>
                                     </div>
@@ -359,7 +359,7 @@ const MenuPage = () => {
                         />
                         {/* Slide-up Panel */}
                         <motion.div
-                            className="fixed bottom-0 left-0 right-0 z-50 rounded-t-[2.5rem] p-6 max-h-[80vh] overflow-y-auto sm:hidden border-t"
+                            className="fixed bottom-0 left-0 right-0 z-50 rounded-[7px]-t-[2.5rem] p-6 max-h-[80vh] overflow-y-auto sm:hidden border-t"
                             style={{ background: 'var(--bg-card)', borderColor: 'var(--border)', fontFamily: 'Poppins, sans-serif' }}
                             initial={{ y: '100%' }}
                             animate={{ y: 0 }}
@@ -370,7 +370,7 @@ const MenuPage = () => {
                                 <h3 className="font-bold text-base" style={{ color: 'var(--text-main)' }}>Select Category</h3>
                                 <button
                                     onClick={() => setFilterDrawerOpen(false)}
-                                    className="p-1.5 rounded-full bg-gray-100 dark:bg-zinc-800 transition-colors"
+                                    className="p-1.5 rounded-[7px]-[7px] bg-gray-100 dark:bg-zinc-800 transition-colors"
                                     style={{ color: 'var(--text-muted)' }}
                                 >
                                     <FiX size={18} />
@@ -380,7 +380,7 @@ const MenuPage = () => {
                             <div className="space-y-2">
                                 <button
                                     onClick={() => handleCategoryChange('all')}
-                                    className="w-full text-left px-4 py-3 rounded-xl transition-all font-medium text-sm flex items-center justify-between"
+                                    className="w-full text-left px-4 py-3 rounded-[7px]-[7px] transition-all font-medium text-sm flex items-center justify-between"
                                     style={{
                                         background: activeCategory === 'all' ? 'var(--primary-glow)' : 'transparent',
                                         color: activeCategory === 'all' ? 'var(--primary)' : 'var(--text-main)',
@@ -393,7 +393,7 @@ const MenuPage = () => {
                                     <button
                                         key={cat.id}
                                         onClick={() => handleCategoryChange(String(cat.id))}
-                                        className="w-full text-left px-4 py-3 rounded-xl transition-all font-medium text-sm flex items-center justify-between"
+                                        className="w-full text-left px-4 py-3 rounded-[7px]-[7px] transition-all font-medium text-sm flex items-center justify-between"
                                         style={{
                                             background: activeCategory === String(cat.id) ? 'var(--primary-glow)' : 'transparent',
                                             color: activeCategory === String(cat.id) ? 'var(--primary)' : 'var(--text-main)',
