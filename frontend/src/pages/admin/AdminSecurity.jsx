@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
-import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff, FiCamera } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff, FiCamera, FiUpload } from 'react-icons/fi'
 import { getAdmins, createAdmin, updateAdmin, deleteAdmin } from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
 
 const AdminSecurity = () => {
-    const { admin: currentAdmin } = useAuth()
+    const { admin: currentAdmin, updateAdminData } = useAuth()
     const [admins, setAdmins] = useState([])
     const [loading, setLoading] = useState(true)
     const [submitting, setSubmitting] = useState(false)
+
+    // My Profile state
+    const [myProfileImage, setMyProfileImage] = useState(null)
+    const [myProfileSaving, setMyProfileSaving] = useState(false)
+    const myProfileFileRef = useRef(null)
 
     const [form, setForm] = useState({ id: null, name: '', email: '', password: '' })
     const [isEditing, setIsEditing] = useState(false)
@@ -135,6 +140,63 @@ const AdminSecurity = () => {
         reader.readAsDataURL(file)
     }
 
+    const handleMyProfileImageFile = (e) => {
+        const file = e.target.files[0]
+        if (!file) return
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Only JPG, PNG, and WEBP images are supported')
+            return
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            toast.error('Image must be under 2MB')
+            return
+        }
+        const reader = new FileReader()
+        reader.onload = (ev) => setMyProfileImage(ev.target.result)
+        reader.readAsDataURL(file)
+    }
+
+    const handleMyProfileSave = async () => {
+        if (!myProfileImage || !currentAdmin?.id) return
+        setMyProfileSaving(true)
+        try {
+            const res = await updateAdmin(currentAdmin.id, { profile_image: myProfileImage })
+            if (res.data.success) {
+                const updated = { ...currentAdmin, profile_image: myProfileImage }
+                updateAdminData(updated)
+                toast.success('Profile image updated!')
+                setMyProfileImage(null)
+                if (myProfileFileRef.current) myProfileFileRef.current.value = ''
+                fetchAdmins()
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update profile image')
+        } finally {
+            setMyProfileSaving(false)
+        }
+    }
+
+    const handleRemoveMyProfileImage = async () => {
+        if (!currentAdmin?.id) return
+        if (!window.confirm('Remove your profile image?')) return
+        setMyProfileSaving(true)
+        try {
+            const res = await updateAdmin(currentAdmin.id, { profile_image: null })
+            if (res.data.success) {
+                const updated = { ...currentAdmin, profile_image: null }
+                updateAdminData(updated)
+                toast.success('Profile image removed')
+                setMyProfileImage(null)
+                fetchAdmins()
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to remove profile image')
+        } finally {
+            setMyProfileSaving(false)
+        }
+    }
+
     return (
         <div style={{ width: '100%', fontFamily: 'Poppins, sans-serif' }}>
             {/* Header */}
@@ -147,6 +209,104 @@ const AdminSecurity = () => {
                     Add, edit, or remove administrator accounts.
                 </p>
             </div>
+
+            {/* ── My Profile Card ─────────────────────────────────────────────── */}
+            {currentAdmin && (
+                <div className="card p-5 mb-6">
+                    <h3 className="font-bold text-base mb-4 flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
+                        <FiUser size={16} style={{ color: 'var(--primary)' }} />
+                        My Profile
+                    </h3>
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                        {/* Avatar */}
+                        <div
+                            className="w-20 h-20 rounded-full shrink-0 overflow-hidden flex items-center justify-center font-bold text-2xl"
+                            style={{
+                                border: '3px solid var(--primary)',
+                                background: (myProfileImage || currentAdmin.profile_image) ? 'transparent' : 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                                color: 'white',
+                                boxShadow: '0 4px 16px rgba(153,0,0,0.2)',
+                            }}
+                        >
+                            {(myProfileImage || currentAdmin.profile_image) ? (
+                                <img
+                                    src={myProfileImage || currentAdmin.profile_image}
+                                    alt={currentAdmin.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <span>{currentAdmin.name ? currentAdmin.name.charAt(0).toUpperCase() : 'A'}</span>
+                            )}
+                        </div>
+
+                        {/* Info + Controls */}
+                        <div className="flex-1 w-full">
+                            <div className="mb-1 font-bold text-lg" style={{ color: 'var(--text-main)' }}>{currentAdmin.name}</div>
+                            <div className="text-sm mb-3" style={{ color: 'var(--text-muted)' }}>{currentAdmin.email}</div>
+
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => myProfileFileRef.current?.click()}
+                                    className="flex items-center gap-2 text-xs px-4 py-2 font-semibold transition-all"
+                                    style={{ borderRadius: '7px', background: 'var(--primary-glow)', border: '1.5px solid var(--primary)', color: 'var(--primary)', cursor: 'pointer' }}
+                                >
+                                    <FiCamera size={13} /> Upload Photo
+                                </button>
+
+                                {myProfileImage && (
+                                    <button
+                                        type="button"
+                                        onClick={handleMyProfileSave}
+                                        disabled={myProfileSaving}
+                                        className="flex items-center gap-2 text-xs px-4 py-2 font-semibold btn-primary"
+                                        style={{ borderRadius: '7px', padding: '8px 16px' }}
+                                    >
+                                        <FiUpload size={13} /> {myProfileSaving ? 'Saving...' : 'Save Photo'}
+                                    </button>
+                                )}
+
+                                {myProfileImage && (
+                                    <button
+                                        type="button"
+                                        onClick={() => { setMyProfileImage(null); if (myProfileFileRef.current) myProfileFileRef.current.value = ''; }}
+                                        className="text-xs px-3 py-2 border transition-all"
+                                        style={{ borderRadius: '7px', borderColor: 'var(--border)', color: 'var(--text-muted)', cursor: 'pointer', background: 'transparent' }}
+                                    >
+                                        Cancel
+                                    </button>
+                                )}
+
+                                {!myProfileImage && currentAdmin.profile_image && (
+                                    <button
+                                        type="button"
+                                        onClick={handleRemoveMyProfileImage}
+                                        disabled={myProfileSaving}
+                                        className="text-xs px-3 py-2 border transition-all"
+                                        style={{ borderRadius: '7px', borderColor: 'rgba(239,68,68,0.3)', color: '#ef4444', cursor: 'pointer', background: 'rgba(239,68,68,0.05)' }}
+                                    >
+                                        Remove Photo
+                                    </button>
+                                )}
+                            </div>
+
+                            <input
+                                ref={myProfileFileRef}
+                                type="file"
+                                accept="image/jpeg,image/jpg,image/png,image/webp"
+                                className="hidden"
+                                onChange={handleMyProfileImageFile}
+                            />
+
+                            {myProfileImage && (
+                                <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+                                    Preview ready — click <strong>Save Photo</strong> to apply.
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">

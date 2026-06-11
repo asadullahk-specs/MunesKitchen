@@ -11,6 +11,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import ProductModal from '../components/ProductModal';
 import ReviewForm from '../components/ReviewForm';
 import ContactForm from '../components/ContactForm';
+import { toast } from 'react-toastify';
 
 const BACKEND = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace('/api', '')
@@ -55,7 +56,7 @@ const ReviewCard = ({ review }) => {
 
     return (
         <div
-            className="flex flex-col h-full w-full overflow-hidden"
+            className="flex flex-col w-full overflow-hidden"
             style={{
                 background: 'var(--bg-card)',
                 border: '1.5px solid var(--border)',
@@ -140,6 +141,7 @@ const ReviewCard = ({ review }) => {
 
 const HomePage = () => {
     const [products, setProducts] = useState([]);
+
     const [categories, setCategories] = useState([]);
     const [allMenuProducts, setAllMenuProducts] = useState([]);
     const [reviews, setReviews] = useState([]);
@@ -308,8 +310,8 @@ const HomePage = () => {
                             style={{ color: 'rgba(255,255,255,0.58)', lineHeight: 1.75 }}
                         >
                             Frozen treats, masterfully prepared with fresh ingredients and secret spices.
-                            For orders, call{' '}
-                            <span className="font-semibold" style={{ color: '#ff8c5a' }}>+92 303 2683689</span>
+                            {/* For orders, call{' '}
+                            <span className="font-semibold" style={{ color: '#ff8c5a' }}>+92 303 2683689</span> */}
                         </motion.p>
 
                         {/* CTA Buttons */}
@@ -427,7 +429,7 @@ const HomePage = () => {
                     </div>
 
                     {/* Desktop/Tablet View — ProductCard per category */}
-                    <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                    <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full">
                         {validCategories.map((cat, i) => {
                             const catProduct = allMenuProducts.find(p => {
                                 const pCatId = p.category_id?.id || p.category?.id;
@@ -906,7 +908,7 @@ const HomePage = () => {
                             </button>
                         )}
 
-                        <div ref={topProdsScrollRef} className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory flex-nowrap sm:flex-wrap sm:grid-cols-2 lg:grid-cols-4 gap-6 no-scrollbar pb-4 px-4 -mx-4 sm:px-0 sm:mx-0">
+                        <div ref={topProdsScrollRef} className="flex sm:grid overflow-x-auto sm:overflow-visible snap-x snap-mandatory flex-nowrap sm:flex-wrap sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 no-scrollbar pb-4 px-4 -mx-4 sm:px-0 sm:mx-0">
                             {loading
                                 ? Array(4).fill(0).map((_, i) => (
                                     <div key={i} className="snap-center shrink-0 w-[280px] sm:w-auto">

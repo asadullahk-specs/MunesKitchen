@@ -2,7 +2,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FiGrid, FiShoppingBag, FiList, FiUsers, FiDollarSign,
-    FiStar, FiMail, FiShield, FiLogOut, FiX, FiExternalLink,
+    FiStar, FiMail, FiShield, FiLogOut, FiX, FiExternalLink, FiCamera,
 } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 import { logout } from '../../api/auth';
@@ -24,7 +24,7 @@ const navItems = [
 // Then, ensure your .map() function uses THIS navItems array.
 
 const AdminSidebar = ({ isOpen, onClose }) => {
-    const { logoutAdmin } = useAuth();
+    const { admin, logoutAdmin } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -56,7 +56,31 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                 </button>
             </div>
 
-            {/* Nav */}
+            {/* Admin Profile Section */}
+            {admin && (
+                <div className="px-4 py-3 flex items-center gap-3" style={{ borderBottom: '1px solid var(--border)', background: 'var(--primary-glow)' }}>
+                    <div
+                        className="w-10 h-10 shrink-0 overflow-hidden flex items-center justify-center font-bold text-sm"
+                        style={{
+                            border: '2px solid var(--primary)',
+                            background: admin.profile_image ? 'transparent' : 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                            color: 'white',
+                            borderRadius: '50%'
+                        }}
+                    >
+                        {admin.profile_image ? (
+                            <img src={admin.profile_image} alt={admin.name} className="w-full h-full object-cover" style={{ borderRadius: '50%' }} />
+                        ) : (
+                            <span>{admin.name ? admin.name.charAt(0).toUpperCase() : 'A'}</span>
+                        )}
+                    </div>
+                    <div className="min-w-0">
+                        <div className="font-semibold text-sm truncate" style={{ color: 'var(--text-main)' }}>{admin.name}</div>
+                        <div className="text-xs" style={{ color: 'var(--primary)' }}>Administrator</div>
+                    </div>
+                </div>
+            )}
+
             <nav className="flex-1 p-4 overflow-y-auto">
                 <div className="flex flex-col gap-1">
                     {navItems.map((item) => (

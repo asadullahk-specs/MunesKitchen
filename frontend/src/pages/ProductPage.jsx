@@ -131,7 +131,7 @@ const ProductPage = () => {
         : null;
 
     return (
-        <div className="min-h-screen bg-[var(--bg-deep)] pt-16 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-[var(--bg-deep)] pt-6 pb-12 px-4 sm:px-6 lg:px-8">
 
             <div className="max-w-6xl mx-auto">
                 {/* Back button */}
@@ -449,7 +449,7 @@ const ProductPage = () => {
                     ) : (
                         <>
                             {/* Desktop/Tablet View */}
-                            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {relatedProducts.map(p => (
                                     <ProductCard key={p.id || p._id} product={p} />
                                 ))}
@@ -543,7 +543,7 @@ const ProductPage = () => {
                     ) : (
                         <>
                             {/* Desktop/Tablet View */}
-                            <div className="hidden sm:grid grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {exploreProducts.map(p => (
                                     <ProductCard key={p.id || p._id} product={p} />
                                 ))}

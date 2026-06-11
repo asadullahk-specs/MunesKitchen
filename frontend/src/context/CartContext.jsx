@@ -29,7 +29,34 @@ export const CartProvider = ({ children }) => {
             }
             return [...prev, { ...product, quantity }]
         })
-        toast.success('Added to cart')
+        toast.success(
+            <div className="flex items-center justify-between w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
+                <span className="font-semibold text-sm" style={{ color: '#fff' }}>Added to cart!</span>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = '/cart';
+                    }}
+                    className="btn-primary"
+                    style={{
+                        padding: '6px 14px',
+                        fontSize: '0.75rem',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        marginLeft: '12px',
+                        border: 'none',
+                        color: 'white',
+                        background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                    }}
+                >
+                    View Cart
+                </button>
+            </div>,
+            {
+                autoClose: 4000
+            }
+        )
     }
 
     const removeFromCart = (productId) => {
