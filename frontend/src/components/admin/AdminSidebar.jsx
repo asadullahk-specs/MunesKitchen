@@ -41,7 +41,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {/* Header */}
             <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid var(--border)' }}>
                 <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center font-display font-bold text-white"
+                    <div className="w-9 h-9 rounded-[7px] flex items-center justify-center font-display font-bold text-white"
                         style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>
                         M
                     </div>
@@ -50,7 +50,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                         <div className="text-xs" style={{ color: 'var(--text-muted)' }}>Admin Panel</div>
                     </div>
                 </div>
-                <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
+                <button onClick={onClose} className="lg:hidden w-8 h-8 rounded-[7px] flex items-center justify-center"
                     style={{ color: 'var(--text-muted)' }}>
                     <FiX />
                 </button>
@@ -65,11 +65,11 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                             border: '2px solid var(--primary)',
                             background: admin.profile_image ? 'transparent' : 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
                             color: 'white',
-                            borderRadius: '50%'
+                            borderRadius: '7px'
                         }}
                     >
                         {admin.profile_image ? (
-                            <img src={admin.profile_image} alt={admin.name} className="w-full h-full object-cover" style={{ borderRadius: '50%' }} />
+                            <img src={admin.profile_image} alt={admin.name} className="w-full h-full object-cover" style={{ borderRadius: '7px' }} />
                         ) : (
                             <span>{admin.name ? admin.name.charAt(0).toUpperCase() : 'A'}</span>
                         )}
@@ -90,7 +90,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
                             end={item.exact}
                             onClick={onClose}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all ${isActive ? 'text-white' : ''}`
+                                `flex items-center gap-3 px-3 py-2.5 rounded-[7px] text-sm font-medium transition-all ${isActive ? 'text-white' : ''}`
                             }
                             style={({ isActive }) => ({
                                 background: isActive ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'transparent',
@@ -108,12 +108,12 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             {/* Footer */}
             <div className="p-4 flex flex-col gap-2" style={{ borderTop: '1px solid var(--border)' }}>
                 <Link to="/" onClick={onClose}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px] text-sm font-medium transition-all"
                     style={{ color: 'var(--text-muted)' }}>
                     <FiExternalLink /> Main Website
                 </Link>
                 <button onClick={handleLogout}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px]-[7px] text-sm font-medium transition-all w-full text-left"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[7px] text-sm font-medium transition-all w-full text-left"
                     style={{ color: '#ef4444' }}>
                     <FiLogOut /> Logout
                 </button>

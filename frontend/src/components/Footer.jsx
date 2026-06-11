@@ -22,7 +22,7 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="col-span-2 lg:col-span-1">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden">
+                            <div className="w-10 h-10 rounded-[7px] overflow-hidden">
                                 <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
                             </div>
                             <div>
@@ -41,7 +41,7 @@ const Footer = () => {
                                 { icon: <FiLinkedin />, href: 'https://www.linkedin.com/in/sameerkhan-webdeveloper/', label: 'LinkedIn' },
                             ].map(({ icon, href, label }) => (
                                 <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}
-                                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 hover:-translate-y-1"
+                                    className="w-9 h-9 rounded-[7px] flex items-center justify-center transition-all hover:scale-110 hover:-translate-y-1"
                                     style={{ background: 'rgba(239,68,68,0.1)', color: 'var(--primary)' }}>
                                     {icon}
                                 </a>

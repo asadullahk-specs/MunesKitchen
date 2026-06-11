@@ -234,7 +234,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                                         style={{
                                             width: 80, height: 80,
                                             objectFit: 'cover',
-                                            borderRadius: 7,
+                                            borderRadius: '7px',
                                             border: '1.5px solid var(--border)',
                                         }}
                                     />
@@ -244,7 +244,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                                         style={{
                                             position: 'absolute', top: -6, right: -6,
                                             width: 20, height: 20,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             background: '#ef4444',
                                             color: '#fff',
                                             border: 'none',
@@ -268,7 +268,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                                 onClick={() => fileInputRef.current?.click()}
                                 style={{
                                     width: 80, height: 80,
-                                    borderRadius: 7,
+                                    borderRadius: '7px',
                                     border: '1.5px dashed var(--border)',
                                     background: 'var(--bg-input)',
                                     cursor: 'pointer',
@@ -290,7 +290,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
                 <button type="submit" disabled={loading} className="btn-primary justify-center py-3">
                     {loading ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                     ) : (
                         <><FiSend /> Submit Review</>
                     )}

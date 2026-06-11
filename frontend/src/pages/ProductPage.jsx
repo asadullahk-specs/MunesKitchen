@@ -119,7 +119,7 @@ const ProductPage = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--bg-deep)]">
-                <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-[7px]-[7px] animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-[var(--primary)] border-t-transparent rounded-[7px] animate-spin"></div>
             </div>
         );
     }
@@ -147,7 +147,7 @@ const ProductPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mb-12">
                     {/* Left: Product Image */}
                     <motion.div
-                        className="rounded-[7px]-[7px] overflow-hidden glass border border-[var(--border)] shadow-lg aspect-square flex items-center justify-center relative bg-[var(--bg-card)]"
+                        className="rounded-[7px] overflow-hidden glass border border-[var(--border)] shadow-lg aspect-square flex items-center justify-center relative bg-[var(--bg-card)]"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
@@ -176,7 +176,7 @@ const ProductPage = () => {
                     >
                         <div>
                             {/* Category badge */}
-                            <span className="text-xs font-semibold px-3 py-1 rounded-[7px]-[7px] uppercase tracking-wider mb-3 inline-block" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
+                            <span className="text-xs font-semibold px-3 py-1 rounded-[7px] uppercase tracking-wider mb-3 inline-block" style={{ color: 'var(--primary)', background: 'var(--primary-glow)' }}>
                                 {product.category_id?.name || 'Menu Item'}
                             </span>
 
@@ -217,7 +217,7 @@ const ProductPage = () => {
 
                             {/* Quantity & Add to Cart Action Row */}
                             <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-4">
-                                <div className="flex items-center gap-3 bg-[var(--bg-input)] border border-[var(--border)] rounded-[7px]-[7px] px-4 py-2">
+                                <div className="flex items-center gap-3 bg-[var(--bg-input)] border border-[var(--border)] rounded-[7px] px-4 py-2">
                                     <button
                                         type="button"
                                         onClick={() => setQty(q => Math.max(1, q - 1))}
@@ -252,7 +252,7 @@ const ProductPage = () => {
                 {/* Collapsible Accordion Sections (Woodmart/Dinenos Style) */}
                 <div className="mb-16 space-y-4">
                     {/* PANEL 1: DESCRIPTION */}
-                    <div id="accordion-description" className="border border-[var(--border)] rounded-[7px]-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
+                    <div id="accordion-description" className="border border-[var(--border)] rounded-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('description')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -289,7 +289,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 2: ADDITIONAL INFORMATION */}
-                    <div id="accordion-info" className="border border-[var(--border)] rounded-[7px]-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
+                    <div id="accordion-info" className="border border-[var(--border)] rounded-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('info')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -316,19 +316,43 @@ const ProductPage = () => {
                                     <div className="p-6 pt-0 border-t border-[var(--border)]">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 pt-4">
                                             {[
-                                                { label: 'Ingredients', value: product.ingredients },
-                                                { label: 'Allergens', value: product.allergens },
-                                                { label: 'Serving Size', value: product.serving_size },
-                                                { label: 'Calories', value: product.calories ? `${product.calories} kcal` : null },
-                                                { label: 'Prep Time', value: product.prep_time },
-                                                { label: 'Spice Level', value: product.spice_level },
-                                                { label: 'Storage Info', value: product.storage_info },
-                                                { label: 'Additional Notes', value: product.additional_notes }
+                                                {
+                                                    label: 'Serving Size',
+                                                    value: (product.serving_size !== undefined && product.serving_size !== null && product.serving_size !== '')
+                                                        ? `${product.serving_size} ${Number(product.serving_size) === 1 ? 'Person' : 'Persons'}`
+                                                        : null
+                                                },
+                                                {
+                                                    label: 'Spice Level',
+                                                    value: product.spice_level || null
+                                                },
+                                                {
+                                                    label: 'Weight',
+                                                    value: (product.weight !== undefined && product.weight !== null && product.weight !== '')
+                                                        ? `${product.weight} gm`
+                                                        : null
+                                                },
+                                                {
+                                                    label: 'Shelf Life',
+                                                    value: (product.shelf_life !== undefined && product.shelf_life !== null && product.shelf_life !== '')
+                                                        ? `${product.shelf_life} Days`
+                                                        : null
+                                                },
+                                                {
+                                                    label: 'Available As',
+                                                    value: product.available_as || null
+                                                },
+                                                {
+                                                    label: 'Cooking Charges',
+                                                    value: (product.cooking_charges !== undefined && product.cooking_charges !== null && product.cooking_charges !== '')
+                                                        ? `Rs. ${product.cooking_charges} per item`
+                                                        : null
+                                                },
                                             ].map((item, idx) => (
                                                 <div key={idx} className="flex justify-between py-3 border-b border-[var(--border)] items-center">
                                                     <span className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
-                                                    <span className="text-sm font-medium text-[var(--text-main)] text-right max-w-[60%] truncate-2-lines">
-                                                        {item.value || 'N/A'}
+                                                    <span className="text-sm font-medium text-right max-w-[60%]" style={{ color: item.value ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                                                        {item.value || '—'}
                                                     </span>
                                                 </div>
                                             ))}
@@ -340,7 +364,7 @@ const ProductPage = () => {
                     </div>
 
                     {/* PANEL 3: REVIEWS */}
-                    <div id="accordion-reviews" className="border border-[var(--border)] rounded-[7px]-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
+                    <div id="accordion-reviews" className="border border-[var(--border)] rounded-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
                             onClick={() => toggleAccordion('reviews')}
                             className="w-full flex items-center justify-between p-5 text-left font-bold text-base transition-colors hover:bg-[var(--primary-glow)] outline-none"
@@ -389,9 +413,9 @@ const ProductPage = () => {
                                                                 <div key={item.star} className="flex items-center gap-3">
                                                                     <span className="text-xs font-semibold w-3 text-right">{item.star}</span>
                                                                     <FiStar size={11} className="text-amber-400 fill-current" />
-                                                                    <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-[7px]-[7px] overflow-hidden">
+                                                                    <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-[7px] overflow-hidden">
                                                                         <div
-                                                                            className="h-full bg-amber-400 rounded-[7px]-[7px]"
+                                                                            className="h-full bg-amber-400 rounded-[7px]"
                                                                             style={{ width: `${percent}%` }}
                                                                         />
                                                                     </div>
@@ -410,7 +434,7 @@ const ProductPage = () => {
                                                         <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
                                                     ) : (
                                                         reviews.map((rev) => (
-                                                            <div key={rev.id || rev._id} className="p-4 rounded-[7px]-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
+                                                            <div key={rev.id || rev._id} className="p-4 rounded-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
                                                                 <div className="flex justify-between items-center mb-2">
                                                                     <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
                                                                     <div className="flex text-amber-400">
@@ -442,7 +466,7 @@ const ProductPage = () => {
                 </div>
 
                 {/* RELATED ITEMS SECTION (Always Visible) */}
-                <div id="related-items-section" className="mb-12 bg-[var(--bg-card)] rounded-[7px]-[7px] border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                <div id="related-items-section" className="mb-12 bg-[var(--bg-card)] rounded-[7px] border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>People Also Ordered (Related Items)</h3>
                     {relatedProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found in this category.</p>
@@ -472,7 +496,7 @@ const ProductPage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -515,7 +539,7 @@ const ProductPage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -536,7 +560,7 @@ const ProductPage = () => {
                 </div>
 
                 {/* EXPLORE PRODUCTS SECTION (Always Visible) */}
-                <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-[7px]-[7px] border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
+                <div id="explore-products-section" className="mb-16 bg-[var(--bg-card)] rounded-[7px] border border-[var(--border)] p-6 sm:p-8 shadow-sm scroll-mt-24">
                     <h3 className="text-lg font-bold mb-6" style={{ color: 'var(--text-main)' }}>Explore Other Categories</h3>
                     {exploreProducts.length === 0 ? (
                         <p className="text-sm text-[var(--text-muted)] italic">No other products found.</p>
@@ -567,7 +591,7 @@ const ProductPage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -610,7 +634,7 @@ const ProductPage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',

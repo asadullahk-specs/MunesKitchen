@@ -110,7 +110,7 @@ const AdminMessages = () => {
             {/* Filter & Search Bar */}
             <div className="card p-4 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 {/* Tabs */}
-                <div className="flex gap-2 bg-black/10 dark:bg-white/5 p-1 rounded-[7px]-[7px] w-fit">
+                <div className="flex gap-2 bg-black/10 dark:bg-white/5 p-1 rounded-[7px] w-fit">
                     {[
                         { id: 'all', label: 'All Messages' },
                         { id: 'unread', label: `Unread (${unreadCount})` },
@@ -119,7 +119,7 @@ const AdminMessages = () => {
                         <button
                             key={tab.id}
                             onClick={() => setFilter(tab.id)}
-                            className="px-4 py-2 text-xs font-semibold rounded-[7px]-[7px] transition-all"
+                            className="px-4 py-2 text-xs font-semibold rounded-[7px] transition-all"
                             style={{
                                 background: filter === tab.id ? 'var(--primary)' : 'transparent',
                                 color: filter === tab.id ? '#ffffff' : 'var(--text-muted)',
@@ -150,7 +150,7 @@ const AdminMessages = () => {
                     {loading ? (
                         <div className="space-y-3">
                             {Array.from({ length: 4 }).map((_, i) => (
-                                <div key={i} className="skeleton h-24 rounded-[7px]-[7px]" />
+                                <div key={i} className="skeleton h-24 rounded-[7px]" />
                             ))}
                         </div>
                     ) : filteredMessages.length === 0 ? (
@@ -176,7 +176,7 @@ const AdminMessages = () => {
                                                 {msg.name}
                                             </h3>
                                             {!msg.is_read && (
-                                                <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-[7px]-[7px] bg-red-500 text-white animate-pulse">
+                                                <span className="text-[10px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-[7px] bg-red-500 text-white animate-pulse">
                                                     New
                                                 </span>
                                             )}
@@ -195,7 +195,7 @@ const AdminMessages = () => {
                                     <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                                         <button
                                             onClick={() => handleToggleRead(msg.id, msg.is_read)}
-                                            className="p-2 rounded-[7px]-[7px] transition-all"
+                                            className="p-2 rounded-[7px] transition-all"
                                             style={{
                                                 background: msg.is_read ? 'rgba(34,197,94,0.1)' : 'rgba(0,0,0,0.05)',
                                                 color: msg.is_read ? '#22c55e' : 'var(--text-muted)'
@@ -206,7 +206,7 @@ const AdminMessages = () => {
                                         </button>
                                         <button
                                             onClick={() => handleDelete(msg.id)}
-                                            className="p-2 rounded-[7px]-[7px] transition-all hover:bg-red-500/10 text-red-500"
+                                            className="p-2 rounded-[7px] transition-all hover:bg-red-500/10 text-red-500"
                                             title="Delete"
                                         >
                                             <FiTrash2 size={14} />
@@ -252,7 +252,7 @@ const AdminMessages = () => {
                                 </div>
                                 <button
                                     onClick={() => handleToggleRead(selectedMessage.id, selectedMessage.is_read)}
-                                    className="px-3 py-1 rounded-[7px]-[7px] text-[10px] font-bold uppercase tracking-wider transition-all"
+                                    className="px-3 py-1 rounded-[7px] text-[10px] font-bold uppercase tracking-wider transition-all"
                                     style={{
                                         background: selectedMessage.is_read ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
                                         color: selectedMessage.is_read ? '#22c55e' : '#ef4444'
@@ -292,7 +292,7 @@ const AdminMessages = () => {
                                 )}
                             </div>
 
-                            <div className="p-4 rounded-[7px]-[7px] text-sm leading-relaxed" style={{ background: 'var(--bg-deep)', border: '1px solid var(--border)', color: 'var(--text-main)', whiteSpace: 'pre-wrap' }}>
+                            <div className="p-4 rounded-[7px] text-sm leading-relaxed" style={{ background: 'var(--bg-deep)', border: '1px solid var(--border)', color: 'var(--text-main)', whiteSpace: 'pre-wrap' }}>
                                 {selectedMessage.message}
                             </div>
 
@@ -306,7 +306,7 @@ const AdminMessages = () => {
                                 </button>
                                 <button
                                     onClick={() => handleDelete(selectedMessage.id)}
-                                    className="px-4 py-2 rounded-[7px]-[7px] text-xs font-semibold justify-center transition-all bg-red-500 hover:bg-red-600 text-white"
+                                    className="px-4 py-2 rounded-[7px] text-xs font-semibold justify-center transition-all bg-red-500 hover:bg-red-600 text-white"
                                 >
                                     Delete
                                 </button>

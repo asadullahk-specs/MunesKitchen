@@ -125,7 +125,7 @@ const AdminOrders = () => {
             <div className="flex flex-wrap gap-2 items-center mb-5">
                 <button
                     onClick={() => { setFilter(''); setPage(1); }}
-                    className="px-3 py-1.5 rounded-[7px]-[7px] text-sm font-medium transition-all"
+                    className="px-3 py-1.5 rounded-[7px] text-sm font-medium transition-all"
                     style={{
                         background: !filter ? 'var(--primary)' : 'var(--bg-card)',
                         color: !filter ? 'white' : 'var(--text-muted)',
@@ -138,7 +138,7 @@ const AdminOrders = () => {
                     <button
                         key={s}
                         onClick={() => { setFilter(s); setPage(1); }}
-                        className="px-3 py-1.5 rounded-[7px]-[7px] text-sm font-medium capitalize transition-all"
+                        className="px-3 py-1.5 rounded-[7px] text-sm font-medium capitalize transition-all"
                         style={{
                             background: filter === s ? STATUS_COLORS[s] : 'var(--bg-card)',
                             color: filter === s ? 'white' : 'var(--text-muted)',
@@ -150,7 +150,7 @@ const AdminOrders = () => {
                 ))}
                 <button
                     onClick={fetchOrders}
-                    className="ml-auto w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center"
+                    className="ml-auto w-9 h-9 rounded-[7px] flex items-center justify-center"
                     style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
                 >
                     <FiRefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -189,7 +189,7 @@ const AdminOrders = () => {
                                 </p>
                             </div>
                             <span
-                                className="px-2.5 py-1 rounded-[7px]-[7px] text-xs font-semibold capitalize shrink-0"
+                                className="px-2.5 py-1 rounded-[7px] text-xs font-semibold capitalize shrink-0"
                                 style={{
                                     background: `${STATUS_COLORS[order.status]}20`,
                                     color: STATUS_COLORS[order.status],
@@ -211,7 +211,7 @@ const AdminOrders = () => {
                             <select
                                 value={order.status}
                                 onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                                className="text-xs px-2 py-1.5 rounded-[7px]-[7px] outline-none"
+                                className="text-xs px-2 py-1.5 rounded-[7px] outline-none"
                                 style={{
                                     background: 'var(--bg-deep)',
                                     border: '1px solid var(--border)',
@@ -232,7 +232,7 @@ const AdminOrders = () => {
 
             {/* Desktop Table (lg+) */}
             <div
-                className="hidden lg:block rounded-[7px]-[7px] overflow-hidden"
+                className="hidden lg:block rounded-[7px] overflow-hidden"
                 style={{ border: '1px solid var(--border)', boxShadow: 'var(--shadow)' }}
             >
                 <div
@@ -465,7 +465,7 @@ const AdminOrders = () => {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 15 }}
                             transition={{ duration: 0.2 }}
-                            className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden rounded-[7px]-[7px] shadow-2xl"
+                            className="w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden rounded-[7px] shadow-2xl"
                             style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}
                             onClick={(e) => e.stopPropagation()} // Prevents closing when clicking modal content
                         >
@@ -474,7 +474,7 @@ const AdminOrders = () => {
                                 <div>
                                     <h3 className="text-base font-bold flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
                                         Order Breakdown
-                                        <span className="font-mono text-sm px-2 py-0.5 rounded-[7px]-[7px] text-white bg-[var(--primary)]">
+                                        <span className="font-mono text-sm px-2 py-0.5 rounded-[7px] text-white bg-[var(--primary)]">
                                             #{selectedOrder.order_number}
                                         </span>
                                     </h3>
@@ -484,7 +484,7 @@ const AdminOrders = () => {
                                 </div>
                                 <button
                                     onClick={() => setSelectedOrder(null)}
-                                    className="p-1.5 rounded-[7px]-[7px] transition-colors"
+                                    className="p-1.5 rounded-[7px] transition-colors"
                                     style={{ color: 'var(--text-muted)', background: 'var(--bg-card)', border: '1px solid var(--border)' }}
                                 >
                                     <FiX size={18} />
@@ -495,7 +495,7 @@ const AdminOrders = () => {
                             <div className="p-6 overflow-y-auto space-y-5 text-left custom-scrollbar">
 
                                 {/* Single Grid Layout with Robust Data Mapping */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 rounded-[7px]-[7px] border" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 rounded-[7px] border" style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}>
 
                                     {/* Column 1: Customer Profile */}
                                     <div className="space-y-4">
@@ -551,7 +551,7 @@ const AdminOrders = () => {
 
                                 {/* Dynamic Kitchen Custom Remarks Box */}
                                 {selectedOrder.notes && (
-                                    <div className="p-3.5 rounded-[7px]-[7px] border border-amber-200/40 bg-amber-500/5 text-amber-600 dark:text-amber-400">
+                                    <div className="p-3.5 rounded-[7px] border border-amber-200/40 bg-amber-500/5 text-amber-600 dark:text-amber-400">
                                         <h5 className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 mb-1">
                                             Special Kitchen Request:
                                         </h5>
@@ -566,7 +566,7 @@ const AdminOrders = () => {
                                     <h4 className="text-xs font-bold tracking-wider uppercase mb-2" style={{ color: 'var(--text-muted)' }}>
                                         Items to Cook ({selectedOrder.items?.length || 0})
                                     </h4>
-                                    <div className="rounded-[7px]-[7px] overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+                                    <div className="rounded-[7px] overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
                                         <table className="w-full text-xs text-left">
                                             <thead style={{ background: 'var(--bg-deep)', color: 'var(--text-muted)' }}>
                                                 <tr>
@@ -588,7 +588,7 @@ const AdminOrders = () => {
                                                         <tr key={index} style={{ color: 'var(--text-main)' }}>
                                                             <td className="p-3 font-medium">
                                                                 <div className="flex items-center gap-2">
-                                                                    <span className="w-1.5 h-1.5 rounded-[7px]-[7px] bg-[var(--primary)]" />
+                                                                    <span className="w-1.5 h-1.5 rounded-[7px] bg-[var(--primary)]" />
                                                                     {itemName}
                                                                 </div>
                                                             </td>
@@ -626,7 +626,7 @@ const AdminOrders = () => {
                                 {/* Direct Live Badge Status Indicator */}
                                 <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-[7px]-[7px] animate-ping" style={{ backgroundColor: STATUS_COLORS[selectedOrder.status] }} />
+                                        <span className="w-2 h-2 rounded-[7px] animate-ping" style={{ backgroundColor: STATUS_COLORS[selectedOrder.status] }} />
                                         <span className="text-xs font-semibold capitalize" style={{ color: STATUS_COLORS[selectedOrder.status] }}>
                                             Status: {selectedOrder.status?.replace(/_/g, ' ')}
                                         </span>
@@ -640,7 +640,7 @@ const AdminOrders = () => {
                                     <button
                                         onClick={() => handleDeleteOrder(selectedOrder.id)}
                                         disabled={deletingId === selectedOrder.id}
-                                        className="px-4 py-2 rounded-[7px]-[7px] text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                                        className="px-4 py-2 rounded-[7px] text-xs font-semibold flex items-center gap-1.5 transition-colors"
                                         style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', opacity: deletingId === selectedOrder.id ? 0.6 : 1 }}
                                     >
                                         <FiTrash2 size={12} />
@@ -648,7 +648,7 @@ const AdminOrders = () => {
                                     </button>
                                     <button
                                         onClick={() => setSelectedOrder(null)}
-                                        className="px-4 py-2 rounded-[7px]-[7px] text-xs font-semibold transition-colors"
+                                        className="px-4 py-2 rounded-[7px] text-xs font-semibold transition-colors"
                                         style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', color: 'var(--text-main)' }}
                                     >
                                         Dismiss View

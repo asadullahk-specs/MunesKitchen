@@ -81,7 +81,7 @@ const ProductCard = ({ product }) => {
                             style={{
                                 background: '#990000',
                                 color: '#ffffff',
-                                borderRadius: 7,
+                                borderRadius: '7px',
                                 fontSize: '0.68rem',
                                 boxShadow: '0 1px 6px rgba(0,0,0,0.25)',
                                 letterSpacing: '0.02em',

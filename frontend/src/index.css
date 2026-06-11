@@ -38,7 +38,7 @@
   --shadow-hover: 0 12px 40px rgba(153, 0, 0, 0.28);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
   --shadow-glow: 0 4px 20px rgba(153, 0, 0, 0.35);
-  --radius: 12px;
+  --radius: 7px;
   --nav-height: 68px;
   --nav-top: 12px;
 }
@@ -109,7 +109,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary);
-  border-radius: 3px;
+  border-radius: 7px;
 }
 
 /* ===== GLASS ===== */
@@ -130,7 +130,7 @@ body {
   background: linear-gradient(135deg, #990000, #7a0000);
   color: white;
   padding: 12px 24px;
-  border-radius: 10px;
+  border-radius: 7px;
   font-weight: 600;
   font-size: 0.875rem;
   font-family: 'Poppins', 'sans-serif';
@@ -166,7 +166,7 @@ body {
   background: transparent;
   color: var(--text-main);
   padding: 11px 24px;
-  border-radius: 10px;
+  border-radius: 7px;
   font-weight: 600;
   font-size: 0.875rem;
   font-family: 'Poppins', 'sans-serif';
@@ -228,7 +228,7 @@ body {
   background: linear-gradient(135deg, #ff6b35, #990000);
   color: white;
   padding: 3px 10px;
-  border-radius: 50px;
+  border-radius: 7px;
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -239,7 +239,7 @@ body {
 .qty-btn {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 7px;
   border: 1.5px solid var(--border);
   background: var(--bg-card);
   color: var(--text-main);
@@ -264,7 +264,7 @@ body {
   width: 100%;
   padding: 11px 16px;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 7px;
   background: var(--bg-input);
   color: var(--text-main);
   font-family: 'Poppins', 'sans-serif';
@@ -331,7 +331,7 @@ select.input-field option {
   width: 100%;
   padding: 11px 16px;
   border: 1.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: 7px;
   background: var(--bg-input) !important;
   color: var(--text-main) !important;
   font-family: 'Poppins', 'sans-serif';
@@ -386,7 +386,7 @@ select.input-field option {
       var(--border) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  border-radius: 8px;
+  border-radius: 7px;
 }
 
 .recharts-text tspan {
@@ -401,7 +401,7 @@ select.input-field option {
   background: var(--bg-card) !important;
   border-color: var(--border) !important;
   color: var(--text-main) !important;
-  border-radius: 12px !important;
+  border-radius: 7px !important;
 }
 
 @keyframes shimmer {
@@ -422,7 +422,7 @@ select.input-field option {
 .Toastify__toast {
   background: transparent !important;
   backdrop-filter: blur(16px) !important;
-  border-radius: 12px !important;
+  border-radius: 7px !important;
   font-family: 'Poppins', 'sans-serif' !important;
   font-size: 0.85rem !important;
   font-weight: 500 !important;
@@ -494,7 +494,7 @@ select.input-field option {
 /* ===== STATUS BADGES ===== */
 .status-badge {
   padding: 4px 12px;
-  border-radius: 50px;
+  border-radius: 7px;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -568,7 +568,7 @@ select.input-field option {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 7px;
   color: var(--text-muted);
   font-weight: 500;
   font-size: 0.85rem;
@@ -600,7 +600,7 @@ select.input-field option {
   top: var(--nav-top) !important;
   left: 16px !important;
   right: 16px !important;
-  border-radius: 20px !important;
+  border-radius: 7px !important;
   max-width: 1200px !important;
   margin: 0 auto !important;
 }
@@ -632,7 +632,7 @@ input[type="number"]::-webkit-inner-spin-button {
 
 .admin-table-wrapper::-webkit-scrollbar-thumb {
   background: var(--border);
-  border-radius: 2px;
+  border-radius: 7px;
 }
 
 /* Prevent red overflow bar */
@@ -686,7 +686,7 @@ input[type="number"]::-webkit-inner-spin-button {
 /* ===== REVIEW IMAGE MINI-SLIDER ===== */
 .review-img-slider {
   position: relative;
-  border-radius: 12px;
+  border-radius: 7px;
   overflow: hidden;
   background: var(--border);
   height: 180px;
@@ -700,7 +700,7 @@ input[type="number"]::-webkit-inner-spin-button {
   height: 100%;
   object-fit: cover;
   display: block;
-  border-radius: 12px;
+  border-radius: 7px;
 }
 
 .review-img-arrow {
@@ -710,7 +710,7 @@ input[type="number"]::-webkit-inner-spin-button {
   z-index: 10;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  border-radius: 7px;
   border: none;
   cursor: pointer;
   display: flex;
@@ -747,7 +747,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .review-img-dot {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: 7px;
   border: none;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.5);
@@ -758,7 +758,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .review-img-dot.active {
   background: #fff;
   width: 18px;
-  border-radius: 3px;
+  border-radius: 7px;
 }
 
 /* ===== REVIEWS SLIDER CAROUSEL ===== */
@@ -784,7 +784,7 @@ input[type="number"]::-webkit-inner-spin-button {
   z-index: 20;
   width: 42px;
   height: 42px;
-  border-radius: 50%;
+  border-radius: 7px;
   border: 1.5px solid var(--border);
   background: var(--bg-card);
   color: var(--text-main);

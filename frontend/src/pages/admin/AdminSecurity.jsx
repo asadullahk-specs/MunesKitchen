@@ -220,7 +220,7 @@ const AdminSecurity = () => {
                     <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                         {/* Avatar */}
                         <div
-                            className="w-20 h-20 rounded-full shrink-0 overflow-hidden flex items-center justify-center font-bold text-2xl"
+                            className="w-20 h-20 rounded-[7px] shrink-0 overflow-hidden flex items-center justify-center font-bold text-2xl"
                             style={{
                                 border: '3px solid var(--primary)',
                                 background: (myProfileImage || currentAdmin.profile_image) ? 'transparent' : 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
@@ -310,7 +310,7 @@ const AdminSecurity = () => {
 
             {loading ? (
                 <div className="card p-8 flex justify-center items-center">
-                    <div className="w-8 h-8 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                    <div className="w-8 h-8 border-4 border-t-transparent rounded-[7px] animate-spin" style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                 </div>
             ) : error ? (
                 <div className="card p-8 text-center">

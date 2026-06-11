@@ -86,7 +86,7 @@ const AdminCustomers = () => {
                                     className="transition-colors hover:bg-red-50 dark:hover:bg-red-900/10">
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 rounded-[7px]-[7px] flex items-center justify-center text-xs font-bold text-white shrink-0"
+                                            <div className="w-7 h-7 rounded-[7px] flex items-center justify-center text-xs font-bold text-white shrink-0"
                                                 style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}>
                                                 {(c.full_name || c.name || '?').charAt(0).toUpperCase()}
                                             </div>
@@ -124,7 +124,7 @@ const AdminCustomers = () => {
                 ) : filteredCustomers.map(c => (
                     <div key={c.id} className="card p-4">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-[7px]-[7px] flex items-center justify-center text-sm font-bold text-white shrink-0"
+                            <div className="w-10 h-10 rounded-[7px] flex items-center justify-center text-sm font-bold text-white shrink-0"
                                 style={{ background: 'linear-gradient(135deg, #ef4444, #b91c1c)' }}>
                                 {(c.full_name || c.name || '?').charAt(0).toUpperCase()}
                             </div>
@@ -136,19 +136,19 @@ const AdminCustomers = () => {
                             </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
-                            <div className="rounded-[7px]-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
+                            <div className="rounded-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
                                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Orders</p>
                                 <p className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>
                                     {c.total_orders || 0}
                                 </p>
                             </div>
-                            <div className="rounded-[7px]-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
+                            <div className="rounded-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
                                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Spent</p>
                                 <p className="font-bold text-sm" style={{ color: 'var(--primary)' }}>
                                     Rs.{Number(c.total_spent || 0).toLocaleString()}
                                 </p>
                             </div>
-                            <div className="rounded-[7px]-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
+                            <div className="rounded-[7px] p-2" style={{ background: 'var(--bg-deep)' }}>
                                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Last Order</p>
                                 <p className="font-bold text-xs" style={{ color: 'var(--text-main)' }}>
                                     {c.last_order_date

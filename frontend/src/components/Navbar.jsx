@@ -58,7 +58,7 @@ const Navbar = () => {
                 <div className="h-full flex items-center justify-between px-5 sm:px-7">
 
                     <Link to="/" className="flex items-center gap-3 group flex-nowrap flex-shrink-0">
-                        {/* <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                        {/* <div className="w-9 h-9 rounded-[7px] bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                             <span className="text-white font-bold text-base">M</span>
                         </div> */}
                         <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform">
@@ -88,7 +88,7 @@ const Navbar = () => {
                                 }}
                             >
                                 {link.label}
-                                <span className={`absolute -bottom-1 left-0 h-0.5 rounded-full transition-all duration-300 ${isActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ background: 'var(--primary)' }} />
+                                <span className={`absolute -bottom-1 left-0 h-0.5 rounded-[7px] transition-all duration-300 ${isActive(link.to) ? 'w-full' : 'w-0 group-hover:w-full'}`} style={{ background: 'var(--primary)' }} />
                             </Link>
                         ))}
                     </div>
@@ -96,19 +96,19 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center gap-2">
                         <button
                             onClick={toggleTheme}
-                            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+                            className="w-9 h-9 rounded-[7px] flex items-center justify-center transition-all"
                             style={{ color: 'var(--text-muted)' }}
                         >
                             {isDark ? <FiSun size={17} className="text-yellow-400" /> : <FiMoon size={17} />}
                         </button>
-                        <Link to="/cart" className="relative w-9 h-9 rounded-xl flex items-center justify-center transition-all" style={{ background: 'transparent' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                        <Link to="/cart" className="relative w-9 h-9 rounded-[7px] flex items-center justify-center transition-all" style={{ background: 'transparent' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                             <FiShoppingCart size={18} style={{ color: 'var(--text-main)' }} />
                             {cartCount > 0 && (
                                 <motion.span
                                     key={cartCount}
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="absolute -top-1 -right-1 w-5 h-5 text-white text-xs font-bold rounded-full flex items-center justify-center"
+                                    className="absolute -top-1 -right-1 w-5 h-5 text-white text-xs font-bold rounded-[7px] flex items-center justify-center"
                                     style={{ background: 'var(--primary)' }}
                                 >
                                     {cartCount > 99 ? '99+' : cartCount}
@@ -118,12 +118,12 @@ const Navbar = () => {
                     </div>
 
                     <div className="flex md:hidden items-center gap-2">
-                        <button onClick={toggleTheme} className="w-9 h-9 flex items-center justify-center rounded-xl" style={{ color: 'var(--text-muted)' }}>
+                        <button onClick={toggleTheme} className="w-9 h-9 flex items-center justify-center rounded-[7px]" style={{ color: 'var(--text-muted)' }}>
                             {isDark ? <FiSun size={17} className="text-yellow-400" /> : <FiMoon size={17} />}
                         </button>
                         <button
                             onClick={() => setIsOpen(prev => !prev)}
-                            className="w-9 h-9 flex items-center justify-center rounded-xl"
+                            className="w-9 h-9 flex items-center justify-center rounded-[7px]"
                             style={{ color: 'var(--text-main)' }}
                         >
                             {isOpen ? <FiX size={20} /> : <FiMenu size={20} />}
@@ -180,7 +180,7 @@ const Navbar = () => {
                                                 setIsOpen(false); // Closes the mobile layout menu
                                                 window.scrollTo({ top: 0, behavior: 'instant' }); // Snaps to top instantly
                                             }}
-                                            className="block py-3 px-4 rounded-xl text-sm font-medium transition-all"
+                                            className="block py-3 px-4 rounded-[7px] text-sm font-medium transition-all"
                                             style={{
                                                 background: isActive(link.to) ? 'var(--primary-glow)' : 'transparent',
                                                 color: isActive(link.to) ? 'var(--primary)' : 'var(--text-main)',
@@ -203,7 +203,7 @@ const Navbar = () => {
                                             setIsOpen(false);
                                             window.scrollTo({ top: 0, behavior: 'instant' });
                                         }}
-                                        className="flex items-center justify-between py-3 px-4 rounded-xl text-sm font-medium transition-all"
+                                        className="flex items-center justify-between py-3 px-4 rounded-[7px] text-sm font-medium transition-all"
                                         style={{
                                             background: isActive('/cart') ? 'var(--primary-glow)' : 'transparent',
                                             color: isActive('/cart') ? 'var(--primary)' : 'var(--text-main)',
@@ -215,7 +215,7 @@ const Navbar = () => {
                                             <span>Cart</span>
                                         </div>
                                         {cartCount > 0 && (
-                                            <span className="w-5 h-5 text-white text-xs font-bold rounded-full flex items-center justify-center" style={{ background: 'var(--primary)' }}>
+                                            <span className="w-5 h-5 text-white text-xs font-bold rounded-[7px] flex items-center justify-center" style={{ background: 'var(--primary)' }}>
                                                 {cartCount > 99 ? '99+' : cartCount}
                                             </span>
                                         )}

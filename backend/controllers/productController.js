@@ -58,6 +58,9 @@ exports.create = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
+        console.log('=== UPDATE PRODUCT ===');
+        console.log('ID:', req.params.id);
+        console.log('BODY:', req.body);
         const product = await Product.findById(req.params.id)
         if (!product) return res.status(404).json({ success: false, message: 'Product not found.' })
         

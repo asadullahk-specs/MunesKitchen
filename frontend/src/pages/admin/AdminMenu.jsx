@@ -15,14 +15,13 @@ const emptyForm = {
     hot_selling: false,
     show_on_menu: true,
     long_description: '',
-    ingredients: '',
     allergens: '',
     serving_size: '',
-    calories: '',
-    prep_time: '',
     spice_level: '',
-    storage_info: '',
-    additional_notes: ''
+    weight: '',
+    shelf_life: '',
+    available_as: '',
+    cooking_charges: ''
 }
 
 const AdminMenu = () => {
@@ -68,19 +67,18 @@ const AdminMenu = () => {
             name: p.name,
             category_id: p.category_id?.id || p.category_id?._id || p.category_id,
             price: p.price,
-            description: p.description || '',
-            image: p.image || '',
+            description: p.description ?? '',
+            image: p.image ?? '',
             hot_selling: p.hot_selling,
             show_on_menu: p.show_on_menu,
-            long_description: p.long_description || '',
-            ingredients: p.ingredients || '',
-            allergens: p.allergens || '',
-            serving_size: p.serving_size || '',
-            calories: p.calories || '',
-            prep_time: p.prep_time || '',
-            spice_level: p.spice_level || '',
-            storage_info: p.storage_info || '',
-            additional_notes: p.additional_notes || ''
+            long_description: p.long_description ?? '',
+            allergens: p.allergens ?? '',
+            serving_size: p.serving_size ?? '',
+            spice_level: p.spice_level ?? '',
+            weight: p.weight ?? '',
+            shelf_life: p.shelf_life ?? '',
+            available_as: p.available_as ?? '',
+            cooking_charges: p.cooking_charges ?? ''
         })
         setShowModal(true)
     }
@@ -155,7 +153,7 @@ const AdminMenu = () => {
                     Array(4).fill(0).map((_, i) => (
                         <div key={i} className="card p-4 animate-pulse">
                             <div className="flex gap-3">
-                                <div className="skeleton w-14 h-14 rounded-[7px]-[7px] shrink-0" />
+                                <div className="skeleton w-14 h-14 rounded-[7px] shrink-0" />
                                 <div className="flex-1">
                                     <div className="skeleton h-4 w-2/3 rounded-[7px] mb-2" />
                                     <div className="skeleton h-3 w-1/2 rounded-[7px] mb-2" />
@@ -176,7 +174,7 @@ const AdminMenu = () => {
                         <div key={p.id} className="card p-4">
                             <div className="flex gap-3 items-start">
                                 <div
-                                    className="w-14 h-14 rounded-[7px]-[7px] overflow-hidden shrink-0"
+                                    className="w-14 h-14 rounded-[7px] overflow-hidden shrink-0"
                                     style={{ background: 'var(--primary-glow)' }}
                                 >
                                     {imgUrl
@@ -196,13 +194,13 @@ const AdminMenu = () => {
                                     </p>
                                     <div className="flex gap-2 mt-1">
                                         {p.hot_selling && (
-                                            <span className="text-xs px-2 py-0.5 rounded-[7px]-[7px] font-medium"
+                                            <span className="text-xs px-2 py-0.5 rounded-[7px] font-medium"
                                                 style={{ background: 'rgba(217,119,6,0.1)', color: '#d97706' }}>
                                                 Hot Selling
                                             </span>
                                         )}
                                         {!p.show_on_menu && (
-                                            <span className="text-xs px-2 py-0.5 rounded-[7px]-[7px]"
+                                            <span className="text-xs px-2 py-0.5 rounded-[7px]"
                                                 style={{ background: 'rgba(0,0,0,0.1)', color: 'var(--text-muted)' }}>
                                                 Hidden
                                             </span>
@@ -211,12 +209,12 @@ const AdminMenu = () => {
                                 </div>
                                 <div className="flex flex-col gap-2 shrink-0">
                                     <button onClick={() => openEdit(p)}
-                                        className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
+                                        className="w-8 h-8 rounded-[7px] flex items-center justify-center"
                                         style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
                                         <FiEdit2 size={13} />
                                     </button>
                                     <button onClick={() => handleDelete(p.id)}
-                                        className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
+                                        className="w-8 h-8 rounded-[7px] flex items-center justify-center"
                                         style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
                                         <FiTrash2 size={13} />
                                     </button>
@@ -269,7 +267,7 @@ const AdminMenu = () => {
                                         onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'}
                                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                                         <td className="px-4 py-3">
-                                            <div className="w-10 h-10 rounded-[7px]-[7px] overflow-hidden"
+                                            <div className="w-10 h-10 rounded-[7px] overflow-hidden"
                                                 style={{ background: 'var(--primary-glow)' }}>
                                                 {imgUrl
                                                     ? <img src={imgUrl} alt="" className="w-full h-full object-cover" />
@@ -295,12 +293,12 @@ const AdminMenu = () => {
                                         <td className="px-4 py-3">
                                             <div className="flex gap-2">
                                                 <button onClick={() => openEdit(p)}
-                                                    className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center transition-all hover:scale-110"
+                                                    className="w-8 h-8 rounded-[7px] flex items-center justify-center transition-all hover:scale-110"
                                                     style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
                                                     <FiEdit2 size={14} />
                                                 </button>
                                                 <button onClick={() => handleDelete(p.id)}
-                                                    className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center transition-all hover:scale-110"
+                                                    className="w-8 h-8 rounded-[7px] flex items-center justify-center transition-all hover:scale-110"
                                                     style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
                                                     <FiTrash2 size={14} />
                                                 </button>
@@ -325,7 +323,7 @@ const AdminMenu = () => {
                         exit={{ opacity: 0 }}
                     >
                         <motion.div
-                            className="w-full sm:max-w-lg rounded-[7px]-t-[7px] sm:rounded-[7px]-[7px] overflow-hidden"
+                            className="w-full sm:max-w-lg rounded-[7px]-t-[7px] sm:rounded-[7px] overflow-hidden"
                             style={{
                                 background: 'var(--bg-card)',
                                 border: '1px solid var(--border)',
@@ -342,7 +340,7 @@ const AdminMenu = () => {
                                     {editProduct ? 'Edit Product' : 'Add Product'}
                                 </h2>
                                 <button onClick={() => setShowModal(false)}
-                                    className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center"
+                                    className="w-8 h-8 rounded-[7px] flex items-center justify-center"
                                     style={{ color: 'var(--text-muted)', background: 'var(--bg-deep)' }}>
                                     <FiX size={16} />
                                 </button>
@@ -423,56 +421,21 @@ const AdminMenu = () => {
                                     />
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="form-label">Ingredients</label>
-                                        <input
-                                            className="form-input"
-                                            placeholder="e.g. Chicken, Spices, Flour"
-                                            value={form.ingredients}
-                                            onChange={(e) => setForm({ ...form, ingredients: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Allergens</label>
-                                        <input
-                                            className="form-input"
-                                            placeholder="e.g. Wheat, Gluten, Dairy"
-                                            value={form.allergens}
-                                            onChange={(e) => setForm({ ...form, allergens: e.target.value })}
-                                        />
-                                    </div>
+                                {/* ── Additional Information ── */}
+                                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '12px', marginTop: '4px' }}>
+                                    <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>Additional Information</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label className="form-label">Serving Size</label>
+                                        <label className="form-label">Serving Size <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(persons)</span></label>
                                         <input
                                             className="form-input"
-                                            placeholder="e.g. 2-3 Persons"
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="e.g. 2"
                                             value={form.serving_size}
-                                            onChange={(e) => setForm({ ...form, serving_size: e.target.value })}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Calories</label>
-                                        <input
-                                            className="form-input"
-                                            placeholder="e.g. 350"
-                                            value={form.calories}
-                                            onChange={(e) => setForm({ ...form, calories: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="form-label">Prep Time</label>
-                                        <input
-                                            className="form-input"
-                                            placeholder="e.g. 15 Mins"
-                                            value={form.prep_time}
-                                            onChange={(e) => setForm({ ...form, prep_time: e.target.value })}
+                                            onChange={(e) => setForm({ ...form, serving_size: e.target.value.replace(/[^0-9]/g, '') })}
                                         />
                                     </div>
                                     <div>
@@ -483,34 +446,66 @@ const AdminMenu = () => {
                                             onChange={(e) => setForm({ ...form, spice_level: e.target.value })}
                                         >
                                             <option value="">Select</option>
-                                            <option value="None">None</option>
                                             <option value="Low">Low</option>
-                                            <option value="Medium">Medium</option>
+                                            <option value="Normal">Normal</option>
                                             <option value="High">High</option>
-                                            <option value="Extra Hot">Extra Hot</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="form-label">Storage Info</label>
-                                    <input
-                                        className="form-input"
-                                        placeholder="e.g. Keep frozen under -18C"
-                                        value={form.storage_info}
-                                        onChange={(e) => setForm({ ...form, storage_info: e.target.value })}
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="form-label">Weight <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(gm)</span></label>
+                                        <input
+                                            className="form-input"
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="e.g. 500"
+                                            value={form.weight}
+                                            onChange={(e) => setForm({ ...form, weight: e.target.value.replace(/[^0-9]/g, '') })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Shelf Life <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(days)</span></label>
+                                        <input
+                                            className="form-input"
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="e.g. 30"
+                                            value={form.shelf_life}
+                                            onChange={(e) => setForm({ ...form, shelf_life: e.target.value.replace(/[^0-9]/g, '') })}
+                                        />
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label className="form-label">Additional Notes</label>
-                                    <input
-                                        className="form-input"
-                                        placeholder="e.g. Serve hot with sauce"
-                                        value={form.additional_notes}
-                                        onChange={(e) => setForm({ ...form, additional_notes: e.target.value })}
-                                    />
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="form-label">Available As</label>
+                                        <select
+                                            className="form-input"
+                                            value={form.available_as}
+                                            onChange={(e) => setForm({ ...form, available_as: e.target.value })}
+                                        >
+                                            <option value="">Select</option>
+                                            <option value="Cooked">Cooked</option>
+                                            <option value="Frozen">Frozen</option>
+                                            <option value="Frozen & Cooked">Frozen &amp; Cooked</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Cooking Charges <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(Rs.)</span></label>
+                                        <input
+                                            className="form-input"
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="e.g. 100"
+                                            value={form.cooking_charges}
+                                            onChange={(e) => setForm({ ...form, cooking_charges: e.target.value.replace(/[^0-9]/g, '') })}
+                                        />
+                                    </div>
                                 </div>
+
+
 
                                 <div className="flex flex-wrap gap-4">
                                     <label className="flex items-center gap-2 cursor-pointer">
@@ -552,7 +547,7 @@ const AdminMenu = () => {
                                     className="btn-primary flex-1 justify-center py-2.5"
                                 >
                                     {saving ? (
-                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
+                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                                     ) : (
                                         editProduct ? 'Update Product' : 'Save Product'
                                     )}

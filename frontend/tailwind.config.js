@@ -6,6 +6,17 @@ export default {
     ],
     darkMode: 'class',
     theme: {
+        borderRadius: {
+            'none': '0px',
+            'sm': '7px',
+            'DEFAULT': '7px',
+            'md': '7px',
+            'lg': '7px',
+            'xl': '7px',
+            '2xl': '7px',
+            '3xl': '7px',
+            'full': '7px',
+        },
         extend: {
             fontFamily: {
                 display: ['"Poppins"', 'sans-serif'],

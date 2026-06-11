@@ -10,14 +10,13 @@ const productSchema = new mongoose.Schema({
     hot_selling: { type: Boolean, default: false },
     show_on_menu: { type: Boolean, default: true },
     // Additional Info fields
-    ingredients: { type: String },
     allergens: { type: String },
-    serving_size: { type: String },
-    calories: { type: Number },
-    prep_time: { type: String },
-    spice_level: { type: String, enum: ['Mild', 'Medium', 'Hot', 'Extra Hot', ''] },
-    storage_info: { type: String },
-    additional_notes: { type: String },
+    serving_size: { type: Number },
+    spice_level: { type: String, enum: ['Low', 'Normal', 'High', ''] },
+    weight: { type: Number },
+    shelf_life: { type: Number },
+    available_as: { type: String, enum: ['Cooked', 'Frozen', 'Frozen & Cooked', ''] },
+    cooking_charges: { type: Number },
     costing: {
         ingredients: [{
             name: { type: String, required: true },

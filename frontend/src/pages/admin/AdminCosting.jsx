@@ -192,7 +192,7 @@ const AdminCosting = () => {
                 </div>
 
                 {loadingProducts ? (
-                    <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
+                    <div className="skeleton h-10 w-full rounded-[7px]" />
                 ) : (
                     <select
                         className="form-input input-field"
@@ -217,7 +217,7 @@ const AdminCosting = () => {
 
                         {/* Selling Price */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                            <div className="w-12 h-12 rounded-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{ background: 'var(--primary-glow)', color: 'var(--primary)' }}>
                                 Rs.
                             </div>
@@ -231,7 +231,7 @@ const AdminCosting = () => {
 
                         {/* Production Cost */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                            <div className="w-12 h-12 rounded-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{ background: 'rgba(217, 119, 6, 0.12)', color: '#d97706' }}>
                                 <FiActivity />
                             </div>
@@ -245,7 +245,7 @@ const AdminCosting = () => {
 
                         {/* Profit Amount */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                            <div className="w-12 h-12 rounded-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{
                                     background: totals.profitAmount >= 0 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(220, 38, 38, 0.12)',
                                     color: totals.profitAmount >= 0 ? '#059669' : '#dc2626'
@@ -267,7 +267,7 @@ const AdminCosting = () => {
 
                         {/* Profit Margin */}
                         <div className="card p-4" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                            <div className="w-12 h-12 rounded-[7px]-[7px] flex items-center justify-center text-xl shrink-0"
+                            <div className="w-12 h-12 rounded-[7px] flex items-center justify-center text-xl shrink-0"
                                 style={{
                                     background: totals.profitMargin >= 30 ? 'rgba(5, 150, 105, 0.12)' : 'rgba(217, 119, 6, 0.12)',
                                     color: totals.profitMargin >= 30 ? '#059669' : '#d97706'
@@ -298,16 +298,16 @@ const AdminCosting = () => {
                                     Recipe Ingredients & Components ({ingredients.length})
                                 </span>
                             </div>
-                            <button onClick={handleAddIngredient} className="btn-primary flex items-center gap-1 text-xs py-2 px-4 rounded-[7px]-[7px]">
+                            <button onClick={handleAddIngredient} className="btn-primary flex items-center gap-1 text-xs py-2 px-4 rounded-[7px]">
                                 <FiPlus size={14} /> Add Ingredient
                             </button>
                         </div>
 
                         {loadingCosting ? (
                             <div style={{ padding: '30px 0' }} className="space-y-3">
-                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
-                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
-                                <div className="skeleton h-10 w-full rounded-[7px]-[7px]" />
+                                <div className="skeleton h-10 w-full rounded-[7px]" />
+                                <div className="skeleton h-10 w-full rounded-[7px]" />
+                                <div className="skeleton h-10 w-full rounded-[7px]" />
                             </div>
                         ) : ingredients.length === 0 ? (
                             <div style={{ padding: '40px 20px', textAlign: 'center', background: 'var(--bg-deep)', borderRadius: '7px', border: '1px dashed var(--border)' }}>
@@ -408,10 +408,10 @@ const AdminCosting = () => {
                             <button
                                 onClick={handleSaveCosting}
                                 disabled={saving || loadingCosting}
-                                className="btn-primary flex items-center gap-2 py-3 px-6 rounded-[7px]-[7px]"
+                                className="btn-primary flex items-center gap-2 py-3 px-6 rounded-[7px]"
                             >
                                 {saving ? (
-                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
+                                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                                 ) : (
                                     <><FiSave size={16} /> Save Costing Profile</>
                                 )}

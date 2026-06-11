@@ -41,7 +41,7 @@ export const CartProvider = ({ children }) => {
                     style={{
                         padding: '6px 14px',
                         fontSize: '0.75rem',
-                        borderRadius: '6px',
+                        borderRadius: '7px',
                         cursor: 'pointer',
                         marginLeft: '12px',
                         border: 'none',

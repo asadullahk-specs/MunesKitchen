@@ -261,7 +261,7 @@ const HomePage = () => {
                             transition={{ duration: 0.5 }}
                             className="flex items-center gap-3 mb-5"
                         >
-                            {/* <div className="h-0.5 w-10 rounded-[7px]-[7px]" style={{ background: '#BC9C22' }} /> */}
+                            {/* <div className="h-0.5 w-10 rounded-[7px]" style={{ background: '#BC9C22' }} /> */}
                             <span
                                 className="text-xs font-bold uppercase tracking-[0.28em]"
                                 style={{ color: '#BC9C22' }}
@@ -362,7 +362,7 @@ const HomePage = () => {
                             initial={{ opacity: 0, scale: 0.92 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5, delay: 0.54 }}
-                            className="inline-flex items-center gap-3 px-5 py-3 rounded-[7px]-[7px]"
+                            className="inline-flex items-center gap-3 px-5 py-3 rounded-[7px]"
                             style={{
                                 background: 'rgba(255,255,255,0.07)',
                                 backdropFilter: 'blur(14px)',
@@ -370,7 +370,7 @@ const HomePage = () => {
                             }}
                         >
                             <div
-                                className="w-9 h-9 rounded-[7px]-[7px] flex items-center justify-center flex-shrink-0"
+                                className="w-9 h-9 rounded-[7px] flex items-center justify-center flex-shrink-0"
                                 style={{ background: 'linear-gradient(135deg, #990000, #7a0000)', color: 'white', boxShadow: '0 3px 10px rgba(153,0,0,0.4)' }}
                             >
                                 <FiPhoneCall size={16} />
@@ -465,7 +465,7 @@ const HomePage = () => {
                     <div className="block sm:hidden">
                         {loading ? (
                             <div className="text-center py-12">
-                                <div className="w-8 h-8 border-t-transparent rounded-[7px]-[7px] animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid', borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
+                                <div className="w-8 h-8 border-t-transparent rounded-[7px] animate-spin mx-auto mb-3" style={{ borderWidth: 3, borderStyle: 'solid', borderColor: 'var(--primary)', borderTopColor: 'transparent' }} />
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Loading categories...</p>
                             </div>
                         ) : validCategories.length > 0 ? (
@@ -482,7 +482,7 @@ const HomePage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -535,7 +535,7 @@ const HomePage = () => {
                                             zIndex: 10,
                                             width: 32,
                                             height: 32,
-                                            borderRadius: '50%',
+                                            borderRadius: '7px',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -612,11 +612,11 @@ const HomePage = () => {
                                             x: { type: "spring", stiffness: 300, damping: 30 },
                                             opacity: { duration: 0.2 }
                                         }}
-                                        className="w-full flex flex-row items-center gap-6 p-6 sm:p-8 rounded-[7px]-[7px] glass border border-[var(--border)] shadow-md animate-none"
+                                        className="w-full flex flex-row items-center gap-6 p-6 sm:p-8 rounded-[7px] glass border border-[var(--border)] shadow-md animate-none"
                                         style={{ background: 'var(--bg-card)' }}
                                     >
                                         
-                                        <div className="w-1/3 aspect-square rounded-[7px]-[7px] overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
+                                        <div className="w-1/3 aspect-square rounded-[7px] overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0">
                                             {offers[activeOfferIdx].image ? (
                                                 <img
                                                     src={offers[activeOfferIdx].image.startsWith('http') ? offers[activeOfferIdx].image : `${BACKEND}/${offers[activeOfferIdx].image.replace(/^\//, '')}`}
@@ -687,7 +687,7 @@ const HomePage = () => {
                                         style={{
                                             position: 'absolute', top: '50%', left: -18,
                                             transform: 'translateY(-50%)',
-                                            width: 36, height: 36, borderRadius: '50%',
+                                            width: 36, height: 36, borderRadius: '7px',
                                             display: 'flex', alignItems: 'center', justify: 'center',
                                             background: 'var(--bg-card)', border: '1.5px solid var(--border)',
                                             boxShadow: 'var(--shadow-md)', cursor: 'pointer',
@@ -706,7 +706,7 @@ const HomePage = () => {
                                         style={{
                                             position: 'absolute', top: '50%', right: -18,
                                             transform: 'translateY(-50%)',
-                                            width: 36, height: 36, borderRadius: '50%',
+                                            width: 36, height: 36, borderRadius: '7px',
                                             display: 'flex', alignItems: 'center', justify: 'center',
                                             background: 'var(--bg-card)', border: '1.5px solid var(--border)',
                                             boxShadow: 'var(--shadow-md)', cursor: 'pointer',
@@ -730,7 +730,7 @@ const HomePage = () => {
                                             style={{
                                                 width: i === activeOfferIdx ? 22 : 8,
                                                 height: 8,
-                                                borderRadius: 7,
+                                                borderRadius: '7px',
                                                 border: 'none',
                                                 cursor: 'pointer',
                                                 padding: 0,
@@ -756,7 +756,7 @@ const HomePage = () => {
                                         zIndex: 10,
                                         width: 32,
                                         height: 32,
-                                        borderRadius: '50%',
+                                        borderRadius: '7px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -780,11 +780,11 @@ const HomePage = () => {
                                     return (
                                         <div 
                                             key={offer.id || idx} 
-                                            className="mobile-scroll-item glass border border-[var(--border)] rounded-[7px]-[7px] p-4 flex flex-col justify-between"
+                                            className="mobile-scroll-item glass border border-[var(--border)] rounded-[7px] p-4 flex flex-col justify-between"
                                             style={{ background: 'var(--bg-card)', width: '280px' }}
                                         >
                                             
-                                            <div className="aspect-video w-full rounded-[7px]-[7px] overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0 mb-3">
+                                            <div className="aspect-video w-full rounded-[7px] overflow-hidden bg-[var(--bg-deep)] border border-[var(--border)] flex items-center justify-center shrink-0 mb-3">
                                                 {imgUrl ? (
                                                     <img src={imgUrl} alt={offer.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -852,7 +852,7 @@ const HomePage = () => {
                                         zIndex: 10,
                                         width: 32,
                                         height: 32,
-                                        borderRadius: '50%',
+                                        borderRadius: '7px',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -892,7 +892,7 @@ const HomePage = () => {
                                     zIndex: 10,
                                     width: 32,
                                     height: 32,
-                                    borderRadius: '50%',
+                                    borderRadius: '7px',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     background: 'var(--bg-card)',
@@ -937,7 +937,7 @@ const HomePage = () => {
                                     zIndex: 10,
                                     width: 32,
                                     height: 32,
-                                    borderRadius: '50%',
+                                    borderRadius: '7px',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     background: 'var(--bg-card)',
@@ -992,7 +992,7 @@ const HomePage = () => {
                             <div className="flex flex-col sm:flex-row md:flex-col gap-4 w-full md:w-2/5 xl:w-full justify-between items-stretch">
 
                                 {/* 4.7 Numeric Rating Summary Card */}
-                                <div className="card p-5 flex flex-col items-center justify-center text-center w-full sm:w-1/2 md:w-full flex-1 min-h-[135px] rounded-[7px]-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
+                                <div className="card p-5 flex flex-col items-center justify-center text-center w-full sm:w-1/2 md:w-full flex-1 min-h-[135px] rounded-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                                     <div className="font-display text-4xl sm:text-5xl font-bold gradient-text mb-1">
                                         {Number(reviewStats.avgRating).toFixed(1)}
                                     </div>
@@ -1010,15 +1010,15 @@ const HomePage = () => {
                                 </div>
 
                                 {/* Progress Bar Breakdown Card */}
-                                <div className="card p-4 sm:p-5 flex flex-col gap-2.5 justify-center w-full sm:w-1/2 md:w-full flex-1 min-h-[145px] rounded-[7px]-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
+                                <div className="card p-4 sm:p-5 flex flex-col gap-2.5 justify-center w-full sm:w-1/2 md:w-full flex-1 min-h-[145px] rounded-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                                     {reviewStats.breakdown.map(({ star, count }) => (
                                         <div key={star} className="flex items-center gap-2 text-xs">
                                             <span className="w-7 sm:w-8 flex items-center justify-end gap-0.5 text-right shrink-0 text-gray-300" style={{ color: 'var(--text-muted)' }}>
                                                 {star} <FiStar size={10} fill="#f59e0b" stroke="#f59e0b" className="shrink-0" />
                                             </span>
-                                            <div className="flex-1 h-1.5 rounded-[7px]-[7px] overflow-hidden" style={{ background: 'var(--border)' }}>
+                                            <div className="flex-1 h-1.5 rounded-[7px] overflow-hidden" style={{ background: 'var(--border)' }}>
                                                 <div
-                                                    className="h-full rounded-[7px]-[7px] transition-all duration-700"
+                                                    className="h-full rounded-[7px] transition-all duration-700"
                                                     style={{
                                                         width: reviewStats.total > 0 ? `${(count / reviewStats.total) * 100}%` : '0%',
                                                         background: 'linear-gradient(90deg, #f59e0b, #ef4444)',
@@ -1034,7 +1034,7 @@ const HomePage = () => {
                             {/* Swiper / Dynamic Carousel Slider Area */}
                             <div className="flex flex-col justify-center w-full md:w-3/5 xl:w-full min-h-[260px]">
                                 {reviews.length === 0 ? (
-                                    <p className="text-center py-8 text-gray-400 bg-[var(--bg-card)] rounded-[7px]-[7px] border border-[var(--border)] w-full text-sm px-4">
+                                    <p className="text-center py-8 text-gray-400 bg-[var(--bg-card)] rounded-[7px] border border-[var(--border)] w-full text-sm px-4">
                                         No reviews yet. Be the first to share your experience!
                                     </p>
                                 ) : (
@@ -1044,7 +1044,7 @@ const HomePage = () => {
                                             <button
                                                 style={{
                                                     position: 'absolute', left: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                                                    width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
                                                     justifyContent: 'center', // <-- FIXED HERE
                                                     background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
                                                 }}
@@ -1091,7 +1091,7 @@ const HomePage = () => {
                                             <button
                                                 style={{
                                                     position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 34, height: 34, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                                                    width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
                                                     justifyContent: 'center', // <-- FIXED HERE
                                                     background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
                                                 }}

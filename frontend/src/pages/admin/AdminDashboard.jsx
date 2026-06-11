@@ -16,7 +16,7 @@ const StatCard = ({ icon, label, value, color, delay }) => (
                 <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
                 <p className="font-display font-bold text-2xl" style={{ color: 'var(--text-main)' }}>{value}</p>
             </div>
-            <div className="w-11 h-11 rounded-[7px]-[7px] flex items-center justify-center"
+            <div className="w-11 h-11 rounded-[7px] flex items-center justify-center"
                 style={{ background: `${color}15`, color }}>
                 {icon}
             </div>

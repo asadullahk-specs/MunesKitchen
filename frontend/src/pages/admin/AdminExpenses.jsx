@@ -146,7 +146,7 @@ const AdminExpenses = () => {
                         <button onClick={handleAdd} disabled={saving} className="btn-primary w-full justify-center">
                             {saving ? (
                                 <span className="flex items-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
+                                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                                     Adding...
                                 </span>
                             ) : (
@@ -187,7 +187,7 @@ const AdminExpenses = () => {
                             <div className="space-y-2 mt-3">
                                 {categoryStats.map((s, i) => (
                                     <div key={i} className="flex items-center gap-2 text-xs">
-                                        <div className="w-3 h-3 rounded-[7px]-[7px] shrink-0"
+                                        <div className="w-3 h-3 rounded-[7px] shrink-0"
                                             style={{ background: s.color || '#990000' }} />
                                         <span className="flex-1 truncate" style={{ color: 'var(--text-muted)' }}>
                                             {s.name}
@@ -219,7 +219,7 @@ const AdminExpenses = () => {
                         {loading ? (
                             <div className="p-4 space-y-3">
                                 {Array.from({ length: 4 }).map((_, i) => (
-                                    <div key={i} className="skeleton h-12 rounded-[7px]-[7px]" />
+                                    <div key={i} className="skeleton h-12 rounded-[7px]" />
                                 ))}
                             </div>
                         ) : expenses.length === 0 ? (
@@ -230,7 +230,7 @@ const AdminExpenses = () => {
                             <div key={exp.id || exp._id}
                                 className="flex items-center gap-3 p-3"
                                 style={{ borderBottom: '1px solid var(--border)' }}>
-                                <div className="w-8 h-8 rounded-[7px]-[7px] flex items-center justify-center shrink-0"
+                                <div className="w-8 h-8 rounded-[7px] flex items-center justify-center shrink-0"
                                     style={{ background: `${exp.category_color || '#990000'}20` }}>
                                     <FiDollarSign size={14} style={{ color: exp.category_color || '#990000' }} />
                                 </div>

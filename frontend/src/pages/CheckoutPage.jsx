@@ -209,7 +209,7 @@ const CheckoutPage = () => {
                                     { value: 'bank_transfer', label: 'Bank Transfer' },
                                 ].map((method) => (
                                     <button key={method.value} onClick={() => setPaymentMethod(method.value)}
-                                        className="p-4 sm:p-3 rounded-[7px]-[7px] text-center transition-all"
+                                        className="p-4 sm:p-3 rounded-[7px] text-center transition-all"
                                         style={{
                                             border: paymentMethod === method.value
                                                 ? '2px solid #16a34a' : '2px solid var(--border)',
@@ -272,7 +272,7 @@ const CheckoutPage = () => {
                                 className="btn-primary w-full justify-center mt-5">
                                 {loading ? (
                                     <span className="flex items-center gap-2">
-                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px]-[7px] animate-spin" />
+                                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                                         Placing Order...
                                     </span>
                                 ) : (

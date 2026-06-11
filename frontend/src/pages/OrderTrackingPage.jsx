@@ -176,7 +176,7 @@ const OrderTrackingPage = () => {
                     <div className="flex justify-end mb-4">
                         <button
                             onClick={downloadPDF}
-                            className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-[7px]-[7px] shadow-md"
+                            className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-[7px] shadow-md"
                         >
                             Download Receipt
                         </button>
@@ -212,7 +212,7 @@ const OrderTrackingPage = () => {
 
                         {/* Customer & Delivery Information Grid */}
                         <div
-                            className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm p-5 rounded-[7px]-[7px] border transition-all"
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm p-5 rounded-[7px] border transition-all"
                             style={{ background: 'var(--bg-input)', borderColor: 'var(--border)' }}
                         >
                             <div>
@@ -426,10 +426,10 @@ const OrderTrackingPage = () => {
                         <div style={{ marginTop: '30px' }}>
                             <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
                                 <div style={{ display: 'table-row', backgroundColor: '#0f172a', color: '#ffffff' }}>
-                                    <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', borderRadius: '4px 0 0 4px' }}>Item Description</div>
+                                    <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', borderRadius: '7px 0 0 7px' }}>Item Description</div>
                                     <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', textAlign: 'center' }}>Unit Price</div>
                                     <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', textAlign: 'center' }}>Quantity</div>
-                                    <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', textAlign: 'right', borderRadius: '0 4px 4px 0' }}>Total</div>
+                                    <div style={{ display: 'table-cell', padding: '10px 12px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', textAlign: 'right', borderRadius: '0 7px 7px 0' }}>Total</div>
                                 </div>
 
                                 {order.items?.map((item, index) => {

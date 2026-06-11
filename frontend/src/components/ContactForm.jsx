@@ -82,7 +82,7 @@ const ContactForm = () => {
                 
                 <button type="submit" disabled={loading} className="btn-primary justify-center py-3">
                     {loading
-                        ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-[7px] animate-spin" />
                         : <><FiSend /> Send Message</>
                     }
                 </button>
