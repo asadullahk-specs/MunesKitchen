@@ -59,9 +59,10 @@ const ProductCard = ({ product, className = 'h-full' }) => {
                             height: '100%',
                             objectFit: 'cover',
                             display: 'block',
+                            transform: 'scale(1.02)',
                             transition: 'transform 0.45s ease',
                         }}
-                        className="group-hover:scale-105"
+                        className="group-hover:scale-110"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">

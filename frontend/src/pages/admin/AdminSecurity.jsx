@@ -493,7 +493,7 @@ const AdminSecurity = () => {
                                         <div className="flex gap-2 shrink-0 self-end md:self-center">
                                             <button
                                                 onClick={() => startEdit(adminItem)}
-                                                className="p-2 transition-all hover:bg-amber-500/10 text-amber-500"
+                                                className="p-2 transition-all hover:bg-emerald-500/10 text-emerald-500"
                                                 style={{ borderRadius: '7px' }}
                                                 title="Edit Credentials"
                                             >

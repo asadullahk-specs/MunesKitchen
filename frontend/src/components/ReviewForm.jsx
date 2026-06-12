@@ -1,9 +1,26 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiStar, FiSend, FiImage, FiX } from 'react-icons/fi';
+import { FiStar, FiSend, FiImage, FiX, FiAlertCircle } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import { createReview } from '../api/reviews';
 import { getProducts } from '../api/products';
+
+const MAX_NAME_CHARS = 30;
+const MAX_MSG_WORDS = 25;
+
+const countWords = (text) => {
+    if (!text || !text.trim()) return 0;
+    return text.trim().split(/\s+/).length;
+};
+
+const FieldError = ({ message }) => (
+    message ? (
+        <p className="flex items-center gap-1 text-[11px] mt-1 font-medium" style={{ color: '#ef4444' }}>
+            <FiAlertCircle size={11} />
+            {message}
+        </p>
+    ) : null
+);
 
 const ReviewForm = ({ onSuccess, productId }) => {
     const [form, setForm] = useState({ customer_name: '', product_id: productId || '', rating: 0, message: '', instructions: '' });
@@ -12,6 +29,8 @@ const ReviewForm = ({ onSuccess, productId }) => {
     const [images, setImages] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [dbProducts, setDbProducts] = useState([]);
+    const [touched, setTouched] = useState({});
+    const [fieldErrors, setFieldErrors] = useState({});
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -31,6 +50,42 @@ const ReviewForm = ({ onSuccess, productId }) => {
         };
         fetchAllProds();
     }, []);
+
+    // Validate a single field and return error string or ''
+    const validateField = (name, value) => {
+        if (name === 'customer_name') {
+            if (!value.trim()) return 'Name is required.';
+            if (/\d/.test(value)) return 'Name cannot contain numbers.';
+            if (value.length > MAX_NAME_CHARS) return `Max ${MAX_NAME_CHARS} characters allowed.`;
+        }
+        if (name === 'message') {
+            if (!value.trim()) return 'Message is required.';
+            if (countWords(value) > MAX_MSG_WORDS) return `Max ${MAX_MSG_WORDS} words allowed.`;
+        }
+        return '';
+    };
+
+    const handleBlur = (name) => {
+        setTouched(prev => ({ ...prev, [name]: true }));
+        const error = validateField(name, form[name] || '');
+        setFieldErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    const handleNameChange = (val) => {
+        // Allow typing but enforce limit
+        const limited = val.slice(0, MAX_NAME_CHARS + 5); // allow a bit over for UX
+        setForm(prev => ({ ...prev, customer_name: limited }));
+        if (touched.customer_name) {
+            setFieldErrors(prev => ({ ...prev, customer_name: validateField('customer_name', limited) }));
+        }
+    };
+
+    const handleMessageChange = (val) => {
+        setForm(prev => ({ ...prev, message: val }));
+        if (touched.message) {
+            setFieldErrors(prev => ({ ...prev, message: validateField('message', val) }));
+        }
+    };
 
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
@@ -56,9 +111,15 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.customer_name.trim()) { toast.error('Please enter your name.'); return; }
+
+        // Validate all required fields on submit
+        const nameErr = validateField('customer_name', form.customer_name);
+        const msgErr = validateField('message', form.message);
+        setFieldErrors({ customer_name: nameErr, message: msgErr });
+        setTouched({ customer_name: true, message: true });
+
+        if (nameErr || msgErr) return;
         if (form.rating === 0) { toast.error('Please select a rating.'); return; }
-        if (!form.message.trim()) { toast.error('Please write a message.'); return; }
 
         setLoading(true);
         try {
@@ -111,6 +172,8 @@ const ReviewForm = ({ onSuccess, productId }) => {
             previews.forEach(url => URL.revokeObjectURL(url));
             setImages([]);
             setPreviews([]);
+            setTouched({});
+            setFieldErrors({});
         } catch (err) {
             console.error(err);
             toast.error('Failed to submit review. Please try again.');
@@ -118,6 +181,9 @@ const ReviewForm = ({ onSuccess, productId }) => {
             setLoading(false);
         }
     };
+
+    const wordCount = countWords(form.message);
+    const wordLimitReached = wordCount >= MAX_MSG_WORDS;
 
     return (
         <motion.div
@@ -135,13 +201,26 @@ const ReviewForm = ({ onSuccess, productId }) => {
                         <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
                             Your Name *
                         </label>
-                        <input
-                            type="text"
-                            className="input-field"
-                            placeholder="Enter your name"
-                            value={form.customer_name}
-                            onChange={(e) => setForm({ ...form, customer_name: e.target.value })}
-                        />
+                        <div className="relative">
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="Enter your name"
+                                value={form.customer_name}
+                                onChange={(e) => handleNameChange(e.target.value)}
+                                onBlur={() => handleBlur('customer_name')}
+                                style={touched.customer_name && fieldErrors.customer_name ? { borderColor: '#ef4444' } : {}}
+                            />
+                            {form.customer_name.length > 0 && (
+                                <span
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium"
+                                    style={{ color: form.customer_name.length > MAX_NAME_CHARS ? '#ef4444' : 'var(--text-muted)' }}
+                                >
+                                    {form.customer_name.length}/{MAX_NAME_CHARS}
+                                </span>
+                            )}
+                        </div>
+                        <FieldError message={touched.customer_name ? fieldErrors.customer_name : ''} />
                     </div>
                     {!productId && (
                         <div>
@@ -191,16 +270,27 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
                 {/* Message */}
                 <div>
-                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
-                        Message *
-                    </label>
+                    <div className="flex justify-between items-center mb-1.5">
+                        <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+                            Message *
+                        </label>
+                        <span
+                            className="text-[10px] font-medium"
+                            style={{ color: wordLimitReached ? '#ef4444' : 'var(--text-muted)' }}
+                        >
+                            {wordCount}/{MAX_MSG_WORDS} words
+                        </span>
+                    </div>
                     <textarea
                         className="input-field resize-none"
                         rows={3}
                         placeholder="Tell us about your experience..."
                         value={form.message}
-                        onChange={(e) => setForm({ ...form, message: e.target.value })}
+                        onChange={(e) => handleMessageChange(e.target.value)}
+                        onBlur={() => handleBlur('message')}
+                        style={touched.message && fieldErrors.message ? { borderColor: '#ef4444' } : {}}
                     />
+                    <FieldError message={touched.message ? fieldErrors.message : ''} />
                 </div>
 
                 {/* Image Upload */}

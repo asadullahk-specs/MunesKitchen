@@ -210,7 +210,7 @@ const AdminMenu = () => {
                                 <div className="flex flex-col gap-2 shrink-0">
                                     <button onClick={() => openEdit(p)}
                                         className="w-8 h-8 rounded-[7px] flex items-center justify-center"
-                                        style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
+                                        style={{ background: 'rgba(22,163,74,0.1)', color: '#16a34a' }}>
                                         <FiEdit2 size={13} />
                                     </button>
                                     <button onClick={() => handleDelete(p.id)}
@@ -294,7 +294,7 @@ const AdminMenu = () => {
                                             <div className="flex gap-2">
                                                 <button onClick={() => openEdit(p)}
                                                     className="w-8 h-8 rounded-[7px] flex items-center justify-center transition-all hover:scale-110"
-                                                    style={{ background: 'rgba(59,130,246,0.1)', color: '#3b82f6' }}>
+                                                    style={{ background: 'rgba(22,163,74,0.1)', color: '#16a34a' }}>
                                                     <FiEdit2 size={14} />
                                                 </button>
                                                 <button onClick={() => handleDelete(p.id)}

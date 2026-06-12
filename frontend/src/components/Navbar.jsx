@@ -223,11 +223,7 @@ const Navbar = () => {
                                 </motion.div>
                             </div>
 
-                            <div className="mt-auto p-5 border-t" style={{ borderColor: 'var(--border)' }}>
-                                <p className="text-xs text-center font-medium" style={{ color: 'var(--text-muted)' }}>
-                                    +92 303 2683689
-                                </p>
-                            </div>
+
                         </motion.div>
                     </>
                 )}

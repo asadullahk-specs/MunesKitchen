@@ -105,19 +105,11 @@ const OrderTrackingPage = () => {
         if (!element) return;
 
         try {
-            // Bring element to normal layout for the canvas snapshot
-            element.style.position = 'static';
-            element.style.left = 'auto';
-
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: '#ffffff'
             });
-
-            // Put the element back to its hidden view state
-            element.style.position = 'absolute';
-            element.style.left = '-9999px';
 
             const imgData = canvas.toDataURL('image/png');
 
@@ -323,13 +315,16 @@ const OrderTrackingPage = () => {
                     <div
                         ref={invoiceRef}
                         style={{
-                            position: 'absolute',
-                            left: '-9999px',
+                            position: 'fixed',
+                            top: '-99999px',
+                            left: '-99999px',
                             width: '700px',
                             padding: '45px',
                             backgroundColor: '#ffffff',
                             color: '#1e293b',
-                            fontFamily: "'Poppins', sans-serif"
+                            fontFamily: "'Poppins', sans-serif",
+                            visibility: 'hidden',
+                            pointerEvents: 'none',
                         }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #ef4444', paddingBottom: '20px' }}>

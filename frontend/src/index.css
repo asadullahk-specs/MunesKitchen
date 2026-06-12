@@ -893,3 +893,33 @@ textarea.input-field {
 .no-scrollbar::-webkit-scrollbar {
   display: none !important;
 }
+
+/* Reviews Smooth Marquee Scroll */
+.reviews-marquee-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  display: flex;
+  mask-image: linear-gradient(to right, transparent, white 8%, white 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, white 8%, white 92%, transparent);
+}
+
+.reviews-marquee-track {
+  display: flex;
+  gap: 1.5rem;
+  animation: marquee 35s linear infinite;
+  width: max-content;
+}
+
+.reviews-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

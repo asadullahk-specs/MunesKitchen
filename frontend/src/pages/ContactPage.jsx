@@ -1,48 +1,92 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
-import { FiPhoneCall, FiMail, FiMapPin, FiSend, FiClock, FiInfo } from 'react-icons/fi'
+import { FiPhoneCall, FiMail, FiMapPin, FiSend, FiClock, FiInfo, FiAlertCircle } from 'react-icons/fi'
 import API from '../api/axios'
+
+const MAX_NAME = 30
+const MAX_PHONE = 11
+
+const FieldError = ({ message }) =>
+    message ? (
+        <p className="flex items-center gap-1 text-[11px] mt-1 font-medium" style={{ color: '#ef4444' }}>
+            <FiAlertCircle size={11} />
+            {message}
+        </p>
+    ) : null
 
 const ContactPage = () => {
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [phone, setPhone] = useState('')
-    const [subject, setSubject] = useState('')
-    const [message, setMessage] = useState('')
+    const [form, setForm] = useState({ name: '', email: '', phone: '', subject: '', message: '' })
     const [loading, setLoading] = useState(false)
+    const [touched, setTouched] = useState({})
+    const [fieldErrors, setFieldErrors] = useState({})
+
+    const validateField = (name, value) => {
+        if (name === 'name') {
+            if (!value.trim()) return 'Name is required.'
+            if (/\d/.test(value)) return 'Name cannot contain numbers.'
+            if (value.length > MAX_NAME) return `Max ${MAX_NAME} characters allowed.`
+        }
+        if (name === 'phone') {
+            if (value && !/^\d+$/.test(value)) return 'Phone must contain digits only.'
+            if (value && value.length > MAX_PHONE) return `Phone cannot exceed ${MAX_PHONE} digits.`
+        }
+        if (name === 'message') {
+            if (!value.trim()) return 'Message is required.'
+        }
+        return ''
+    }
+
+    const handleBlur = (name) => {
+        setTouched(prev => ({ ...prev, [name]: true }))
+        setFieldErrors(prev => ({ ...prev, [name]: validateField(name, form[name] || '') }))
+    }
+
+    const handleChange = (name, value) => {
+        if (name === 'phone') {
+            const digits = value.replace(/\D/g, '').slice(0, MAX_PHONE + 2)
+            setForm(prev => ({ ...prev, [name]: digits }))
+            if (touched[name]) {
+                setFieldErrors(prev => ({ ...prev, [name]: validateField(name, digits) }))
+            }
+            return
+        }
+        setForm(prev => ({ ...prev, [name]: value }))
+        if (touched[name]) {
+            setFieldErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+        }
+    }
 
     const handleSubmit = async () => {
-        if (!name.trim()) {
-            toast.error('Name is required')
-            return
-        }
-        if (!message.trim()) {
-            toast.error('Message is required')
-            return
-        }
+        const nameErr = validateField('name', form.name)
+        const msgErr = validateField('message', form.message)
+        const phoneErr = validateField('phone', form.phone)
+        setFieldErrors({ name: nameErr, message: msgErr, phone: phoneErr })
+        setTouched({ name: true, message: true, phone: true })
+        if (nameErr || msgErr || phoneErr) return
+
         setLoading(true)
         try {
             await API.post('/contacts', {
-                name,
-                email: email.trim() || null,
-                phone: phone.trim() || null,
-                subject: subject.trim() || null,
-                message
+                name: form.name,
+                email: form.email.trim() || null,
+                phone: form.phone.trim() || null,
+                subject: form.subject.trim() || null,
+                message: form.message
             })
             toast.success('Message sent! We will contact you soon.')
-            setName('')
-            setEmail('')
-            setPhone('')
-            setSubject('')
-            setMessage('')
+            setForm({ name: '', email: '', phone: '', subject: '', message: '' })
+            setTouched({})
+            setFieldErrors({})
         } catch (err) {
             toast.error(err.response?.data?.message || 'Failed to send message')
         } finally {
             setLoading(false)
         }
     }
+
+    const msgWordCount = form.message.trim() ? form.message.trim().split(/\s+/).length : 0
 
     return (
         <motion.div
@@ -77,59 +121,100 @@ const ContactPage = () => {
 
                         <div className="space-y-4">
 
+                            {/* Name */}
                             <div>
                                 <label className="form-label">Full Name *</label>
-                                <input
-                                    className="form-input"
-                                    placeholder="Your full name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                />
+                                <div className="relative">
+                                    <input
+                                        className="form-input"
+                                        placeholder="Your full name"
+                                        value={form.name}
+                                        onChange={(e) => handleChange('name', e.target.value)}
+                                        onBlur={() => handleBlur('name')}
+                                        style={touched.name && fieldErrors.name ? { borderColor: '#ef4444' } : {}}
+                                    />
+                                    {form.name.length > 0 && (
+                                        <span
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium"
+                                            style={{ color: form.name.length > MAX_NAME ? '#ef4444' : 'var(--text-muted)' }}
+                                        >
+                                            {form.name.length}/{MAX_NAME}
+                                        </span>
+                                    )}
+                                </div>
+                                <FieldError message={touched.name ? fieldErrors.name : ''} />
                             </div>
 
+                            {/* Email */}
                             <div>
                                 <label className="form-label">Email Address</label>
                                 <input
                                     className="form-input"
                                     type="email"
                                     placeholder="yourname@example.com"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    value={form.email}
+                                    onChange={(e) => handleChange('email', e.target.value)}
                                 />
                             </div>
 
+                            {/* Phone */}
                             <div>
                                 <label className="form-label">Phone Number</label>
-                                <input
-                                    className="form-input"
-                                    placeholder="+92 3XX XXXXXXX"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                />
+                                <div className="relative">
+                                    <input
+                                        className="form-input"
+                                        placeholder="03XX XXXXXXX"
+                                        value={form.phone}
+                                        onChange={(e) => handleChange('phone', e.target.value)}
+                                        onBlur={() => handleBlur('phone')}
+                                        style={touched.phone && fieldErrors.phone ? { borderColor: '#ef4444' } : {}}
+                                    />
+                                    {form.phone.length > 0 && (
+                                        <span
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium"
+                                            style={{ color: form.phone.length > MAX_PHONE ? '#ef4444' : 'var(--text-muted)' }}
+                                        >
+                                            {form.phone.length}/{MAX_PHONE}
+                                        </span>
+                                    )}
+                                </div>
+                                <FieldError message={touched.phone ? fieldErrors.phone : ''} />
                             </div>
 
+                            {/* Subject */}
                             <div>
                                 <label className="form-label">Subject</label>
                                 <input
                                     className="form-input"
                                     placeholder="How can we help?"
-                                    value={subject}
-                                    onChange={(e) => setSubject(e.target.value)}
+                                    value={form.subject}
+                                    onChange={(e) => handleChange('subject', e.target.value)}
                                 />
                             </div>
 
+                            {/* Message */}
                             <div>
-                                <label className="form-label">Message *</label>
+                                <div className="flex justify-between items-center mb-1.5">
+                                    <label className="form-label" style={{ marginBottom: 0 }}>Message *</label>
+                                    <span
+                                        className="text-[10px] font-medium"
+                                        style={{ color: 'var(--text-muted)' }}
+                                    >
+                                        {msgWordCount} words
+                                    </span>
+                                </div>
                                 <textarea
                                     className="form-input"
                                     rows={4}
                                     style={{ resize: 'none' }}
                                     placeholder="Write your message..."
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
+                                    value={form.message}
+                                    onChange={(e) => handleChange('message', e.target.value)}
+                                    onBlur={() => handleBlur('message')}
                                     required
+                                    style={touched.message && fieldErrors.message ? { borderColor: '#ef4444', resize: 'none' } : { resize: 'none' }}
                                 />
+                                <FieldError message={touched.message ? fieldErrors.message : ''} />
                             </div>
 
                             <button onClick={handleSubmit} disabled={loading} className="btn-primary w-full justify-center py-3">

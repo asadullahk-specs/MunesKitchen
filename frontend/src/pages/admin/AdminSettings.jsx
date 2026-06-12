@@ -373,7 +373,7 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setDeliveryForm({ id: area.id || area._id, name: area.name, charge: (area.charge !== undefined && area.charge !== null) ? String(area.charge) : '0' })}
-                                                        className="p-2 rounded-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px] transition-all hover:bg-emerald-500/10 text-emerald-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
@@ -420,7 +420,7 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setFoodForm({ id: cat.id || cat._id, name: cat.name })}
-                                                        className="p-2 rounded-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px] transition-all hover:bg-emerald-500/10 text-emerald-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />
@@ -468,7 +468,7 @@ const AdminSettings = () => {
                                                 <div className="flex gap-2">
                                                     <button
                                                         onClick={() => setExpenseForm({ id: cat.id || cat._id, name: cat.name, color: cat.color || '#ef4444' })}
-                                                        className="p-2 rounded-[7px] transition-all hover:bg-amber-500/10 text-amber-500"
+                                                        className="p-2 rounded-[7px] transition-all hover:bg-emerald-500/10 text-emerald-500"
                                                         title="Edit"
                                                     >
                                                         <FiEdit2 size={14} />

@@ -281,7 +281,7 @@ const AdminOffers = () => {
                                         <button
                                             onClick={() => openEdit(offer)}
                                             className="w-8 h-8 rounded-[7px] flex items-center justify-center transition-all hover:scale-110"
-                                            style={{ background: 'rgba(217,119,6,0.1)', color: '#d97706' }}
+                                            style={{ background: 'rgba(5,150,105,0.1)', color: '#059669' }}
                                             title="Edit"
                                         >
                                             <FiEdit2 size={13} />

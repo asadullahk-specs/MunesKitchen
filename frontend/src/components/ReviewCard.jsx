@@ -3,6 +3,14 @@ import { FiStar, FiChevronLeft, FiChevronRight, FiImage } from 'react-icons/fi';
 
 const BACKEND = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+// Truncate message to max 25 words
+const truncateWords = (text, maxWords = 25) => {
+    if (!text) return '';
+    const words = text.trim().split(/\s+/);
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '…';
+};
+
 const ReviewCard = ({ review }) => {
     const userImages = (() => {
         try {
@@ -60,6 +68,8 @@ const ReviewCard = ({ review }) => {
 
     if (!review) return null;
 
+    const truncatedMessage = truncateWords(review.message || '', 25);
+
     return (
         <div
             className="flex flex-col w-full overflow-hidden"
@@ -68,6 +78,7 @@ const ReviewCard = ({ review }) => {
                 border: '1.5px solid var(--border)',
                 borderRadius: '7px',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
+                height: '100%',
             }}
         >
             {/* Image area — fixed height so all cards are consistent */}
@@ -129,16 +140,24 @@ const ReviewCard = ({ review }) => {
                     )}
                 </div>
             ) : (
-                /* No images — fixed height placeholder */
-                <div className="relative shrink-0 overflow-hidden flex items-center justify-center" style={{ height: '160px', background: 'var(--primary-glow)' }}>
-                    <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.3 }} />
+                /* No images — polished placeholder */
+                <div
+                    className="relative shrink-0 overflow-hidden flex flex-col items-center justify-center gap-2"
+                    style={{
+                        height: '160px',
+                        background: 'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-deep) 100%)',
+                        borderBottom: '1.5px solid var(--border)',
+                    }}
+                >
+                    <FiImage size={28} style={{ color: 'var(--primary)', opacity: 0.4 }} />
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', opacity: 0.6, letterSpacing: '0.04em' }}>No photo</span>
                 </div>
             )}
 
-            {/* Review content */}
-            <div className="px-3.5 py-3 flex flex-col flex-1 justify-between gap-2">
+            {/* Review content — fixed height so all cards are uniform */}
+            <div className="px-3.5 py-3 flex flex-col justify-between" style={{ height: '130px' }}>
                 <div>
-                    <div className="flex justify-between items-start gap-2 mb-2">
+                    <div className="flex justify-between items-start gap-2 mb-1.5">
                         <h3 className="font-bold text-sm text-[var(--text-main)] truncate" title={review.customer_name || 'Anonymous'}>
                             {review.customer_name || 'Anonymous'}
                         </h3>
@@ -150,13 +169,14 @@ const ReviewCard = ({ review }) => {
                     </div>
 
                     {(review.product_name || review.product_id?.name) && (
-                        <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-[7px] bg-[var(--primary-glow)] border border-[var(--border)] mb-2" style={{ color: 'var(--primary)', width: 'fit-content' }}>
+                        <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-[7px] bg-[var(--primary-glow)] border border-[var(--border)] mb-1.5" style={{ color: 'var(--primary)', width: 'fit-content' }}>
                             {review.product_name || review.product_id?.name}
                         </span>
                     )}
 
-                    <p className="text-xs italic leading-relaxed text-[var(--text-muted)] line-clamp-3">
-                        "{review.message || ''}"
+                    {/* Fixed height message area — always 3 lines */}
+                    <p className="text-xs italic leading-relaxed text-[var(--text-muted)]" style={{ overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                        "{truncatedMessage}"
                     </p>
                 </div>
 
