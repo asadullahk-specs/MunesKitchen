@@ -73,7 +73,7 @@ const AdminLogin = () => {
                         <input
                             className="form-input"
                             type="email"
-                            placeholder="e.g. asadullahk@admin1.muneskitchen"
+                            placeholder="Enter your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}

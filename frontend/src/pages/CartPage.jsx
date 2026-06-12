@@ -76,22 +76,21 @@ const CartPage = () => {
                                         initial={{ opacity: 0, x: -20 }}
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 20, height: 0 }}
-                                        // Change flex-row to flex-wrap on mobile, and add items-start
-                                        className="card p-4 flex flex-wrap items-center gap-4"
+                                        className="card p-3 sm:p-4 flex items-center justify-between gap-3 sm:gap-4"
                                     >
                                         <img
                                             src={imgUrl}
                                             alt={item.name}
-                                            className="w-16 h-16 rounded-[7px] object-cover shrink-0"
+                                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-[7px] object-cover shrink-0"
                                             onError={(e) => {
                                                 e.target.src = `https://placehold.co/100x100/6b7280/fff?text=Food`
                                             }}
                                         />
 
-                                        {/* Product Details Wrapper - add w-full to push controls to next line on mobile */}
-                                        <div className="flex-1 min-w-[150px]">
+                                        {/* Product Details Wrapper */}
+                                        <div className="flex-1 min-w-0">
                                             <h3
-                                                className="font-semibold text-sm whitespace-normal break-words" // Changed truncate to normal
+                                                className="font-semibold text-sm whitespace-normal break-words"
                                                 style={{ color: 'var(--text-main)' }}
                                             >
                                                 {item.name}
@@ -101,36 +100,34 @@ const CartPage = () => {
                                             </p>
                                         </div>
 
-                                        {/* Controls Wrapper */}
-                                        <div className="flex items-center gap-4 shrink-0 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-0 pt-3 sm:pt-0 mt-2 sm:mt-0">
-                                            <div className="flex items-center gap-2">
+                                        {/* Controls & Price Block (stacked vertically, aligned to the right) */}
+                                        <div className="flex flex-col items-end gap-1.5 shrink-0 ml-auto">
+                                            <p className="font-bold text-sm" style={{ color: 'var(--primary)' }}>
+                                                Rs. {(Number(item.price) * item.quantity).toLocaleString()}
+                                            </p>
+                                            <button
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="transition-colors text-[var(--text-muted)] hover:text-[var(--primary)]"
+                                            >
+                                                <FiTrash2 size={15} />
+                                            </button>
+                                            <div className="flex items-center gap-1.5 mt-0.5">
                                                 <button
                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                                     className="qty-btn"
+                                                    style={{ width: '28px', height: '28px' }}
                                                 >
-                                                    <FiMinus size={12} />
+                                                    <FiMinus size={10} />
                                                 </button>
-                                                <span className="w-8 text-center text-sm font-bold" style={{ color: 'var(--text-main)' }}>
+                                                <span className="w-6 text-center text-xs font-bold" style={{ color: 'var(--text-main)' }}>
                                                     {item.quantity}
                                                 </span>
                                                 <button
                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
                                                     className="qty-btn"
+                                                    style={{ width: '28px', height: '28px' }}
                                                 >
-                                                    <FiPlus size={12} />
-                                                </button>
-                                            </div>
-
-                                            <div className="text-right">
-                                                <p className="font-bold text-sm" style={{ color: 'var(--primary)' }}>
-                                                    Rs. {(Number(item.price) * item.quantity).toLocaleString()}
-                                                </p>
-                                                <button
-                                                    onClick={() => removeFromCart(item.id)}
-                                                    className="transition-colors mt-1"
-                                                    style={{ color: 'var(--text-muted)' }}
-                                                >
-                                                    <FiTrash2 size={15} />
+                                                    <FiPlus size={10} />
                                                 </button>
                                             </div>
                                         </div>

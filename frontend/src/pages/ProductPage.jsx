@@ -7,6 +7,7 @@ import { getReviews } from '../api/reviews';
 import { useCart } from '../context/CartContext';
 import ProductCard from '../components/ProductCard';
 import ReviewForm from '../components/ReviewForm';
+import ReviewCard from '../components/ReviewCard';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -36,6 +37,7 @@ const ProductPage = () => {
     const [exploreProducts, setExploreProducts] = useState([]);
     const relatedScrollRef = useRef(null);
     const exploreScrollRef = useRef(null);
+    const productReviewsScrollRef = useRef(null);
 
     useEffect(() => {
         if (!id) return;
@@ -427,28 +429,111 @@ const ProductPage = () => {
                                                 </div>
 
                                                 {/* Right: Reviews List */}
-                                                <div className="md:col-span-2 space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                                <div className="md:col-span-2">
                                                     {reviewsLoading ? (
                                                         <p className="text-center text-sm text-[var(--text-muted)]">Loading reviews...</p>
                                                     ) : reviews.length === 0 ? (
                                                         <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
                                                     ) : (
-                                                        reviews.map((rev) => (
-                                                            <div key={rev.id || rev._id} className="p-4 rounded-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
-                                                                <div className="flex justify-between items-center mb-2">
-                                                                    <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
-                                                                    <div className="flex text-amber-400">
-                                                                        {[...Array(5)].map((_, i) => (
-                                                                            <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
-                                                                        ))}
+                                                        <>
+                                                            {/* Desktop/Tablet View — vertical scrollable list */}
+                                                            <div className="hidden sm:block space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                                                {reviews.map((rev) => (
+                                                                    <div key={rev.id || rev._id} className="p-4 rounded-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
+                                                                        <div className="flex justify-between items-center mb-2">
+                                                                            <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
+                                                                            <div className="flex text-amber-400">
+                                                                                {[...Array(5)].map((_, i) => (
+                                                                                    <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                        <p className="text-xs text-[var(--text-muted)] mb-2">
+                                                                            {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
+                                                                        </p>
+                                                                        <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
                                                                     </div>
-                                                                </div>
-                                                                <p className="text-xs text-[var(--text-muted)] mb-2">
-                                                                    {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
-                                                                </p>
-                                                                <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
+                                                                ))}
                                                             </div>
-                                                        ))
+
+                                                            {/* Mobile View — horizontal scrollable row */}
+                                                            <div className="block sm:hidden relative w-full">
+                                                                {/* Left Arrow */}
+                                                                {reviews.length > 1 && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (productReviewsScrollRef.current) {
+                                                                                productReviewsScrollRef.current.scrollBy({ left: -296, behavior: 'smooth' });
+                                                                            }
+                                                                        }}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            left: '-8px',
+                                                                            top: '50%',
+                                                                            transform: 'translateY(-50%)',
+                                                                            zIndex: 10,
+                                                                            width: 32,
+                                                                            height: 32,
+                                                                            borderRadius: '7px',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            background: 'var(--bg-card)',
+                                                                            border: '1.5px solid var(--border)',
+                                                                            boxShadow: 'var(--shadow-sm)',
+                                                                            cursor: 'pointer',
+                                                                            color: 'var(--text-main)'
+                                                                        }}
+                                                                        aria-label="Scroll Left"
+                                                                    >
+                                                                        <FiChevronLeft size={16} />
+                                                                    </button>
+                                                                )}
+
+                                                                <div
+                                                                    ref={productReviewsScrollRef}
+                                                                    className="mobile-scroll-container px-4 -mx-4 pb-2"
+                                                                >
+                                                                    {reviews.map((rev) => (
+                                                                        <div key={rev.id || rev._id} className="mobile-scroll-item">
+                                                                            <ReviewCard review={rev} />
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+
+                                                                {/* Right Arrow */}
+                                                                {reviews.length > 1 && (
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            if (productReviewsScrollRef.current) {
+                                                                                productReviewsScrollRef.current.scrollBy({ left: 296, behavior: 'smooth' });
+                                                                            }
+                                                                        }}
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            right: '-8px',
+                                                                            top: '50%',
+                                                                            transform: 'translateY(-50%)',
+                                                                            zIndex: 10,
+                                                                            width: 32,
+                                                                            height: 32,
+                                                                            borderRadius: '7px',
+                                                                            display: 'flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            background: 'var(--bg-card)',
+                                                                            border: '1.5px solid var(--border)',
+                                                                            boxShadow: 'var(--shadow-sm)',
+                                                                            cursor: 'pointer',
+                                                                            color: 'var(--text-main)'
+                                                                        }}
+                                                                        aria-label="Scroll Right"
+                                                                    >
+                                                                        <FiChevronRight size={16} />
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        </>
                                                     )}
                                                 </div>
                                             </div>

@@ -78,10 +78,10 @@ const ContactPage = () => {
                         <div className="space-y-4">
 
                             <div>
-                                <label className="form-label">Your Name *</label>
+                                <label className="form-label">Full Name *</label>
                                 <input
                                     className="form-input"
-                                    placeholder="Enter your name"
+                                    placeholder="Your full name"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     required
@@ -113,7 +113,7 @@ const ContactPage = () => {
                                 <label className="form-label">Subject</label>
                                 <input
                                     className="form-input"
-                                    placeholder="How can we help you?"
+                                    placeholder="How can we help?"
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
                                 />
@@ -125,7 +125,7 @@ const ContactPage = () => {
                                     className="form-input"
                                     rows={4}
                                     style={{ resize: 'none' }}
-                                    placeholder="Type your message here..."
+                                    placeholder="Write your message..."
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     required

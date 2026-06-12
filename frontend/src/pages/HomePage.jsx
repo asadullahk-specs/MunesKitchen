@@ -11,133 +11,8 @@ import SkeletonCard from '../components/SkeletonCard';
 import ProductModal from '../components/ProductModal';
 import ReviewForm from '../components/ReviewForm';
 import ContactForm from '../components/ContactForm';
+import ReviewCard from '../components/ReviewCard';
 import { toast } from 'react-toastify';
-
-const BACKEND = import.meta.env.VITE_API_URL
-    ? import.meta.env.VITE_API_URL.replace('/api', '')
-    : 'http://localhost:5000';
-
-// ─── ReviewCard: single review with image display logic ──────────────────────
-const ReviewCard = ({ review }) => {
-    const userImages = (() => {
-        try {
-            if (!review.images) return [];
-            if (Array.isArray(review.images)) return review.images.filter(Boolean);
-            if (review.images === 'NULL' || review.images === '[]') return [];
-            const parsed = JSON.parse(review.images);
-            return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
-        } catch { return []; }
-    })();
-
-    const displayImages = (() => {
-        if (userImages.length > 0) return userImages;
-        const prodImg = review.product_image;
-        if (prodImg) {
-            const src = prodImg.startsWith('http')
-                ? prodImg
-                : `${BACKEND}/${prodImg.replace(/^\//, '')}`;
-            return [src];
-        }
-        return [];
-    })();
-
-    const [imgIdx, setImgIdx] = useState(0);
-
-    const prev = (e) => {
-        e.stopPropagation();
-        setImgIdx((i) => (i - 1 + displayImages.length) % displayImages.length);
-    };
-    const next = (e) => {
-        e.stopPropagation();
-        setImgIdx((i) => (i + 1) % displayImages.length);
-    };
-
-    if (!review) return null;
-
-    return (
-        <div
-            className="flex flex-col w-full overflow-hidden"
-            style={{
-                background: 'var(--bg-card)',
-                border: '1.5px solid var(--border)',
-                borderRadius: '7px',
-                boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
-            }}
-        >
-            {/* Image area — fixed height so all cards are consistent */}
-            {displayImages.length > 0 ? (
-                <div className="relative overflow-hidden shrink-0" style={{ height: '160px', background: 'var(--primary-glow)' }}>
-                    <img
-                        src={displayImages[imgIdx]}
-                        alt={`Review photo ${imgIdx + 1}`}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-
-                    {/* Arrow navigation — only when multiple images */}
-                    {displayImages.length > 1 && (
-                        <>
-                            <button className="review-img-arrow review-img-prev" onClick={prev} aria-label="Previous image">
-                                <FiChevronLeft size={14} />
-                            </button>
-                            <button className="review-img-arrow review-img-next" onClick={next} aria-label="Next image">
-                                <FiChevronRight size={14} />
-                            </button>
-
-                            {/* Dot indicators */}
-                            <div className="review-img-dots">
-                                {displayImages.map((_, i) => (
-                                    <button
-                                        key={i}
-                                        className={`review-img-dot${i === imgIdx ? ' active' : ''}`}
-                                        onClick={(e) => { e.stopPropagation(); setImgIdx(i); }}
-                                        aria-label={`Go to image ${i + 1}`}
-                                    />
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </div>
-            ) : (
-                /* No images — fixed height placeholder */
-                <div className="relative shrink-0 overflow-hidden flex items-center justify-center" style={{ height: '160px', background: 'var(--primary-glow)' }}>
-                    <FiImage size={32} style={{ color: 'var(--primary)', opacity: 0.3 }} />
-                </div>
-            )}
-
-            {/* Review content */}
-            <div className="px-3.5 py-3 flex flex-col flex-1 justify-between gap-2">
-                <div>
-                    <div className="flex justify-between items-start gap-2 mb-2">
-                        <h3 className="font-bold text-sm text-[var(--text-main)] truncate" title={review.customer_name || 'Anonymous'}>
-                            {review.customer_name || 'Anonymous'}
-                        </h3>
-                        <div className="flex text-amber-400 shrink-0">
-                            {[...Array(5)].map((_, i) => (
-                                <FiStar key={i} size={13} fill={i < (review.rating || 0) ? "currentColor" : "none"} stroke="currentColor" />
-                            ))}
-                        </div>
-                    </div>
-
-                    {(review.product_name || review.product_id?.name) && (
-                        <span className="inline-block text-[10px] font-bold px-1.5 py-0.5 rounded-[7px] bg-[var(--primary-glow)] border border-[var(--border)] mb-2" style={{ color: 'var(--primary)', width: 'fit-content' }}>
-                            {review.product_name || review.product_id?.name}
-                        </span>
-                    )}
-
-                    <p className="text-xs italic leading-relaxed text-[var(--text-muted)] line-clamp-3">
-                        "{review.message || ''}"
-                    </p>
-                </div>
-
-                {/* Date footer */}
-                <div className="text-[10px] text-right font-medium" style={{ color: 'var(--text-muted)', opacity: 0.8 }}>
-                    {new Date(review.created_at || review.createdAt || Date.now()).toLocaleDateString('en-GB')}
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const HomePage = () => {
     const [products, setProducts] = useState([]);
@@ -978,7 +853,7 @@ const HomePage = () => {
 
                     {/* FIX: Heading Group matching your Top Products Styles exactly */}
                     <div className="text-center mb-8">
-                        <h2 className="section-title mb-3 text-white uppercase" style={{ color: 'rgb(188, 156, 34)' }}>CUSTOMERS FEEDBACK</h2>
+                        <h2 className="section-title mb-3 text-white uppercase" style={{ color: 'rgb(188, 156, 34)' }}>TESTIMONIALS</h2>
                         <p className="section-subtitle text-gray-300" style={{ color: 'rgba(255, 255, 255, 0.58)' }}>See what people say about the products of Mune's Kitchen</p>
                     </div>
 
@@ -1038,73 +913,143 @@ const HomePage = () => {
                                         No reviews yet. Be the first to share your experience!
                                     </p>
                                 ) : (
-                                    <div className="w-full relative px-10 sm:px-12 flex items-center h-full">
-                                        {/* Left Navigation Arrow */}
-                                        {reviews.length > 1 && (
-                                            <button
-                                                style={{
-                                                    position: 'absolute', left: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
-                                                    justifyContent: 'center', // <-- FIXED HERE
-                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
-                                                }}
-                                                onClick={() => {
-                                                    setDirection(-1);
-                                                    setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
-                                                }}
-                                                aria-label="Previous review"
-                                            >
-                                                <FiChevronLeft size={18} />
-                                            </button>
-                                        )}
-
-                                        {/* Carousel Content Frame */}
-                                        <div className="w-full overflow-hidden flex items-center">
-                                            <AnimatePresence initial={false} custom={direction} mode="wait">
-                                                <motion.div
-                                                    key={activeIdx}
-                                                    custom={direction}
-                                                    variants={{
-                                                        enter: (dir) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
-                                                        center: { x: 0, opacity: 1 },
-                                                        exit: (dir) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 })
+                                    <>
+                                        {/* Desktop View — Carousel with Framer Motion */}
+                                        <div className="hidden sm:flex w-full relative px-10 sm:px-12 items-center h-full">
+                                            {/* Left Navigation Arrow */}
+                                            {reviews.length > 1 && (
+                                                <button
+                                                    style={{
+                                                        position: 'absolute', left: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                        width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
                                                     }}
-                                                    initial="enter"
-                                                    animate="center"
-                                                    exit="exit"
-                                                    transition={{
-                                                        x: { type: "spring", stiffness: 300, damping: 30 },
-                                                        opacity: { duration: 0.2 }
+                                                    onClick={() => {
+                                                        setDirection(-1);
+                                                        setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
                                                     }}
-                                                    drag="x"
-                                                    dragConstraints={{ left: 0, right: 0 }}
-                                                    dragElastic={0.6}
-                                                    className="w-full cursor-grab active:cursor-grabbing"
+                                                    aria-label="Previous review"
                                                 >
-                                                    <ReviewCard review={reviews[activeIdx]} />
-                                                </motion.div>
-                                            </AnimatePresence>
+                                                    <FiChevronLeft size={18} />
+                                                </button>
+                                            )}
+
+                                            {/* Carousel Content Frame */}
+                                            <div className="w-full overflow-hidden flex items-center">
+                                                <AnimatePresence initial={false} custom={direction} mode="wait">
+                                                    <motion.div
+                                                        key={activeIdx}
+                                                        custom={direction}
+                                                        variants={{
+                                                            enter: (dir) => ({ x: dir > 0 ? '100%' : '-100%', opacity: 0 }),
+                                                            center: { x: 0, opacity: 1 },
+                                                            exit: (dir) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 })
+                                                        }}
+                                                        initial="enter"
+                                                        animate="center"
+                                                        exit="exit"
+                                                        transition={{
+                                                            x: { type: "spring", stiffness: 300, damping: 30 },
+                                                            opacity: { duration: 0.2 }
+                                                        }}
+                                                        drag="x"
+                                                        dragConstraints={{ left: 0, right: 0 }}
+                                                        dragElastic={0.6}
+                                                        className="w-full cursor-grab active:cursor-grabbing"
+                                                    >
+                                                        <ReviewCard review={reviews[activeIdx]} />
+                                                    </motion.div>
+                                                </AnimatePresence>
+                                            </div>
+
+                                            {/* Right Navigation Arrow */}
+                                            {reviews.length > 1 && (
+                                                <button
+                                                    style={{
+                                                        position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
+                                                        width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
+                                                    }}
+                                                    onClick={() => {
+                                                        setDirection(1);
+                                                        setActiveIdx((prev) => (prev + 1) % reviews.length);
+                                                    }}
+                                                    aria-label="Next review"
+                                                >
+                                                    <FiChevronRight size={18} />
+                                                </button>
+                                            )}
                                         </div>
 
-                                        {/* Right Navigation Arrow */}
-                                        {reviews.length > 1 && (
-                                            <button
-                                                style={{
-                                                    position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)', zIndex: 10,
-                                                    width: 34, height: 34, borderRadius: '7px', display: 'flex', alignItems: 'center',
-                                                    justifyContent: 'center', // <-- FIXED HERE
-                                                    background: 'var(--bg-card)', border: '1.5px solid var(--border)', cursor: 'pointer', color: 'var(--text-main)'
-                                                }}
-                                                onClick={() => {
-                                                    setDirection(1);
-                                                    setActiveIdx((prev) => (prev + 1) % reviews.length);
-                                                }}
-                                                aria-label="Next review"
-                                            >
-                                                <FiChevronRight size={18} />
-                                            </button>
-                                        )}
-                                    </div>
+                                        {/* Mobile View — horizontal scroll container */}
+                                        <div className="flex sm:hidden w-full relative items-center">
+                                            {/* Left Arrow */}
+                                            {reviews.length > 1 && (
+                                                <button
+                                                    onClick={() => handleScrollRef(reviewsScrollRef, 'left')}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        left: '-8px',
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                        zIndex: 10,
+                                                        width: 32,
+                                                        height: 32,
+                                                        borderRadius: '7px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)',
+                                                        border: '1.5px solid var(--border)',
+                                                        boxShadow: 'var(--shadow-sm)',
+                                                        cursor: 'pointer',
+                                                        color: 'var(--text-main)'
+                                                    }}
+                                                    aria-label="Scroll Left"
+                                                >
+                                                    <FiChevronLeft size={16} />
+                                                </button>
+                                            )}
+
+                                            <div ref={reviewsScrollRef} className="mobile-scroll-container px-4 -mx-4 pb-2">
+                                                {reviews.map((review, i) => (
+                                                    <div key={review.id || i} className="mobile-scroll-item">
+                                                        <ReviewCard review={review} />
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Right Arrow */}
+                                            {reviews.length > 1 && (
+                                                <button
+                                                    onClick={() => handleScrollRef(reviewsScrollRef, 'right')}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        right: '-8px',
+                                                        top: '50%',
+                                                        transform: 'translateY(-50%)',
+                                                        zIndex: 10,
+                                                        width: 32,
+                                                        height: 32,
+                                                        borderRadius: '7px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        background: 'var(--bg-card)',
+                                                        border: '1.5px solid var(--border)',
+                                                        boxShadow: 'var(--shadow-sm)',
+                                                        cursor: 'pointer',
+                                                        color: 'var(--text-main)'
+                                                    }}
+                                                    aria-label="Scroll Right"
+                                                >
+                                                    <FiChevronRight size={16} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </div>
