@@ -22,9 +22,7 @@ const MenuPage = () => {
     const scrollRefs = useRef({});
 
     const filteredProductsList = products.filter(p =>
-        p.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (p.category?.name && p.category.name.toLowerCase().includes(searchQuery.toLowerCase()))
+        p.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     useEffect(() => {

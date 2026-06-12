@@ -27,6 +27,11 @@ const ProductPage = () => {
         setOpenAccordion(prev => (prev === tabId ? null : tabId));
     };
 
+    // Tabs active state for desktop (>768px)
+    const [activeTab, setActiveTab] = useState('description');
+    // Lightbox image state
+    const [activeLightboxImage, setActiveLightboxImage] = useState(null);
+
     // Reviews states
     const [reviews, setReviews] = useState([]);
     const [reviewStats, setReviewStats] = useState({ avgRating: 0, total: 0, breakdown: [] });
@@ -115,8 +120,253 @@ const ProductPage = () => {
         addToCart(product, qty);
     };
 
+    const renderDescriptionContent = () => (
+        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
+            <p className="whitespace-pre-line">
+                {product.long_description || product.description || 'No detailed description available.'}
+            </p>
+        </div>
+    );
 
+    const renderInfoContent = () => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 pt-4">
+            {[
+                {
+                    label: 'Serving Size',
+                    value: (product.serving_size !== undefined && product.serving_size !== null && product.serving_size !== '')
+                        ? `${product.serving_size} ${Number(product.serving_size) === 1 ? 'Person' : 'Persons'}`
+                        : null
+                },
+                {
+                    label: 'Spice Level',
+                    value: product.spice_level || null
+                },
+                {
+                    label: 'Weight',
+                    value: (product.weight !== undefined && product.weight !== null && product.weight !== '')
+                        ? `${product.weight} gm`
+                        : null
+                },
+                {
+                    label: 'Shelf Life',
+                    value: (product.shelf_life !== undefined && product.shelf_life !== null && product.shelf_life !== '')
+                        ? `${product.shelf_life} Days`
+                        : null
+                },
+                {
+                    label: 'Available As',
+                    value: product.available_as || null
+                },
+                {
+                    label: 'Cooking Charges',
+                    value: (product.cooking_charges !== undefined && product.cooking_charges !== null && product.cooking_charges !== '')
+                        ? `Rs. ${product.cooking_charges} per item`
+                        : null
+                },
+            ].map((item, idx) => (
+                <div key={idx} className="flex justify-between py-3 border-b border-[var(--border)] items-center">
+                    <span className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
+                    <span className="text-sm font-medium text-right max-w-[60%]" style={{ color: item.value ? 'var(--text-main)' : 'var(--text-muted)' }}>
+                        {item.value || '—'}
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
 
+    const renderReviewsContent = () => (
+        <div className="space-y-8 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Left: Ratings Breakdown */}
+                <div className="md:border-r border-[var(--border)] md:pr-8 flex flex-col justify-center">
+                    <div className="text-center mb-6">
+                        <span className="text-5xl font-black block" style={{ color: 'var(--text-main)' }}>
+                            {reviewStats.avgRating}
+                        </span>
+                        <div className="flex justify-center text-amber-400 my-2">
+                            {[...Array(5)].map((_, i) => (
+                                <FiStar key={i} size={18} fill={i < Math.round(reviewStats.avgRating) ? "currentColor" : "none"} />
+                            ))}
+                        </div>
+                        <span className="text-sm text-[var(--text-muted)] block">Based on {reviewStats.total} approved reviews</span>
+                    </div>
+
+                    {/* Stars Breakdown progress bars */}
+                    <div className="space-y-2.5">
+                        {reviewStats.breakdown.map((item) => {
+                            const percent = reviewStats.total > 0 ? (item.count / reviewStats.total) * 100 : 0;
+                            return (
+                                <div key={item.star} className="flex items-center gap-3">
+                                    <span className="text-xs font-semibold w-3 text-right">{item.star}</span>
+                                    <FiStar size={11} className="text-amber-400 fill-current" />
+                                    <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-[7px] overflow-hidden">
+                                        <div
+                                            className="h-full bg-amber-400 rounded-[7px]"
+                                            style={{ width: `${percent}%` }}
+                                        />
+                                    </div>
+                                    <span className="text-xs text-[var(--text-muted)] w-8 text-right">{item.count}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Right: Reviews List */}
+                <div className="md:col-span-2">
+                    {reviewsLoading ? (
+                        <p className="text-center text-sm text-[var(--text-muted)]">Loading reviews...</p>
+                    ) : reviews.length === 0 ? (
+                        <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
+                    ) : (
+                        <>
+                            {/* Desktop/Tablet View — vertical scrollable list */}
+                            <div className="hidden sm:block space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                {reviews.map((rev) => {
+                                    const userImages = (() => {
+                                        try {
+                                            if (!rev.images) return [];
+                                            if (Array.isArray(rev.images)) return rev.images.filter(Boolean);
+                                            if (rev.images === 'NULL' || rev.images === '[]') return [];
+                                            const parsed = JSON.parse(rev.images);
+                                            return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+                                        } catch { return []; }
+                                    })();
+
+                                    const displayImages = (() => {
+                                        if (userImages.length > 0) return userImages;
+                                        const prodImg = rev.product_image;
+                                        if (prodImg) {
+                                            const src = prodImg.startsWith('http')
+                                                ? prodImg
+                                                : `${BACKEND_URL.replace('/api', '')}/${prodImg.replace(/^\//, '')}`;
+                                            return [src];
+                                        }
+                                        return [];
+                                    })();
+
+                                    return (
+                                        <div key={rev.id || rev._id} className="p-4 rounded-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
+                                                <div className="flex text-amber-400">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-[var(--text-muted)] mb-2">
+                                                {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
+                                            </p>
+                                            <p className="text-sm italic mb-2" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
+                                            
+                                            {displayImages.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {displayImages.map((src, idx) => (
+                                                        <div key={idx} className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-[7px] overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] group cursor-zoom-in">
+                                                            <img
+                                                                src={src}
+                                                                alt={`Review image ${idx + 1}`}
+                                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                                                onClick={() => setActiveLightboxImage(src)}
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Mobile View — horizontal scrollable row */}
+                            <div className="block sm:hidden relative w-full">
+                                {/* Left Arrow */}
+                                {reviews.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (productReviewsScrollRef.current) {
+                                                productReviewsScrollRef.current.scrollBy({ left: -296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            left: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '7px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Left"
+                                    >
+                                        <FiChevronLeft size={16} />
+                                    </button>
+                                )}
+
+                                <div
+                                    ref={productReviewsScrollRef}
+                                    className="mobile-scroll-container px-4 -mx-4 pb-2"
+                                >
+                                    {reviews.map((rev) => (
+                                        <div key={rev.id || rev._id} className="mobile-scroll-item">
+                                            <ReviewCard review={rev} />
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Right Arrow */}
+                                {reviews.length > 1 && (
+                                    <button
+                                        onClick={() => {
+                                            if (productReviewsScrollRef.current) {
+                                                productReviewsScrollRef.current.scrollBy({ left: 296, behavior: 'smooth' });
+                                            }
+                                        }}
+                                        style={{
+                                            position: 'absolute',
+                                            right: '-8px',
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 10,
+                                            width: 32,
+                                            height: 32,
+                                            borderRadius: '7px',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            background: 'var(--bg-card)',
+                                            border: '1.5px solid var(--border)',
+                                            boxShadow: 'var(--shadow-sm)',
+                                            cursor: 'pointer',
+                                            color: 'var(--text-main)'
+                                        }}
+                                        aria-label="Scroll Right"
+                                    >
+                                        <FiChevronRight size={16} />
+                                    </button>
+                                )}
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
+            {/* Bottom: Review Submission Form */}
+            <div className="border-t border-[var(--border)] pt-8">
+                <ReviewForm productId={id} onSuccess={() => { }} />
+            </div>
+        </div>
+    );
 
     if (loading) {
         return (
@@ -251,8 +501,8 @@ const ProductPage = () => {
                         </div>
                     </motion.div>
                 </div>
-                {/* Collapsible Accordion Sections (Woodmart/Dinenos Style) */}
-                <div className="mb-16 space-y-4">
+                {/* Collapsible Accordion Sections (Woodmart/Dinenos Style) - Mobile view (<=768px) */}
+                <div className="mb-16 space-y-4 md:hidden">
                     {/* PANEL 1: DESCRIPTION */}
                     <div id="accordion-description" className="border border-[var(--border)] rounded-[7px] overflow-hidden bg-[var(--bg-card)] scroll-mt-24">
                         <button
@@ -279,11 +529,7 @@ const ProductPage = () => {
                                     className="overflow-hidden"
                                 >
                                     <div className="p-6 pt-0 border-t border-[var(--border)]">
-                                        <div className="prose max-w-none text-sm text-[var(--text-muted)] leading-relaxed pt-4">
-                                            <p className="whitespace-pre-line">
-                                                {product.long_description || product.description || 'No detailed description available.'}
-                                            </p>
-                                        </div>
+                                        {renderDescriptionContent()}
                                     </div>
                                 </motion.div>
                             )}
@@ -316,49 +562,7 @@ const ProductPage = () => {
                                     className="overflow-hidden"
                                 >
                                     <div className="p-6 pt-0 border-t border-[var(--border)]">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8 pt-4">
-                                            {[
-                                                {
-                                                    label: 'Serving Size',
-                                                    value: (product.serving_size !== undefined && product.serving_size !== null && product.serving_size !== '')
-                                                        ? `${product.serving_size} ${Number(product.serving_size) === 1 ? 'Person' : 'Persons'}`
-                                                        : null
-                                                },
-                                                {
-                                                    label: 'Spice Level',
-                                                    value: product.spice_level || null
-                                                },
-                                                {
-                                                    label: 'Weight',
-                                                    value: (product.weight !== undefined && product.weight !== null && product.weight !== '')
-                                                        ? `${product.weight} gm`
-                                                        : null
-                                                },
-                                                {
-                                                    label: 'Shelf Life',
-                                                    value: (product.shelf_life !== undefined && product.shelf_life !== null && product.shelf_life !== '')
-                                                        ? `${product.shelf_life} Days`
-                                                        : null
-                                                },
-                                                {
-                                                    label: 'Available As',
-                                                    value: product.available_as || null
-                                                },
-                                                {
-                                                    label: 'Cooking Charges',
-                                                    value: (product.cooking_charges !== undefined && product.cooking_charges !== null && product.cooking_charges !== '')
-                                                        ? `Rs. ${product.cooking_charges} per item`
-                                                        : null
-                                                },
-                                            ].map((item, idx) => (
-                                                <div key={idx} className="flex justify-between py-3 border-b border-[var(--border)] items-center">
-                                                    <span className="text-sm font-semibold text-[var(--text-muted)]">{item.label}</span>
-                                                    <span className="text-sm font-medium text-right max-w-[60%]" style={{ color: item.value ? 'var(--text-main)' : 'var(--text-muted)' }}>
-                                                        {item.value || '—'}
-                                                    </span>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        {renderInfoContent()}
                                     </div>
                                 </motion.div>
                             )}
@@ -391,161 +595,62 @@ const ProductPage = () => {
                                     className="overflow-hidden"
                                 >
                                     <div className="p-6 pt-0 border-t border-[var(--border)]">
-                                        <div className="space-y-8 pt-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                {/* Left: Ratings Breakdown */}
-                                                <div className="md:border-r border-[var(--border)] md:pr-8 flex flex-col justify-center">
-                                                    <div className="text-center mb-6">
-                                                        <span className="text-5xl font-black block" style={{ color: 'var(--text-main)' }}>
-                                                            {reviewStats.avgRating}
-                                                        </span>
-                                                        <div className="flex justify-center text-amber-400 my-2">
-                                                            {[...Array(5)].map((_, i) => (
-                                                                <FiStar key={i} size={18} fill={i < Math.round(reviewStats.avgRating) ? "currentColor" : "none"} />
-                                                            ))}
-                                                        </div>
-                                                        <span className="text-sm text-[var(--text-muted)] block">Based on {reviewStats.total} approved reviews</span>
-                                                    </div>
-
-                                                    {/* Stars Breakdown progress bars */}
-                                                    <div className="space-y-2.5">
-                                                        {reviewStats.breakdown.map((item) => {
-                                                            const percent = reviewStats.total > 0 ? (item.count / reviewStats.total) * 100 : 0;
-                                                            return (
-                                                                <div key={item.star} className="flex items-center gap-3">
-                                                                    <span className="text-xs font-semibold w-3 text-right">{item.star}</span>
-                                                                    <FiStar size={11} className="text-amber-400 fill-current" />
-                                                                    <div className="flex-1 h-2 bg-[var(--bg-deep)] rounded-[7px] overflow-hidden">
-                                                                        <div
-                                                                            className="h-full bg-amber-400 rounded-[7px]"
-                                                                            style={{ width: `${percent}%` }}
-                                                                        />
-                                                                    </div>
-                                                                    <span className="text-xs text-[var(--text-muted)] w-8 text-right">{item.count}</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-
-                                                {/* Right: Reviews List */}
-                                                <div className="md:col-span-2">
-                                                    {reviewsLoading ? (
-                                                        <p className="text-center text-sm text-[var(--text-muted)]">Loading reviews...</p>
-                                                    ) : reviews.length === 0 ? (
-                                                        <p className="text-center text-sm py-12 text-[var(--text-muted)] italic">No approved reviews yet for this item. Be the first to share your experience!</p>
-                                                    ) : (
-                                                        <>
-                                                            {/* Desktop/Tablet View — vertical scrollable list */}
-                                                            <div className="hidden sm:block space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                                                                {reviews.map((rev) => (
-                                                                    <div key={rev.id || rev._id} className="p-4 rounded-[7px] border border-[var(--border)] bg-[var(--bg-deep)]">
-                                                                        <div className="flex justify-between items-center mb-2">
-                                                                            <h4 className="font-bold text-sm" style={{ color: 'var(--text-main)' }}>{rev.customer_name}</h4>
-                                                                            <div className="flex text-amber-400">
-                                                                                {[...Array(5)].map((_, i) => (
-                                                                                    <FiStar key={i} size={12} fill={i < rev.rating ? "currentColor" : "none"} />
-                                                                                ))}
-                                                                            </div>
-                                                                        </div>
-                                                                        <p className="text-xs text-[var(--text-muted)] mb-2">
-                                                                            {new Date(rev.created_at || rev.createdAt).toLocaleDateString('en-GB')}
-                                                                        </p>
-                                                                        <p className="text-sm italic" style={{ color: 'var(--text-muted)' }}>"{rev.message}"</p>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-
-                                                            {/* Mobile View — horizontal scrollable row */}
-                                                            <div className="block sm:hidden relative w-full">
-                                                                {/* Left Arrow */}
-                                                                {reviews.length > 1 && (
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if (productReviewsScrollRef.current) {
-                                                                                productReviewsScrollRef.current.scrollBy({ left: -296, behavior: 'smooth' });
-                                                                            }
-                                                                        }}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            left: '-8px',
-                                                                            top: '50%',
-                                                                            transform: 'translateY(-50%)',
-                                                                            zIndex: 10,
-                                                                            width: 32,
-                                                                            height: 32,
-                                                                            borderRadius: '7px',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            background: 'var(--bg-card)',
-                                                                            border: '1.5px solid var(--border)',
-                                                                            boxShadow: 'var(--shadow-sm)',
-                                                                            cursor: 'pointer',
-                                                                            color: 'var(--text-main)'
-                                                                        }}
-                                                                        aria-label="Scroll Left"
-                                                                    >
-                                                                        <FiChevronLeft size={16} />
-                                                                    </button>
-                                                                )}
-
-                                                                <div
-                                                                    ref={productReviewsScrollRef}
-                                                                    className="mobile-scroll-container px-4 -mx-4 pb-2"
-                                                                >
-                                                                    {reviews.map((rev) => (
-                                                                        <div key={rev.id || rev._id} className="mobile-scroll-item">
-                                                                            <ReviewCard review={rev} />
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-
-                                                                {/* Right Arrow */}
-                                                                {reviews.length > 1 && (
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            if (productReviewsScrollRef.current) {
-                                                                                productReviewsScrollRef.current.scrollBy({ left: 296, behavior: 'smooth' });
-                                                                            }
-                                                                        }}
-                                                                        style={{
-                                                                            position: 'absolute',
-                                                                            right: '-8px',
-                                                                            top: '50%',
-                                                                            transform: 'translateY(-50%)',
-                                                                            zIndex: 10,
-                                                                            width: 32,
-                                                                            height: 32,
-                                                                            borderRadius: '7px',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center',
-                                                                            background: 'var(--bg-card)',
-                                                                            border: '1.5px solid var(--border)',
-                                                                            boxShadow: 'var(--shadow-sm)',
-                                                                            cursor: 'pointer',
-                                                                            color: 'var(--text-main)'
-                                                                        }}
-                                                                        aria-label="Scroll Right"
-                                                                    >
-                                                                        <FiChevronRight size={16} />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Bottom: Review Submission Form */}
-                                            <div className="border-t border-[var(--border)] pt-8">
-                                                <ReviewForm productId={id} onSuccess={() => { }} />
-                                            </div>
-                                        </div>
+                                        {renderReviewsContent()}
                                     </div>
                                 </motion.div>
                             )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Tab Navigation Sections - Desktop/Tablet view (>768px) */}
+                <div className="hidden md:block mb-16">
+                    {/* Tab Headers Row */}
+                    <div className="border-b border-[var(--border)] flex justify-start gap-10 mb-8 relative">
+                        {[
+                            { id: 'description', label: 'Description' },
+                            { id: 'info', label: 'Additional Information' },
+                            { id: 'reviews', label: `Reviews (${reviewStats.total})` }
+                        ].map((tab) => {
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`relative py-4 text-xs font-bold uppercase tracking-widest transition-colors duration-200 focus:outline-none ${
+                                        isActive
+                                            ? 'text-[var(--text-main)]'
+                                            : 'text-[var(--text-muted)] hover:text-[var(--text-main)]'
+                                    }`}
+                                    style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                                >
+                                    {isActive && (
+                                        <motion.div
+                                            layoutId="activeTabLine"
+                                            className="absolute -top-[1.5px] left-0 right-0 h-[3px] bg-[var(--primary)]"
+                                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                                        />
+                                    )}
+                                    {tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Tab Active Content Panel */}
+                    <div className="p-8 bg-[var(--bg-card)] rounded-[7px] border border-[var(--border)] shadow-sm min-h-[200px]">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeTab}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                {activeTab === 'description' && renderDescriptionContent()}
+                                {activeTab === 'info' && renderInfoContent()}
+                                {activeTab === 'reviews' && renderReviewsContent()}
+                            </motion.div>
                         </AnimatePresence>
                     </div>
                 </div>
@@ -739,6 +844,40 @@ const ProductPage = () => {
                     )}
                 </div>
             </div>
+
+            {/* Sleek Full-Screen Lightbox Modal for review images */}
+            <AnimatePresence>
+                {activeLightboxImage && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setActiveLightboxImage(null)}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 cursor-zoom-out"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-[7px] shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <img
+                                src={activeLightboxImage}
+                                alt="Review enlarged view"
+                                className="max-w-full max-h-[85vh] object-contain rounded-[7px]"
+                            />
+                            <button
+                                onClick={() => setActiveLightboxImage(null)}
+                                className="absolute top-4 right-4 text-white bg-black/50 hover:bg-black/80 w-10 h-10 rounded-[7px] flex items-center justify-center transition-colors border border-white/10"
+                                aria-label="Close lightbox"
+                            >
+                                <FiPlus className="rotate-45" size={24} />
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
