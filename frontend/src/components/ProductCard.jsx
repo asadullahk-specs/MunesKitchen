@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiShoppingCart, FiEye, FiImage, FiPlus, FiMinus } from 'react-icons/fi';
@@ -6,11 +6,18 @@ import { useCart } from '../context/CartContext';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, className = 'h-full' }) => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [imgError, setImgError] = useState(false);
     const [qty, setQty] = useState(1);
+    const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const imageUrl = product.image && !imgError
         ? product.image.startsWith('/uploads')
@@ -27,14 +34,14 @@ const ProductCard = ({ product }) => {
 
     return (
         <motion.div
-            className="group relative overflow-hidden cursor-pointer flex flex-col h-full w-full"
+            className={`group relative overflow-hidden cursor-pointer flex flex-col w-full ${className}`}
             style={{
                 background: 'var(--bg-card)',
                 border: '1.5px solid var(--border)',
                 borderRadius: '7px',
                 boxShadow: '0 2px 12px rgba(0,0,0,0.05)',
             }}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: isMobile ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.35 }}

@@ -455,7 +455,7 @@ const HomePage = () => {
                                             See all <FiArrowRight size={12} />
                                         </Link>
                                     </div>
-                                    <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
+                                    <ProductCard product={catProduct} onViewDetails={setSelectedProduct} className="flex-1" />
                                 </motion.div>
                             );
                         })}
@@ -517,7 +517,7 @@ const HomePage = () => {
                                                         See all <FiArrowRight size={10} />
                                                     </Link>
                                                 </div>
-                                                <ProductCard product={catProduct} onViewDetails={setSelectedProduct} />
+                                                <ProductCard product={catProduct} onViewDetails={setSelectedProduct} className="flex-1" />
                                             </div>
                                         );
                                     })}
