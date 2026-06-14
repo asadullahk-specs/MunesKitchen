@@ -5,13 +5,8 @@ import { toast } from 'react-toastify';
 import { createReview } from '../api/reviews';
 import { getProducts } from '../api/products';
 
-const MAX_NAME_CHARS = 30;
-const MAX_MSG_WORDS = 25;
-
-const countWords = (text) => {
-    if (!text || !text.trim()) return 0;
-    return text.trim().split(/\s+/).length;
-};
+const MAX_NAME_CHARS = 25;
+const MAX_MSG_CHARS = 50;
 
 const FieldError = ({ message }) => (
     message ? (
@@ -31,6 +26,8 @@ const ReviewForm = ({ onSuccess, productId }) => {
     const [dbProducts, setDbProducts] = useState([]);
     const [touched, setTouched] = useState({});
     const [fieldErrors, setFieldErrors] = useState({});
+    const [focusedField, setFocusedField] = useState(null);
+    const [hasTyped, setHasTyped] = useState({});
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -51,7 +48,6 @@ const ReviewForm = ({ onSuccess, productId }) => {
         fetchAllProds();
     }, []);
 
-    // Validate a single field and return error string or ''
     const validateField = (name, value) => {
         if (name === 'customer_name') {
             if (!value.trim()) return 'Name is required.';
@@ -60,30 +56,37 @@ const ReviewForm = ({ onSuccess, productId }) => {
         }
         if (name === 'message') {
             if (!value.trim()) return 'Message is required.';
-            if (countWords(value) > MAX_MSG_WORDS) return `Max ${MAX_MSG_WORDS} words allowed.`;
+            if (value.length > MAX_MSG_CHARS) return `Max ${MAX_MSG_CHARS} characters allowed.`;
         }
         return '';
     };
 
     const handleBlur = (name) => {
-        setTouched(prev => ({ ...prev, [name]: true }));
-        const error = validateField(name, form[name] || '');
-        setFieldErrors(prev => ({ ...prev, [name]: error }));
+        setFocusedField(null);
+        // Only validate on blur if the user actually typed something in this field
+        if (hasTyped[name]) {
+            setTouched(prev => ({ ...prev, [name]: true }));
+            const error = validateField(name, form[name] || '');
+            setFieldErrors(prev => ({ ...prev, [name]: error }));
+        }
     };
 
     const handleNameChange = (val) => {
-        // Allow typing but enforce limit
-        const limited = val.slice(0, MAX_NAME_CHARS + 5); // allow a bit over for UX
+        const noDigits = val.replace(/\d/g, '');
+        const limited = noDigits.slice(0, MAX_NAME_CHARS);
         setForm(prev => ({ ...prev, customer_name: limited }));
+        setHasTyped(prev => ({ ...prev, customer_name: true }));
         if (touched.customer_name) {
             setFieldErrors(prev => ({ ...prev, customer_name: validateField('customer_name', limited) }));
         }
     };
 
     const handleMessageChange = (val) => {
-        setForm(prev => ({ ...prev, message: val }));
+        const limited = val.slice(0, MAX_MSG_CHARS);
+        setForm(prev => ({ ...prev, message: limited }));
+        setHasTyped(prev => ({ ...prev, message: true }));
         if (touched.message) {
-            setFieldErrors(prev => ({ ...prev, message: validateField('message', val) }));
+            setFieldErrors(prev => ({ ...prev, message: validateField('message', limited) }));
         }
     };
 
@@ -112,18 +115,20 @@ const ReviewForm = ({ onSuccess, productId }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validate all required fields on submit
         const nameErr = validateField('customer_name', form.customer_name);
         const msgErr = validateField('message', form.message);
         setFieldErrors({ customer_name: nameErr, message: msgErr });
         setTouched({ customer_name: true, message: true });
 
-        if (nameErr || msgErr) return;
+        // If completely empty, show generic fill message; otherwise specific error
+        const isCompletelyEmpty = !form.customer_name.trim() && !form.message.trim() && form.rating === 0;
+        if (isCompletelyEmpty) { toast.error('Please fill the form.'); return; }
+        if (nameErr) { toast.error(nameErr); return; }
+        if (msgErr) { toast.error(msgErr); return; }
         if (form.rating === 0) { toast.error('Please select a rating.'); return; }
 
         setLoading(true);
         try {
-            // Compress images to max 400px and 0.45 JPEG quality to stay under Vercel's 4.5MB body limit
             const compressImage = (file) => new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -182,8 +187,10 @@ const ReviewForm = ({ onSuccess, productId }) => {
         }
     };
 
-    const wordCount = countWords(form.message);
-    const wordLimitReached = wordCount >= MAX_MSG_WORDS;
+    const charCount = form.message.length;
+    const charLimitReached = charCount >= MAX_MSG_CHARS;
+    const showNameCounter = focusedField === 'customer_name' || form.customer_name.length > 0;
+    const showMsgCounter = focusedField === 'message' || form.message.length > 0;
 
     return (
         <motion.div
@@ -198,28 +205,29 @@ const ReviewForm = ({ onSuccess, productId }) => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className={productId ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
                     <div>
-                        <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
-                            Your Name *
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                className="input-field"
-                                placeholder="Enter your name"
-                                value={form.customer_name}
-                                onChange={(e) => handleNameChange(e.target.value)}
-                                onBlur={() => handleBlur('customer_name')}
-                                style={touched.customer_name && fieldErrors.customer_name ? { borderColor: '#ef4444' } : {}}
-                            />
-                            {form.customer_name.length > 0 && (
+                        <div className="flex justify-between items-center mb-1.5">
+                            <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+                                Your Name *
+                            </label>
+                            {showNameCounter && (
                                 <span
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium"
-                                    style={{ color: form.customer_name.length > MAX_NAME_CHARS ? '#ef4444' : 'var(--text-muted)' }}
+                                    className="text-[10px] font-medium"
+                                    style={{ color: form.customer_name.length >= MAX_NAME_CHARS ? '#ef4444' : 'var(--text-muted)' }}
                                 >
                                     {form.customer_name.length}/{MAX_NAME_CHARS}
                                 </span>
                             )}
                         </div>
+                        <input
+                            type="text"
+                            className="input-field"
+                            placeholder="Enter your name"
+                            value={form.customer_name}
+                            onChange={(e) => handleNameChange(e.target.value)}
+                            onFocus={() => setFocusedField('customer_name')}
+                            onBlur={() => handleBlur('customer_name')}
+                            style={touched.customer_name && fieldErrors.customer_name ? { borderColor: '#ef4444' } : {}}
+                        />
                         <FieldError message={touched.customer_name ? fieldErrors.customer_name : ''} />
                     </div>
                     {!productId && (
@@ -274,12 +282,14 @@ const ReviewForm = ({ onSuccess, productId }) => {
                         <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                             Message *
                         </label>
-                        <span
-                            className="text-[10px] font-medium"
-                            style={{ color: wordLimitReached ? '#ef4444' : 'var(--text-muted)' }}
-                        >
-                            {wordCount}/{MAX_MSG_WORDS} words
-                        </span>
+                        {showMsgCounter && (
+                            <span
+                                className="text-[10px] font-medium"
+                                style={{ color: charLimitReached ? '#ef4444' : 'var(--text-muted)' }}
+                            >
+                                {charCount}/{MAX_MSG_CHARS}
+                            </span>
+                        )}
                     </div>
                     <textarea
                         className="input-field resize-none"
@@ -287,6 +297,7 @@ const ReviewForm = ({ onSuccess, productId }) => {
                         placeholder="Tell us about your experience..."
                         value={form.message}
                         onChange={(e) => handleMessageChange(e.target.value)}
+                        onFocus={() => setFocusedField('message')}
                         onBlur={() => handleBlur('message')}
                         style={touched.message && fieldErrors.message ? { borderColor: '#ef4444' } : {}}
                     />

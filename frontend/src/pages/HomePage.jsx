@@ -50,6 +50,28 @@ const HomePage = () => {
     const [mobileCenterOffset, setMobileCenterOffset] = useState(30);
     const [reviewNoAnim, setReviewNoAnim] = useState(false);
 
+    const touchStartX = useRef(0);
+    const touchEndX = useRef(0);
+
+    const handleTouchStart = (e) => {
+        touchStartX.current = e.targetTouches[0].clientX;
+        touchEndX.current = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchMove = (e) => {
+        touchEndX.current = e.targetTouches[0].clientX;
+    };
+
+    const handleTouchEnd = () => {
+        if (reviews.length <= 1) return;
+        const diff = touchStartX.current - touchEndX.current;
+        if (diff > 50) {
+            setActiveIdx((prev) => prev + 1);
+        } else if (diff < -50) {
+            setActiveIdx((prev) => prev === 0 ? reviews.length - 1 : prev - 1);
+        }
+    };
+
     const handleScrollRef = (ref, dir) => {
         if (ref.current) {
             const scrollAmount = dir === 'left' ? -296 : 296;
@@ -216,7 +238,7 @@ const HomePage = () => {
                                 style={{ color: '#BC9C22' }}
                             >
                                 <FiClock size={10} className="inline mr-1.5 animate-pulse" style={{ verticalAlign: 'middle' }} />
-                                Order at least 3 hours in advance
+                                Order at least 3 hours in advance for frozen treats
                             </span>
                         </motion.div>
 
@@ -1051,24 +1073,36 @@ const HomePage = () => {
                                     )}
 
                                     {/* Track — overflow-hidden only here so clipping is clean */}
-                                    <div ref={mobileReviewTrackRef} className="w-full h-full overflow-hidden">
+                                    <div
+                                        ref={mobileReviewTrackRef}
+                                        className="w-full h-full overflow-hidden"
+                                        onTouchStart={handleTouchStart}
+                                        onTouchMove={handleTouchMove}
+                                        onTouchEnd={handleTouchEnd}
+                                    >
                                         <div
                                             className={reviewNoAnim ? "flex gap-4 items-center h-full" : "flex gap-4 items-center h-full transition-transform duration-700 ease-in-out"}
                                             style={{
                                                 transform: `translateX(${- (activeIdx * mobileReviewStepPx - mobileCenterOffset)}px)`,
                                             }}
                                         >
-                                            {[...reviews, ...reviews].map((rev, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    style={{
-                                                        width: '80%',
-                                                        flexShrink: 0,
-                                                    }}
-                                                >
-                                                    <ReviewCard review={rev} />
-                                                </div>
-                                            ))}
+                                            {[...reviews, ...reviews].map((rev, idx) => {
+                                                const isActive = idx === activeIdx;
+                                                return (
+                                                    <div
+                                                        key={idx}
+                                                        style={{
+                                                            width: '80%',
+                                                            flexShrink: 0,
+                                                            opacity: isActive ? 1 : 0.4,
+                                                            transform: isActive ? 'scale(1)' : 'scale(0.9)',
+                                                            transition: 'all 0.4s ease-in-out',
+                                                        }}
+                                                    >
+                                                        <ReviewCard review={rev} />
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     </div>
 
@@ -1107,7 +1141,7 @@ const HomePage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
                         {/* 4.7 Numeric Rating Summary Card */}
                         <div className="card p-6 flex flex-col items-center justify-center text-center rounded-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
-                            <div className="font-display text-5xl font-bold mb-2" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                            <div className="font-display text-5xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
                                 {Number(reviewStats.avgRating).toFixed(1)}
                             </div>
                             <div className="flex gap-1 mb-2">

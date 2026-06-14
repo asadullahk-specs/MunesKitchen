@@ -58,9 +58,6 @@ const Navbar = () => {
                 <div className="h-full flex items-center justify-between px-5 sm:px-7">
 
                     <Link to="/" className="flex items-center gap-3 group flex-nowrap flex-shrink-0">
-                        {/* <div className="w-9 h-9 rounded-[7px] bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
-                            <span className="text-white font-bold text-base">M</span>
-                        </div> */}
                         <div className="w-12 h-12 flex-shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform">
                             <img
                                 src="/logo.png"
@@ -80,7 +77,7 @@ const Navbar = () => {
                             <Link
                                 key={link.to}
                                 to={link.to}
-                                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })} // FORCE RESET HERE
+                                onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                                 className="text-sm font-medium transition-all relative group"
                                 style={{
                                     color: isActive(link.to) ? 'var(--primary)' : 'var(--text-muted)',
@@ -101,7 +98,13 @@ const Navbar = () => {
                         >
                             {isDark ? <FiSun size={17} className="text-yellow-400" /> : <FiMoon size={17} />}
                         </button>
-                        <Link to="/cart" className="relative w-9 h-9 rounded-[7px] flex items-center justify-center transition-all" style={{ background: 'transparent' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                        <Link
+                            to="/cart"
+                            className="relative w-9 h-9 rounded-[7px] flex items-center justify-center transition-all"
+                            style={{ background: 'transparent' }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'var(--primary-glow)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
                             <FiShoppingCart size={18} style={{ color: 'var(--text-main)' }} />
                             {cartCount > 0 && (
                                 <motion.span
@@ -164,7 +167,6 @@ const Navbar = () => {
                                 </button>
                             </div>
 
-                            {/* UPDATED STATE IN NAVBAR.JSX */}
                             <div className="flex flex-col gap-1 p-4">
                                 {navLinks.map((link, i) => (
                                     <motion.div
@@ -177,8 +179,8 @@ const Navbar = () => {
                                         <Link
                                             to={link.to}
                                             onClick={() => {
-                                                setIsOpen(false); // Closes the mobile layout menu
-                                                window.scrollTo({ top: 0, behavior: 'instant' }); // Snaps to top instantly
+                                                setIsOpen(false);
+                                                window.scrollTo({ top: 0, behavior: 'instant' });
                                             }}
                                             className="block py-3 px-4 rounded-[7px] text-sm font-medium transition-all"
                                             style={{
@@ -222,7 +224,6 @@ const Navbar = () => {
                                     </Link>
                                 </motion.div>
                             </div>
-
 
                         </motion.div>
                     </>

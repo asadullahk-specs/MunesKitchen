@@ -315,15 +315,14 @@ const OrderTrackingPage = () => {
                     <div
                         ref={invoiceRef}
                         style={{
-                            position: 'fixed',
-                            top: '-99999px',
-                            left: '-99999px',
+                            position: 'absolute',
+                            left: '-9999px',
+                            top: '0',
                             width: '700px',
                             padding: '45px',
                             backgroundColor: '#ffffff',
                             color: '#1e293b',
                             fontFamily: "'Poppins', sans-serif",
-                            visibility: 'hidden',
                             pointerEvents: 'none',
                         }}
                     >

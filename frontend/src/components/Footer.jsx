@@ -31,8 +31,7 @@ const Footer = () => {
                             </div>
                         </div>
                         <p className="text-sm leading-relaxed mb-3" style={{ color: 'var(--text-muted)' }}>
-                            Premium frozen foods made with fresh ingredients and secret spices.
-                            Taste the mystery, savor the excellence.
+                            For orders, inquiries, and more information, connect with us using the links below.
                         </p>
                         <div className="flex gap-3">
                             {[
@@ -136,9 +135,9 @@ const Footer = () => {
                     <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
                         © {currentYear} Mune's Kitchen. All rights reserved.
                     </p>
-                    <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
+                    {/* <p className="text-sm" style={{ color: 'var(--text-soft)' }}>
                         Creation & Design Credits: Sameer Khan & Asadullah Khan
-                    </p>
+                    </p> */}
                 </div>
             </div>
         </footer>

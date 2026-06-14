@@ -5,8 +5,13 @@ import { FiShoppingBag, FiMapPin, FiAlertCircle } from 'react-icons/fi'
 import API from '../api/axios'
 import { useCart } from '../context/CartContext'
 
-const MAX_NAME = 30;
-const MAX_PHONE = 11;
+const MAX_NAME = 25
+const MAX_PHONE_03 = 11
+const MAX_PHONE_92 = 13
+const MAX_ADDRESS_WORDS = 100
+const MAX_EMAIL = 15
+
+const countWords = (text) => text.trim() === '' ? 0 : text.trim().split(/\s+/).length
 
 const FieldError = ({ message }) =>
     message ? (
@@ -14,7 +19,21 @@ const FieldError = ({ message }) =>
             <FiAlertCircle size={11} />
             {message}
         </p>
-    ) : null;
+    ) : null
+
+const normalizePhone = (val) => val.replace(/[\s+]/g, '')
+
+const validatePhone = (value) => {
+    if (!value.trim()) return 'Phone number is required.'
+    if (value.startsWith('03')) {
+        if (value.length !== MAX_PHONE_03) return `Phone starting with 03 must be exactly ${MAX_PHONE_03} digits.`
+    } else if (value.startsWith('92')) {
+        if (value.length !== MAX_PHONE_92) return `Phone starting with 92 must be exactly ${MAX_PHONE_92} digits.`
+    } else {
+        return 'Phone must start with 03 or 92.'
+    }
+    return ''
+}
 
 const CheckoutPage = () => {
     const { cart, cartSubtotal, clearCart } = useCart()
@@ -36,63 +55,83 @@ const CheckoutPage = () => {
 
     const [touched, setTouched] = useState({})
     const [fieldErrors, setFieldErrors] = useState({})
+    const [focusedField, setFocusedField] = useState(null)
+    const [hasTyped, setHasTyped] = useState({})
 
     const validateField = (name, value) => {
         if (name === 'fullName') {
-            if (!value.trim()) return 'Full name is required.';
-            if (/\d/.test(value)) return 'Name cannot contain numbers.';
-            if (value.length > MAX_NAME) return `Max ${MAX_NAME} characters allowed.`;
+            if (!value.trim()) return 'Full name is required.'
+            if (/\d/.test(value)) return 'Name cannot contain numbers.'
+            if (value.length > MAX_NAME) return `Max ${MAX_NAME} characters allowed.`
         }
         if (name === 'phone') {
-            if (!value.trim()) return 'Phone number is required.';
-            if (!/^\d+$/.test(value)) return 'Phone must contain digits only.';
-            if (value.length !== MAX_PHONE) return `Phone must be exactly ${MAX_PHONE} digits.`;
+            return validatePhone(value)
+        }
+        if (name === 'email') {
+            if (value) {
+                if (value.length > MAX_EMAIL) return `Max ${MAX_EMAIL} characters allowed.`
+                if (!value.includes('@')) return 'Email must contain @.'
+            }
         }
         if (name === 'address') {
-            if (!value.trim()) return 'Address is required.';
+            if (!value.trim()) return 'Address is required.'
+            if (countWords(value) > MAX_ADDRESS_WORDS) return `Address max ${MAX_ADDRESS_WORDS} words.`
         }
-        return '';
-    };
+        return ''
+    }
 
     const handleBlur = (name) => {
-        setTouched(prev => ({ ...prev, [name]: true }));
-        const value = name === 'fullName' ? fullName : name === 'phone' ? phone : address;
-        setFieldErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
-    };
+        setFocusedField(null)
+        if (hasTyped[name]) {
+            setTouched(prev => ({ ...prev, [name]: true }))
+            const value = name === 'fullName' ? fullName : name === 'phone' ? phone : name === 'email' ? email : address
+            setFieldErrors(prev => ({ ...prev, [name]: validateField(name, value) }))
+        }
+    }
 
     const handleNameChange = (val) => {
-        setFullName(val);
-        if (touched.fullName) {
-            setFieldErrors(prev => ({ ...prev, fullName: validateField('fullName', val) }));
-        }
-    };
+        const noDigits = val.replace(/\d/g, '')
+        const limited = noDigits.slice(0, MAX_NAME)
+        setFullName(limited)
+        setHasTyped(prev => ({ ...prev, fullName: true }))
+        if (touched.fullName) setFieldErrors(prev => ({ ...prev, fullName: validateField('fullName', limited) }))
+    }
 
     const handlePhoneChange = (val) => {
-        const digits = val.replace(/\D/g, '').slice(0, MAX_PHONE);
-        setPhone(digits);
-        if (touched.phone) {
-            setFieldErrors(prev => ({ ...prev, phone: validateField('phone', digits) }));
-        }
-    };
+        const clean = normalizePhone(val)
+        const digits = clean.replace(/\D/g, '')
+        const maxLen = digits.startsWith('92') ? MAX_PHONE_92 : MAX_PHONE_03
+        const limited = digits.slice(0, maxLen)
+        setPhone(limited)
+        setHasTyped(prev => ({ ...prev, phone: true }))
+        if (touched.phone) setFieldErrors(prev => ({ ...prev, phone: validatePhone(limited) }))
+    }
+
+    const handleEmailChange = (val) => {
+        const limited = val.slice(0, MAX_EMAIL)
+        setEmail(limited)
+        setHasTyped(prev => ({ ...prev, email: true }))
+        if (touched.email) setFieldErrors(prev => ({ ...prev, email: validateField('email', limited) }))
+    }
 
     const handleAddressChange = (val) => {
-        setAddress(val);
-        if (touched.address) {
-            setFieldErrors(prev => ({ ...prev, address: validateField('address', val) }));
-        }
-    };
+        const words = val.trim() === '' ? [] : val.trim().split(/\s+/)
+        if (words.length > MAX_ADDRESS_WORDS) return
+        setAddress(val)
+        setHasTyped(prev => ({ ...prev, address: true }))
+        if (touched.address) setFieldErrors(prev => ({ ...prev, address: validateField('address', val) }))
+    }
 
     // Fetch delivery areas on mount
     useEffect(() => {
         setAreasLoading(true)
         API.get('/delivery')
             .then((r) => {
-                // Check the exact structure returned by the controller
-                const areas = r.data.areas || [];
+                const areas = r.data.areas || []
                 setDeliveryAreas(areas)
             })
             .catch((err) => {
-                console.error("Fetch Error:", err);
+                console.error("Fetch Error:", err)
                 toast.error('Could not load delivery areas')
             })
             .finally(() => setAreasLoading(false))
@@ -112,17 +151,20 @@ const CheckoutPage = () => {
     const total = cartSubtotal + deliveryCharge
 
     const handleSubmit = async () => {
-        const nameErr = validateField('fullName', fullName);
-        const phoneErr = validateField('phone', phone);
-        const addrErr = validateField('address', address);
+        const nameErr = validateField('fullName', fullName)
+        const phoneErr = validateField('phone', phone)
+        const emailErr = validateField('email', email)
+        const addrErr = validateField('address', address)
 
-        setFieldErrors({ fullName: nameErr, phone: phoneErr, address: addrErr });
-        setTouched({ fullName: true, phone: true, address: true });
+        setFieldErrors({ fullName: nameErr, phone: phoneErr, email: emailErr, address: addrErr })
+        setTouched({ fullName: true, phone: true, email: true, address: true })
 
-        if (nameErr || phoneErr || addrErr) {
-            toast.error('Please resolve the errors in the form.');
-            return;
-        }
+        // If completely empty, show generic message; otherwise show specific error
+        const isCompletelyEmpty = !fullName.trim() && !phone.trim() && !address.trim()
+        if (isCompletelyEmpty) { toast.error('Please fill the form.'); return }
+
+        const firstErr = nameErr || phoneErr || emailErr || addrErr
+        if (firstErr) { toast.error(firstErr); return }
         if (loading) return
 
         const cartItems = [...safeCart]
@@ -133,7 +175,7 @@ const CheckoutPage = () => {
             const payload = {
                 full_name: fullName,
                 phone,
-                email,
+                email: email.trim() || null,
                 delivery_area_id: deliveryAreaId || null,
                 address,
                 additional_instructions: instructions,
@@ -153,11 +195,7 @@ const CheckoutPage = () => {
 
             if (data.success) {
                 toast.success('Order placed successfully!')
-
-                // 1. Clear out the global basket context items
                 clearCart()
-
-                // 2. Route them directly to the tracking view using the code from the backend response!
                 navigate(`/track/${data.orderNumber}`)
             } else {
                 toast.error(data.message || 'Order failed')
@@ -169,8 +207,7 @@ const CheckoutPage = () => {
         }
     }
 
-    // EMPTY CART FALLBACK VIEW
-    if (safeCart.length === 0) {
+    if (safeCart.length === 0 && !loading) {
         return (
             <div className="page-enter min-h-screen flex items-center justify-center px-4">
                 <div className="text-center">
@@ -186,6 +223,12 @@ const CheckoutPage = () => {
             </div>
         )
     }
+
+    const phoneMax = phone.startsWith('92') ? MAX_PHONE_92 : MAX_PHONE_03
+    const showNameCounter = focusedField === 'fullName' || fullName.length > 0
+    const showPhoneCounter = focusedField === 'phone' || phone.length > 0
+    const showAddressCounter = focusedField === 'address' || address.length > 0
+    const showEmailCounter = focusedField === 'email' || email.length > 0
 
     return (
         <div className="page-enter min-h-screen py-10 px-4 sm:px-6">
@@ -211,52 +254,69 @@ const CheckoutPage = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="form-label">Full Name *</label>
-                                        <div className="relative">
-                                            <input
-                                                className="form-input"
-                                                placeholder="Your full name"
-                                                value={fullName}
-                                                onChange={(e) => handleNameChange(e.target.value)}
-                                                onBlur={() => handleBlur('fullName')}
-                                                style={touched.fullName && fieldErrors.fullName ? { borderColor: '#ef4444' } : {}}
-                                            />
-                                            <span
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400"
-                                            >
-                                                {fullName.length}/{MAX_NAME}
-                                            </span>
-                                        </div>
-                                        <FieldError message={touched.fullName ? fieldErrors.fullName : ''} />
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Phone *</label>
-                                        <div className="relative">
-                                            <input
-                                                className="form-input"
-                                                placeholder="03XX XXXXXXX"
-                                                value={phone}
-                                                onChange={(e) => handlePhoneChange(e.target.value)}
-                                                onBlur={() => handleBlur('phone')}
-                                                maxLength={MAX_PHONE}
-                                                style={touched.phone && fieldErrors.phone ? { borderColor: '#ef4444' } : {}}
-                                            />
-                                            {phone && (
-                                                <span
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-medium text-gray-400"
-                                                >
-                                                    {phone.length}/{MAX_PHONE}
+                                        <div className="flex justify-between items-center mb-1.5">
+                                            <label className="form-label" style={{ marginBottom: 0 }}>Full Name *</label>
+                                            {showNameCounter && (
+                                                <span className="text-[10px] font-medium text-gray-400">
+                                                    {fullName.length}/{MAX_NAME}
                                                 </span>
                                             )}
                                         </div>
+                                        <input
+                                            className="form-input"
+                                            placeholder="Your full name"
+                                            value={fullName}
+                                            onChange={(e) => handleNameChange(e.target.value)}
+                                            onFocus={() => setFocusedField('fullName')}
+                                            onBlur={() => handleBlur('fullName')}
+                                            style={touched.fullName && fieldErrors.fullName ? { borderColor: '#ef4444' } : {}}
+                                        />
+                                        <FieldError message={touched.fullName ? fieldErrors.fullName : ''} />
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between items-center mb-1.5">
+                                            <label className="form-label" style={{ marginBottom: 0 }}>Phone *</label>
+                                            {showPhoneCounter && (
+                                                <span className="text-[10px] font-medium text-gray-400">
+                                                    {phone.length}/{phoneMax}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            inputMode="tel"
+                                            className="form-input"
+                                            placeholder="03XX... or 9203XX..."
+                                            value={phone}
+                                            onChange={(e) => handlePhoneChange(e.target.value)}
+                                            onFocus={() => setFocusedField('phone')}
+                                            onBlur={() => handleBlur('phone')}
+                                            style={touched.phone && fieldErrors.phone ? { borderColor: '#ef4444' } : {}}
+                                        />
                                         <FieldError message={touched.phone ? fieldErrors.phone : ''} />
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label className="form-label">Email</label>
-                                    <input className="form-input" type="email" placeholder="Optional"
-                                        value={email} onChange={(e) => setEmail(e.target.value)} />
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="form-label" style={{ marginBottom: 0 }}>Email</label>
+                                        {showEmailCounter && (
+                                            <span className="text-[10px] font-medium text-gray-400">
+                                                {email.length}/{MAX_EMAIL}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <input
+                                        className="form-input"
+                                        type="text"
+                                        placeholder="Optional"
+                                        value={email}
+                                        onChange={(e) => handleEmailChange(e.target.value)}
+                                        onFocus={() => setFocusedField('email')}
+                                        onBlur={() => handleBlur('email')}
+                                        style={touched.email && fieldErrors.email ? { borderColor: '#ef4444' } : {}}
+                                    />
+                                    <FieldError message={touched.email ? fieldErrors.email : ''} />
                                 </div>
 
                                 <div>
@@ -281,7 +341,14 @@ const CheckoutPage = () => {
                                 </div>
 
                                 <div>
-                                    <label className="form-label">Full Address *</label>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="form-label" style={{ marginBottom: 0 }}>Full Address *</label>
+                                        {showAddressCounter && (
+                                            <span className="text-[10px] font-medium text-gray-400">
+                                                {countWords(address)}/{MAX_ADDRESS_WORDS} words
+                                            </span>
+                                        )}
+                                    </div>
                                     <textarea
                                         className="form-input"
                                         rows={3}
@@ -289,6 +356,7 @@ const CheckoutPage = () => {
                                         placeholder="Street, area, landmarks..."
                                         value={address}
                                         onChange={(e) => handleAddressChange(e.target.value)}
+                                        onFocus={() => setFocusedField('address')}
                                         onBlur={() => handleBlur('address')}
                                     />
                                     <FieldError message={touched.address ? fieldErrors.address : ''} />

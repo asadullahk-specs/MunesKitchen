@@ -18,16 +18,18 @@ export const CartProvider = ({ children }) => {
     }, [cart])
 
     const addToCart = (product, quantity = 1) => {
+        const prodId = product.id || product._id
+        if (!prodId) return
         setCart(prev => {
-            const existing = prev.find(item => item.id === product.id)
+            const existing = prev.find(item => (item.id || item._id) === prodId)
             if (existing) {
                 return prev.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity }
+                    (item.id || item._id) === prodId
+                        ? { ...item, id: prodId, _id: prodId, quantity: item.quantity + quantity }
                         : item
                 )
             }
-            return [...prev, { ...product, quantity }]
+            return [...prev, { ...product, id: prodId, _id: prodId, quantity }]
         })
         toast.success(
             <div className="flex items-center justify-between w-full" style={{ fontFamily: 'Poppins, sans-serif' }}>
@@ -60,7 +62,7 @@ export const CartProvider = ({ children }) => {
     }
 
     const removeFromCart = (productId) => {
-        setCart(prev => prev.filter(item => item.id !== productId))
+        setCart(prev => prev.filter(item => (item.id || item._id) !== productId))
         toast.error('Item removed')
     }
 
@@ -71,7 +73,7 @@ export const CartProvider = ({ children }) => {
         }
         setCart(prev =>
             prev.map(item =>
-                item.id === productId ? { ...item, quantity: newQty } : item
+                (item.id || item._id) === productId ? { ...item, id: productId, _id: productId, quantity: newQty } : item
             )
         )
     }
