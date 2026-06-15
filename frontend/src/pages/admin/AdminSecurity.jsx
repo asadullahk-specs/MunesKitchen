@@ -1,8 +1,83 @@
 import { useState, useEffect, useRef } from 'react'
 import { toast } from 'react-toastify'
 import { FiPlus, FiEdit2, FiTrash2, FiShield, FiLock, FiUser, FiMail, FiX, FiCheck, FiEye, FiEyeOff, FiCamera, FiUpload } from 'react-icons/fi'
-import { getAdmins, createAdmin, updateAdmin, deleteAdmin } from '../../api/auth'
+import { getAdmins, createAdmin, updateAdmin, deleteAdmin, changePassword } from '../../api/auth'
 import { useAuth } from '../../context/AuthContext'
+
+const PasswordStrengthBar = ({ password }) => {
+    if (!password) return null;
+    
+    const requirements = {
+        length: password.length >= 8,
+        uppercase: /[A-Z]/.test(password),
+        lowercase: /[a-z]/.test(password),
+        number: /\d/.test(password),
+        special: /[^A-Za-z0-9]/.test(password)
+    };
+    
+    const metCount = Object.values(requirements).filter(Boolean).length;
+    
+    let strengthLabel = 'Very Weak';
+    let strengthColor = '#ef4444'; // red
+    let progressWidth = '20%';
+    
+    if (metCount === 5) {
+        strengthLabel = 'Strong';
+        strengthColor = '#10b981'; // emerald
+        progressWidth = '100%';
+    } else if (metCount >= 4) {
+        strengthLabel = 'Good';
+        strengthColor = '#3b82f6'; // blue
+        progressWidth = '80%';
+    } else if (metCount >= 3) {
+        strengthLabel = 'Medium';
+        strengthColor = '#f59e0b'; // amber
+        progressWidth = '60%';
+    } else if (metCount >= 2) {
+        strengthLabel = 'Weak';
+        strengthColor = '#f97316'; // orange
+        progressWidth = '40%';
+    }
+    
+    return (
+        <div className="mt-2 space-y-2">
+            <div className="flex justify-between items-center text-xs">
+                <span style={{ color: 'var(--text-muted)' }}>Strength:</span>
+                <span className="font-bold" style={{ color: strengthColor }}>{strengthLabel}</span>
+            </div>
+            
+            <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div 
+                     className="h-full transition-all duration-300"
+                     style={{ width: progressWidth, backgroundColor: strengthColor }}
+                />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-x-2 gap-y-1 pt-1 text-[11px]">
+                <div className="flex items-center gap-1.5" style={{ color: requirements.length ? '#10b981' : '#ef4444' }}>
+                    {requirements.length ? <FiCheck size={12} /> : <FiX size={12} />}
+                    <span>Min 8 characters</span>
+                </div>
+                <div className="flex items-center gap-1.5" style={{ color: requirements.uppercase ? '#10b981' : '#ef4444' }}>
+                    {requirements.uppercase ? <FiCheck size={12} /> : <FiX size={12} />}
+                    <span>Uppercase (A-Z)</span>
+                </div>
+                <div className="flex items-center gap-1.5" style={{ color: requirements.lowercase ? '#10b981' : '#ef4444' }}>
+                    {requirements.lowercase ? <FiCheck size={12} /> : <FiX size={12} />}
+                    <span>Lowercase (a-z)</span>
+                </div>
+                <div className="flex items-center gap-1.5" style={{ color: requirements.number ? '#10b981' : '#ef4444' }}>
+                    {requirements.number ? <FiCheck size={12} /> : <FiX size={12} />}
+                    <span>Number (0-9)</span>
+                </div>
+                <div className="col-span-2 flex items-center gap-1.5" style={{ color: requirements.special ? '#10b981' : '#ef4444' }}>
+                    {requirements.special ? <FiCheck size={12} /> : <FiX size={12} />}
+                    <span>Special character (e.g. @, #, $, %)</span>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const AdminSecurity = () => {
     const { admin: currentAdmin, updateAdminData } = useAuth()
@@ -51,11 +126,27 @@ const AdminSecurity = () => {
         if (!form.name.trim()) return toast.error('Name is required')
         if (!form.email.trim()) return toast.error('Email is required')
 
-        if (!isEditing && (!form.password || form.password.length < 6)) {
-            return toast.error('Password must be at least 6 characters')
-        }
-        if (isEditing && form.password && form.password.length < 6) {
-            return toast.error('New password must be at least 6 characters')
+        const checkStrength = (pwd) => {
+            return (
+                pwd.length >= 8 &&
+                /[A-Z]/.test(pwd) &&
+                /[a-z]/.test(pwd) &&
+                /\d/.test(pwd) &&
+                /[^A-Za-z0-9]/.test(pwd)
+            );
+        };
+
+        if (!isEditing) {
+            if (!form.password) {
+                return toast.error('Password is required');
+            }
+            if (!checkStrength(form.password)) {
+                return toast.error('Password does not meet complexity requirements (must be at least 8 characters long, containing an uppercase, lowercase, digit, and special character).');
+            }
+        } else {
+            if (form.password && !checkStrength(form.password)) {
+                return toast.error('New password does not meet complexity requirements (must be at least 8 characters long, containing an uppercase, lowercase, digit, and special character).');
+            }
         }
 
         setSubmitting(true)
@@ -197,6 +288,48 @@ const AdminSecurity = () => {
         }
     }
 
+    // Change password state
+    const [changePwd, setChangePwd] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' })
+    const [changingPwd, setChangingPwd] = useState(false)
+    const [showChangePwd, setShowChangePwd] = useState({ current: false, new: false, confirm: false })
+
+    const handleChangePasswordSubmit = async (e) => {
+        e.preventDefault()
+        if (!changePwd.currentPassword) return toast.error('Current password is required')
+        if (!changePwd.newPassword) return toast.error('New password is required')
+        if (changePwd.newPassword !== changePwd.confirmPassword) {
+            return toast.error('New passwords do not match')
+        }
+
+        const password = changePwd.newPassword;
+        const meetsStrength = 
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[a-z]/.test(password) &&
+            /\d/.test(password) &&
+            /[^A-Za-z0-9]/.test(password);
+
+        if (!meetsStrength) {
+            return toast.error('New password does not meet complexity requirements.')
+        }
+
+        setChangingPwd(true)
+        try {
+            const res = await changePassword({
+                currentPassword: changePwd.currentPassword,
+                newPassword: changePwd.newPassword
+            })
+            if (res.data.success) {
+                toast.success('Password updated successfully')
+                setChangePwd({ currentPassword: '', newPassword: '', confirmPassword: '' })
+            }
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to update password')
+        } finally {
+            setChangingPwd(false)
+        }
+    }
+
     return (
         <div style={{ width: '100%', fontFamily: 'Poppins, sans-serif' }}>
             {/* Header */}
@@ -322,7 +455,7 @@ const AdminSecurity = () => {
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Form Area */}
-                    <div className="lg:col-span-1">
+                    <div className="lg:col-span-1 space-y-6">
                         <div className="card p-5">
                             <h3 className="font-bold text-base mb-4" style={{ color: 'var(--text-main)' }}>
                                 {isEditing ? 'Edit Administrator Credentials' : 'Add New Administrator'}
@@ -424,7 +557,7 @@ const AdminSecurity = () => {
                                             className="form-input"
                                             style={{ paddingLeft: '36px', paddingRight: '40px' }}
                                             type={showPassword ? 'text' : 'password'}
-                                            placeholder={isEditing ? '••••••••' : 'Password (min 6 chars)'}
+                                            placeholder={isEditing ? '••••••••' : 'Password (min 8 chars)'}
                                             value={form.password}
                                             onChange={(e) => setForm({ ...form, password: e.target.value })}
                                             required={!isEditing}
@@ -439,6 +572,7 @@ const AdminSecurity = () => {
                                             {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
                                         </button>
                                     </div>
+                                    <PasswordStrengthBar password={form.password} />
                                 </div>
 
                                 <div className="flex gap-2 pt-2">
@@ -456,6 +590,108 @@ const AdminSecurity = () => {
                                         </button>
                                     )}
                                 </div>
+                            </form>
+                        </div>
+
+                        {/* Change Current Admin Password Card */}
+                        <div className="card p-5">
+                            <h3 className="font-bold text-base mb-4 flex items-center gap-2" style={{ color: 'var(--text-main)' }}>
+                                <FiLock size={16} style={{ color: 'var(--primary)' }} />
+                                Change My Password
+                            </h3>
+                            <form onSubmit={handleChangePasswordSubmit} className="space-y-4">
+                                {/* Current Password */}
+                                <div>
+                                    <label className="form-label">Current Password *</label>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
+                                            <FiLock size={14} />
+                                        </span>
+                                        <input
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px', paddingRight: '40px' }}
+                                            type={showChangePwd.current ? 'text' : 'password'}
+                                            placeholder="Current Password"
+                                            value={changePwd.currentPassword}
+                                            onChange={(e) => setChangePwd({ ...changePwd, currentPassword: e.target.value })}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowChangePwd(p => ({ ...p, current: !p.current }))}
+                                            className="absolute inset-y-0 right-0 flex items-center"
+                                            style={{ paddingRight: '12px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            tabIndex={-1}
+                                        >
+                                            {showChangePwd.current ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* New Password */}
+                                <div>
+                                    <label className="form-label">New Password *</label>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
+                                            <FiLock size={14} />
+                                        </span>
+                                        <input
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px', paddingRight: '40px' }}
+                                            type={showChangePwd.new ? 'text' : 'password'}
+                                            placeholder="New Password (min 8 chars)"
+                                            value={changePwd.newPassword}
+                                            onChange={(e) => setChangePwd({ ...changePwd, newPassword: e.target.value })}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowChangePwd(p => ({ ...p, new: !p.new }))}
+                                            className="absolute inset-y-0 right-0 flex items-center"
+                                            style={{ paddingRight: '12px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            tabIndex={-1}
+                                        >
+                                            {showChangePwd.new ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                                        </button>
+                                    </div>
+                                    <PasswordStrengthBar password={changePwd.newPassword} />
+                                </div>
+
+                                {/* Confirm Password */}
+                                <div>
+                                    <label className="form-label">Confirm New Password *</label>
+                                    <div className="relative">
+                                        <span className="absolute inset-y-0 left-0 flex items-center pointer-events-none" style={{ paddingLeft: '12px', color: 'var(--text-muted)' }}>
+                                            <FiLock size={14} />
+                                        </span>
+                                        <input
+                                            className="form-input"
+                                            style={{ paddingLeft: '36px', paddingRight: '40px' }}
+                                            type={showChangePwd.confirm ? 'text' : 'password'}
+                                            placeholder="Confirm New Password"
+                                            value={changePwd.confirmPassword}
+                                            onChange={(e) => setChangePwd({ ...changePwd, confirmPassword: e.target.value })}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowChangePwd(p => ({ ...p, confirm: !p.confirm }))}
+                                            className="absolute inset-y-0 right-0 flex items-center"
+                                            style={{ paddingRight: '12px', color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            tabIndex={-1}
+                                        >
+                                            {showChangePwd.confirm ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    disabled={changingPwd}
+                                    className="btn-primary w-full justify-center"
+                                >
+                                    {changingPwd ? 'Updating...' : 'Update Password'}
+                                </button>
                             </form>
                         </div>
                     </div>

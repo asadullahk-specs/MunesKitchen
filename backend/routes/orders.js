@@ -4,6 +4,7 @@ const { protect } = require('../middleware/auth')
 const {
     createOrder,
     trackOrder,
+    cancelOrder,
     getAllOrders,
     getOrderById,
     updateOrderStatus,
@@ -13,6 +14,7 @@ const {
 
 router.post('/', createOrder)
 router.get('/track/:orderNumber', trackOrder)
+router.put('/:id/cancel', cancelOrder)
 router.get('/dashboard/stats', protect, getDashboardStats)
 router.get('/', protect, getAllOrders)
 router.get('/:id', protect, getOrderById)

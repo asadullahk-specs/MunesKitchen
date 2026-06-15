@@ -5,13 +5,8 @@ import { FiShoppingBag, FiMapPin, FiAlertCircle } from 'react-icons/fi'
 import API from '../api/axios'
 import { useCart } from '../context/CartContext'
 
-const MAX_NAME = 25
 const MAX_PHONE_03 = 11
-const MAX_PHONE_92 = 13
-const MAX_ADDRESS_WORDS = 100
-const MAX_EMAIL = 15
-
-const countWords = (text) => text.trim() === '' ? 0 : text.trim().split(/\s+/).length
+const MAX_PHONE_92 = 12
 
 const FieldError = ({ message }) =>
     message ? (
@@ -62,20 +57,17 @@ const CheckoutPage = () => {
         if (name === 'fullName') {
             if (!value.trim()) return 'Full name is required.'
             if (/\d/.test(value)) return 'Name cannot contain numbers.'
-            if (value.length > MAX_NAME) return `Max ${MAX_NAME} characters allowed.`
         }
         if (name === 'phone') {
             return validatePhone(value)
         }
         if (name === 'email') {
             if (value) {
-                if (value.length > MAX_EMAIL) return `Max ${MAX_EMAIL} characters allowed.`
                 if (!value.includes('@')) return 'Email must contain @.'
             }
         }
         if (name === 'address') {
             if (!value.trim()) return 'Address is required.'
-            if (countWords(value) > MAX_ADDRESS_WORDS) return `Address max ${MAX_ADDRESS_WORDS} words.`
         }
         return ''
     }
@@ -91,10 +83,9 @@ const CheckoutPage = () => {
 
     const handleNameChange = (val) => {
         const noDigits = val.replace(/\d/g, '')
-        const limited = noDigits.slice(0, MAX_NAME)
-        setFullName(limited)
+        setFullName(noDigits)
         setHasTyped(prev => ({ ...prev, fullName: true }))
-        if (touched.fullName) setFieldErrors(prev => ({ ...prev, fullName: validateField('fullName', limited) }))
+        if (touched.fullName) setFieldErrors(prev => ({ ...prev, fullName: validateField('fullName', noDigits) }))
     }
 
     const handlePhoneChange = (val) => {
@@ -108,15 +99,12 @@ const CheckoutPage = () => {
     }
 
     const handleEmailChange = (val) => {
-        const limited = val.slice(0, MAX_EMAIL)
-        setEmail(limited)
+        setEmail(val)
         setHasTyped(prev => ({ ...prev, email: true }))
-        if (touched.email) setFieldErrors(prev => ({ ...prev, email: validateField('email', limited) }))
+        if (touched.email) setFieldErrors(prev => ({ ...prev, email: validateField('email', val) }))
     }
 
     const handleAddressChange = (val) => {
-        const words = val.trim() === '' ? [] : val.trim().split(/\s+/)
-        if (words.length > MAX_ADDRESS_WORDS) return
         setAddress(val)
         setHasTyped(prev => ({ ...prev, address: true }))
         if (touched.address) setFieldErrors(prev => ({ ...prev, address: validateField('address', val) }))
@@ -224,11 +212,7 @@ const CheckoutPage = () => {
         )
     }
 
-    const phoneMax = phone.startsWith('92') ? MAX_PHONE_92 : MAX_PHONE_03
-    const showNameCounter = focusedField === 'fullName' || fullName.length > 0
-    const showPhoneCounter = focusedField === 'phone' || phone.length > 0
-    const showAddressCounter = focusedField === 'address' || address.length > 0
-    const showEmailCounter = focusedField === 'email' || email.length > 0
+
 
     return (
         <div className="page-enter min-h-screen py-10 px-4 sm:px-6">
@@ -254,42 +238,26 @@ const CheckoutPage = () => {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <div className="flex justify-between items-center mb-1.5">
-                                            <label className="form-label" style={{ marginBottom: 0 }}>Full Name *</label>
-                                            {showNameCounter && (
-                                                <span className="text-[10px] font-medium text-gray-400">
-                                                    {fullName.length}/{MAX_NAME}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <label className="form-label">Full Name *</label>
                                         <input
                                             className="form-input"
                                             placeholder="Your full name"
                                             value={fullName}
                                             onChange={(e) => handleNameChange(e.target.value)}
-                                            onFocus={() => setFocusedField('fullName')}
                                             onBlur={() => handleBlur('fullName')}
                                             style={touched.fullName && fieldErrors.fullName ? { borderColor: '#ef4444' } : {}}
                                         />
                                         <FieldError message={touched.fullName ? fieldErrors.fullName : ''} />
                                     </div>
                                     <div>
-                                        <div className="flex justify-between items-center mb-1.5">
-                                            <label className="form-label" style={{ marginBottom: 0 }}>Phone *</label>
-                                            {showPhoneCounter && (
-                                                <span className="text-[10px] font-medium text-gray-400">
-                                                    {phone.length}/{phoneMax}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <label className="form-label">Phone *</label>
                                         <input
                                             type="text"
                                             inputMode="tel"
                                             className="form-input"
-                                            placeholder="03XX... or 9203XX..."
+                                            placeholder="03XX... or 923XX"
                                             value={phone}
                                             onChange={(e) => handlePhoneChange(e.target.value)}
-                                            onFocus={() => setFocusedField('phone')}
                                             onBlur={() => handleBlur('phone')}
                                             style={touched.phone && fieldErrors.phone ? { borderColor: '#ef4444' } : {}}
                                         />
@@ -298,21 +266,13 @@ const CheckoutPage = () => {
                                 </div>
 
                                 <div>
-                                    <div className="flex justify-between items-center mb-1.5">
-                                        <label className="form-label" style={{ marginBottom: 0 }}>Email</label>
-                                        {showEmailCounter && (
-                                            <span className="text-[10px] font-medium text-gray-400">
-                                                {email.length}/{MAX_EMAIL}
-                                            </span>
-                                        )}
-                                    </div>
+                                    <label className="form-label">Email</label>
                                     <input
                                         className="form-input"
                                         type="text"
-                                        placeholder="Optional"
+                                        placeholder="yourname@example.com"
                                         value={email}
                                         onChange={(e) => handleEmailChange(e.target.value)}
-                                        onFocus={() => setFocusedField('email')}
                                         onBlur={() => handleBlur('email')}
                                         style={touched.email && fieldErrors.email ? { borderColor: '#ef4444' } : {}}
                                     />
@@ -341,14 +301,7 @@ const CheckoutPage = () => {
                                 </div>
 
                                 <div>
-                                    <div className="flex justify-between items-center mb-1.5">
-                                        <label className="form-label" style={{ marginBottom: 0 }}>Full Address *</label>
-                                        {showAddressCounter && (
-                                            <span className="text-[10px] font-medium text-gray-400">
-                                                {countWords(address)}/{MAX_ADDRESS_WORDS} words
-                                            </span>
-                                        )}
-                                    </div>
+                                    <label className="form-label">Full Address *</label>
                                     <textarea
                                         className="form-input"
                                         rows={3}
@@ -356,7 +309,6 @@ const CheckoutPage = () => {
                                         placeholder="Street, area, landmarks..."
                                         value={address}
                                         onChange={(e) => handleAddressChange(e.target.value)}
-                                        onFocus={() => setFocusedField('address')}
                                         onBlur={() => handleBlur('address')}
                                     />
                                     <FieldError message={touched.address ? fieldErrors.address : ''} />

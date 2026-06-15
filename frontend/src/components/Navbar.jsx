@@ -26,9 +26,9 @@ const Navbar = () => {
     }, [isOpen])
 
     const navLinks = [
-        { to: '/', label: 'Home' },
         { to: '/menu', label: 'Our Menu' },
         { to: '/contact', label: 'Contact' },
+        { to: '/track', label: 'Track Order' },
     ]
 
     const isActive = (path) => location.pathname === path

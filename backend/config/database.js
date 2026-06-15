@@ -23,9 +23,9 @@ const connectDB = async () => {
         await Admin.deleteMany({ email: 'admin@muneskitchen.com' });
 
         const defaultAdmins = [
-            { name: 'Asadullah Khan', email: 'asadullahk@admin1.muneskitchen', password: 'admin#1@kitchen' },
-            { name: 'Sameer Khan',    email: 'sameerk@admin2.muneskitchen',   password: 'admin#2@kitchen' },
-            { name: 'Munes Admin',   email: 'munes@admin3.muneskitchen',      password: 'admin#3@kitchen' }
+            { name: 'Asadullah Khan', email: 'asadullahk@admin1.muneskitchen', password: 'Admin#1@kitchen' },
+            { name: 'Sameer Khan',    email: 'sameerk@admin2.muneskitchen',   password: 'Admin#2@kitchen' },
+            { name: 'Munes Admin',   email: 'munes@admin3.muneskitchen',      password: 'Admin#3@kitchen' }
         ];
 
         for (const adminData of defaultAdmins) {

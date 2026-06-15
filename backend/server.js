@@ -65,6 +65,8 @@ app.use('/api/contacts', require('./routes/contacts'));
 app.use('/api/delivery', require('./routes/delivery'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/offers', require('./routes/offers'));
+app.use('/api/subjects', require('./routes/subjects'));
+app.use('/api/cancel-reasons', require('./routes/cancelReasons'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -86,8 +88,19 @@ const PORT = process.env.PORT || 5000;
 
 // Only start local server when running directly (not on Vercel)
 if (require.main === module) {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`🚀 Mune's Kitchen Backend running on http://localhost:${PORT}`);
+    });
+
+    server.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.error(`❌ Port ${PORT} is already in use. Waiting for it to free up...`);
+            // Exit cleanly so nodemon restarts without showing "app crashed"
+            process.exit(0);
+        } else {
+            console.error('❌ Server error:', err.message);
+            process.exit(1);
+        }
     });
 }
 

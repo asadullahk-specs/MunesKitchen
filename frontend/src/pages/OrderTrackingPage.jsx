@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import API from '../api/axios';
+import { getCancelReasons } from '../api/cancelReasons';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import QRCode from 'qrcode';
@@ -31,6 +32,64 @@ const OrderTrackingPage = () => {
     const [homeQrImage, setHomeQrImage] = useState('');
     const [trackQrImage, setTrackQrImage] = useState('');
 
+    // Cancel order states
+    const [showCancelModal, setShowCancelModal] = useState(false);
+    const [cancelReasons, setCancelReasons] = useState([]);
+    const [selectedReason, setSelectedReason] = useState('');
+    const [customReason, setCustomReason] = useState('');
+    const [cancelling, setCancelling] = useState(false);
+
+    const isCancellable = () => {
+        if (!order || !order.created_at) return false;
+        if (order.status === 'cancelled') return false;
+        const createdTime = new Date(order.created_at).getTime();
+        const currentTime = new Date().getTime();
+        const diffInMinutes = (currentTime - createdTime) / (1000 * 60);
+        return diffInMinutes < 10;
+    };
+
+    const handleCancelClick = async () => {
+        try {
+            const { data } = await getCancelReasons();
+            if (data.success) {
+                setCancelReasons(data.reasons || data.data || []);
+            }
+            setSelectedReason('');
+            setCustomReason('');
+            setShowCancelModal(true);
+        } catch (err) {
+            console.error("Failed to fetch cancel reasons", err);
+            toast.error("Could not fetch cancellation reasons. Please try again.");
+        }
+    };
+
+    const submitCancelOrder = async () => {
+        const finalReason = selectedReason === 'Others' ? customReason : selectedReason;
+        if (!finalReason || !finalReason.trim()) {
+            toast.error("Please select or specify a reason.");
+            return;
+        }
+
+        setCancelling(true);
+        try {
+            const { data } = await API.put(`/orders/${order._id || order.id}/cancel`, {
+                cancel_reason: finalReason.trim()
+            });
+            if (data.success) {
+                toast.success("Order cancelled successfully");
+                setOrder({ ...order, status: 'cancelled', cancel_reason: finalReason.trim() });
+                setShowCancelModal(false);
+            } else {
+                toast.error(data.message || "Could not cancel the order.");
+            }
+        } catch (err) {
+            console.error("Cancellation error:", err);
+            toast.error(err.response?.data?.message || "An error occurred while cancelling your order.");
+        } finally {
+            setCancelling(false);
+        }
+    };
+
     const fetchOrderDetails = async (targetNumber) => {
         if (!targetNumber || !targetNumber.trim()) return;
 
@@ -46,7 +105,8 @@ const OrderTrackingPage = () => {
         } catch (err) {
             setOrder(null);
             console.error("Tracking lookup error:", err);
-            toast.error(err.response?.data?.message || 'No order found with that reference code.');
+            const errMsg = err.response?.data?.message || 'No order found with that reference code.';
+            toast.error(errMsg);
         } finally {
             setLoading(false);
         }
@@ -165,7 +225,15 @@ const OrderTrackingPage = () => {
                 </form>
 
                 {order && (
-                    <div className="flex justify-end mb-4">
+                    <div className="flex justify-end gap-2 mb-4">
+                        {isCancellable() && (
+                            <button
+                                onClick={handleCancelClick}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-[7px] text-xs transition-all shadow-md flex items-center gap-1.5"
+                            >
+                                Cancel Order
+                            </button>
+                        )}
                         <button
                             onClick={downloadPDF}
                             className="btn-primary flex items-center gap-2 text-xs py-2 px-4 rounded-[7px] shadow-md"
@@ -491,6 +559,79 @@ const OrderTrackingPage = () => {
                             <p style={{ fontSize: '10px', color: '#94a3b8', margin: 0 }}>
                                 This is a computer-generated official receipt invoice for Mune's Kitchen order transactions.
                             </p>
+                        </div>
+                    </div>
+                )}
+
+                {showCancelModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+                        <div className="bg-[var(--bg-card)] border border-[var(--border)] rounded-[7px] max-w-md w-full p-6 shadow-2xl relative">
+                            <h3 className="text-lg font-bold mb-4" style={{ color: 'var(--text-main)' }}>Cancel Order</h3>
+                            <p className="text-sm mb-4" style={{ color: 'var(--text-muted)' }}>
+                                Please select a reason for cancelling your order:
+                            </p>
+                            
+                            <div className="space-y-4">
+                                <div className="space-y-3 max-h-[220px] overflow-y-auto pr-1 border border-[var(--border)] p-3 rounded-[7px]" style={{ background: 'var(--bg-input)' }}>
+                                    {cancelReasons.map((r) => (
+                                        <label key={r._id || r.id} className="flex items-start gap-2.5 cursor-pointer text-xs font-medium">
+                                            <input
+                                                type="radio"
+                                                name="cancelReason"
+                                                className="mt-0.5 accent-red-600 shrink-0"
+                                                value={r.name}
+                                                checked={selectedReason === r.name}
+                                                onChange={(e) => setSelectedReason(e.target.value)}
+                                            />
+                                            <span style={{ color: 'var(--text-main)' }}>{r.name}</span>
+                                        </label>
+                                    ))}
+                                    <label className="flex items-start gap-2.5 cursor-pointer text-xs font-medium">
+                                        <input
+                                            type="radio"
+                                            name="cancelReason"
+                                            className="mt-0.5 accent-red-600 shrink-0"
+                                            value="Others"
+                                            checked={selectedReason === 'Others'}
+                                            onChange={(e) => setSelectedReason(e.target.value)}
+                                        />
+                                        <span style={{ color: 'var(--text-main)' }}>Others</span>
+                                    </label>
+                                </div>
+
+                                {selectedReason === 'Others' && (
+                                    <div>
+                                        <label className="form-label mb-1">Custom Reason *</label>
+                                        <textarea
+                                            className="form-input w-full min-h-[80px]"
+                                            placeholder="Please specify your reason for cancelling..."
+                                            value={customReason}
+                                            onChange={(e) => setCustomReason(e.target.value)}
+                                            style={{ background: 'var(--bg-input)', color: 'var(--text-main)', borderColor: 'var(--border)' }}
+                                            required
+                                        />
+                                    </div>
+                                )}
+
+                                <div className="flex gap-2 justify-end pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCancelModal(false)}
+                                        className="px-4 py-2 rounded-[7px] border border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800 text-xs font-semibold transition-all"
+                                        style={{ color: 'var(--text-main)' }}
+                                    >
+                                        Close
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={submitCancelOrder}
+                                        disabled={cancelling || !selectedReason || (selectedReason === 'Others' && !customReason.trim())}
+                                        className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-[7px] text-xs font-semibold transition-all"
+                                    >
+                                        {cancelling ? 'Cancelling...' : 'Confirm Cancel'}
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 )}

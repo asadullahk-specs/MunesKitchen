@@ -119,6 +119,39 @@ const trackOrder = async (req, res) => {
         res.json({ success: true, order: orderObj });
     } catch (error) {
         console.error("❌ Track Order Error:", error.message);
+        if (error.name === 'CastError') {
+            return res.status(400).json({ success: false, message: 'Invalid order number or ID format' });
+        }
+        res.status(500).json({ success: false, message: 'An error occurred while tracking the order' });
+    }
+};
+
+const cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { cancel_reason } = req.body;
+
+        const order = await Order.findById(id);
+        if (!order) {
+            return res.status(404).json({ success: false, message: 'Order not found' });
+        }
+
+        // Restrict cancellation to orders under 10 minutes old
+        const createdTime = new Date(order.created_at).getTime();
+        const currentTime = new Date().getTime();
+        const diffInMinutes = (currentTime - createdTime) / (1000 * 60);
+
+        if (diffInMinutes >= 10) {
+            return res.status(400).json({ success: false, message: 'Orders can only be cancelled within 10 minutes of placement.' });
+        }
+
+        order.status = 'cancelled';
+        order.cancel_reason = cancel_reason || 'No reason provided';
+        await order.save();
+
+        res.json({ success: true, message: 'Order cancelled successfully', order });
+    } catch (error) {
+        console.error("❌ Cancel Order Error:", error.message);
         res.status(500).json({ success: false, message: error.message });
     }
 };
@@ -334,4 +367,4 @@ const deleteOrder = async (req, res) => {
     }
 };
 
-module.exports = { createOrder, trackOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats, deleteOrder };
+module.exports = { createOrder, trackOrder, cancelOrder, getAllOrders, getOrderById, updateOrderStatus, getDashboardStats, deleteOrder };

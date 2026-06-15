@@ -5,9 +5,6 @@ import { toast } from 'react-toastify';
 import { createReview } from '../api/reviews';
 import { getProducts } from '../api/products';
 
-const MAX_NAME_CHARS = 25;
-const MAX_MSG_CHARS = 50;
-
 const FieldError = ({ message }) => (
     message ? (
         <p className="flex items-center gap-1 text-[11px] mt-1 font-medium" style={{ color: '#ef4444' }}>
@@ -26,9 +23,11 @@ const ReviewForm = ({ onSuccess, productId }) => {
     const [dbProducts, setDbProducts] = useState([]);
     const [touched, setTouched] = useState({});
     const [fieldErrors, setFieldErrors] = useState({});
-    const [focusedField, setFocusedField] = useState(null);
     const [hasTyped, setHasTyped] = useState({});
     const fileInputRef = useRef(null);
+
+    // Message limit: 50 if a product is selected, 120 if not
+    const maxMsgChars = (productId || form.product_id) ? 50 : 120;
 
     useEffect(() => {
         if (productId) {
@@ -52,18 +51,15 @@ const ReviewForm = ({ onSuccess, productId }) => {
         if (name === 'customer_name') {
             if (!value.trim()) return 'Name is required.';
             if (/\d/.test(value)) return 'Name cannot contain numbers.';
-            if (value.length > MAX_NAME_CHARS) return `Max ${MAX_NAME_CHARS} characters allowed.`;
         }
         if (name === 'message') {
             if (!value.trim()) return 'Message is required.';
-            if (value.length > MAX_MSG_CHARS) return `Max ${MAX_MSG_CHARS} characters allowed.`;
+            if (value.length > maxMsgChars) return `Message is too long.`;
         }
         return '';
     };
 
     const handleBlur = (name) => {
-        setFocusedField(null);
-        // Only validate on blur if the user actually typed something in this field
         if (hasTyped[name]) {
             setTouched(prev => ({ ...prev, [name]: true }));
             const error = validateField(name, form[name] || '');
@@ -73,16 +69,15 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
     const handleNameChange = (val) => {
         const noDigits = val.replace(/\d/g, '');
-        const limited = noDigits.slice(0, MAX_NAME_CHARS);
-        setForm(prev => ({ ...prev, customer_name: limited }));
+        setForm(prev => ({ ...prev, customer_name: noDigits }));
         setHasTyped(prev => ({ ...prev, customer_name: true }));
         if (touched.customer_name) {
-            setFieldErrors(prev => ({ ...prev, customer_name: validateField('customer_name', limited) }));
+            setFieldErrors(prev => ({ ...prev, customer_name: validateField('customer_name', noDigits) }));
         }
     };
 
     const handleMessageChange = (val) => {
-        const limited = val.slice(0, MAX_MSG_CHARS);
+        const limited = val.slice(0, maxMsgChars);
         setForm(prev => ({ ...prev, message: limited }));
         setHasTyped(prev => ({ ...prev, message: true }));
         if (touched.message) {
@@ -120,7 +115,6 @@ const ReviewForm = ({ onSuccess, productId }) => {
         setFieldErrors({ customer_name: nameErr, message: msgErr });
         setTouched({ customer_name: true, message: true });
 
-        // If completely empty, show generic fill message; otherwise specific error
         const isCompletelyEmpty = !form.customer_name.trim() && !form.message.trim() && form.rating === 0;
         if (isCompletelyEmpty) { toast.error('Please fill the form.'); return; }
         if (nameErr) { toast.error(nameErr); return; }
@@ -187,11 +181,6 @@ const ReviewForm = ({ onSuccess, productId }) => {
         }
     };
 
-    const charCount = form.message.length;
-    const charLimitReached = charCount >= MAX_MSG_CHARS;
-    const showNameCounter = focusedField === 'customer_name' || form.customer_name.length > 0;
-    const showMsgCounter = focusedField === 'message' || form.message.length > 0;
-
     return (
         <motion.div
             className="card p-6"
@@ -205,26 +194,15 @@ const ReviewForm = ({ onSuccess, productId }) => {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                 <div className={productId ? "grid grid-cols-1 gap-4" : "grid grid-cols-1 sm:grid-cols-2 gap-4"}>
                     <div>
-                        <div className="flex justify-between items-center mb-1.5">
-                            <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                                Your Name *
-                            </label>
-                            {showNameCounter && (
-                                <span
-                                    className="text-[10px] font-medium"
-                                    style={{ color: form.customer_name.length >= MAX_NAME_CHARS ? '#ef4444' : 'var(--text-muted)' }}
-                                >
-                                    {form.customer_name.length}/{MAX_NAME_CHARS}
-                                </span>
-                            )}
-                        </div>
+                        <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                            Your Name *
+                        </label>
                         <input
                             type="text"
                             className="input-field"
                             placeholder="Enter your name"
                             value={form.customer_name}
                             onChange={(e) => handleNameChange(e.target.value)}
-                            onFocus={() => setFocusedField('customer_name')}
                             onBlur={() => handleBlur('customer_name')}
                             style={touched.customer_name && fieldErrors.customer_name ? { borderColor: '#ef4444' } : {}}
                         />
@@ -278,26 +256,15 @@ const ReviewForm = ({ onSuccess, productId }) => {
 
                 {/* Message */}
                 <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                        <label className="block text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
-                            Message *
-                        </label>
-                        {showMsgCounter && (
-                            <span
-                                className="text-[10px] font-medium"
-                                style={{ color: charLimitReached ? '#ef4444' : 'var(--text-muted)' }}
-                            >
-                                {charCount}/{MAX_MSG_CHARS}
-                            </span>
-                        )}
-                    </div>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                        Message *
+                    </label>
                     <textarea
                         className="input-field resize-none"
                         rows={3}
                         placeholder="Tell us about your experience..."
                         value={form.message}
                         onChange={(e) => handleMessageChange(e.target.value)}
-                        onFocus={() => setFocusedField('message')}
                         onBlur={() => handleBlur('message')}
                         style={touched.message && fieldErrors.message ? { borderColor: '#ef4444' } : {}}
                     />

@@ -9,6 +9,8 @@ const ExpenseCategory = require('./ExpenseCategory');
 const Expense = require('./Expense');
 const Contact = require('./Contact');
 const Offer = require('./Offer');
+const Subject = require('./Subject');
+const CancelReason = require('./CancelReason');
 
 module.exports = {
     Admin,
@@ -21,5 +23,7 @@ module.exports = {
     ExpenseCategory,
     Expense,
     Contact,
-    Offer
+    Offer,
+    Subject,
+    CancelReason
 };

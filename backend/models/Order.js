@@ -34,7 +34,8 @@ const orderSchema = new mongoose.Schema({
     delivery_charge: { type: Number, default: 0.00 },
     total: { type: Number, required: true },
     items: [orderItemSchema],
-    payment: { type: orderPaymentSchema, default: () => ({}) }
+    payment: { type: orderPaymentSchema, default: () => ({}) },
+    cancel_reason: { type: String }
 }, {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });

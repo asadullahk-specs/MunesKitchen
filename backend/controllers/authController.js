@@ -9,6 +9,16 @@ const generateToken = (id) => {
     })
 }
 
+const validatePasswordStrength = (password) => {
+    if (!password) return false;
+    if (password.length < 8) return false;
+    if (!/[A-Z]/.test(password)) return false;
+    if (!/[a-z]/.test(password)) return false;
+    if (!/\d/.test(password)) return false;
+    if (!/[^A-Za-z0-9]/.test(password)) return false;
+    return true;
+}
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body
@@ -64,6 +74,10 @@ exports.changePassword = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Current password is incorrect.' })
         }
 
+        if (!validatePasswordStrength(newPassword)) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, a number, and a special character.' })
+        }
+
         const hashed = await bcrypt.hash(newPassword, 10)
         await admin.updateOne({ password: hashed })
 
@@ -97,7 +111,10 @@ exports.createAdmin = async (req, res) => {
         const { name, email, password, profile_image } = req.body
         if (!name || !name.trim()) return res.status(400).json({ success: false, message: 'Name is required.' })
         if (!email || !email.trim()) return res.status(400).json({ success: false, message: 'Email is required.' })
-        if (!password || password.length < 6) return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' })
+        if (!password) return res.status(400).json({ success: false, message: 'Password is required.' })
+        if (!validatePasswordStrength(password)) {
+            return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, a number, and a special character.' })
+        }
 
         const existing = await Admin.findOne({ email: email.trim().toLowerCase() })
         if (existing) return res.status(400).json({ success: false, message: 'An admin with this email already exists.' })
@@ -138,7 +155,10 @@ exports.updateAdmin = async (req, res) => {
             if (existing) return res.status(400).json({ success: false, message: 'Email already in use by another admin.' })
             adminToUpdate.email = email.trim().toLowerCase()
         }
-        if (password && password.length >= 6) {
+        if (password) {
+            if (!validatePasswordStrength(password)) {
+                return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long and contain an uppercase letter, a lowercase letter, a number, and a special character.' })
+            }
             adminToUpdate.password = await bcrypt.hash(password, 10)
         }
         if (profile_image !== undefined) {

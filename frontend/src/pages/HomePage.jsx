@@ -48,6 +48,7 @@ const HomePage = () => {
     const [reviewStepPx, setReviewStepPx] = useState(350);
     const [mobileReviewStepPx, setMobileReviewStepPx] = useState(300);
     const [mobileCenterOffset, setMobileCenterOffset] = useState(30);
+    const [cardsToShow, setCardsToShow] = useState(3);
     const [reviewNoAnim, setReviewNoAnim] = useState(false);
 
     const touchStartX = useRef(0);
@@ -84,7 +85,10 @@ const HomePage = () => {
         const updateStep = () => {
             if (reviewTrackRef.current) {
                 const trackWidth = reviewTrackRef.current.clientWidth;
-                const cardWidth = (trackWidth - 2 * 24) / 3;
+                const width = window.innerWidth;
+                const currentCards = width < 1024 ? 2 : 3;
+                setCardsToShow(currentCards);
+                const cardWidth = (trackWidth - (currentCards - 1) * 24) / currentCards;
                 setReviewStepPx(cardWidth + 24);
             }
             if (mobileReviewTrackRef.current) {
@@ -1018,7 +1022,7 @@ const HomePage = () => {
                                             style={{ transform: `translateX(-${activeIdx * reviewStepPx}px)` }}
                                         >
                                             {[...reviews, ...reviews].map((rev, idx) => (
-                                                <div key={idx} style={{ width: 'calc(33.333% - 16px)', flexShrink: 0 }}>
+                                                <div key={idx} style={{ width: cardsToShow === 2 ? 'calc(50% - 12px)' : 'calc(33.333% - 16px)', flexShrink: 0 }}>
                                                     <ReviewCard review={rev} />
                                                 </div>
                                             ))}
@@ -1138,8 +1142,7 @@ const HomePage = () => {
                     </div>
 
                     {/* 2. Stats Breakdown (Grid Layout) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
-                        {/* 4.7 Numeric Rating Summary Card */}
+                    {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
                         <div className="card p-6 flex flex-col items-center justify-center text-center rounded-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             <div className="font-display text-5xl font-bold mb-2" style={{ color: 'var(--text-main)' }}>
                                 {Number(reviewStats.avgRating).toFixed(1)}
@@ -1157,7 +1160,6 @@ const HomePage = () => {
                             </div>
                         </div>
 
-                        {/* Progress Bar Breakdown Card */}
                         <div className="card p-6 flex flex-col gap-3 justify-center rounded-[7px] backdrop-blur-sm" style={{ background: 'var(--bg-card)', border: '1.5px solid var(--border)' }}>
                             {reviewStats.breakdown.map(({ star, count }) => (
                                 <div key={star} className="flex items-center gap-3 text-xs">
@@ -1177,7 +1179,7 @@ const HomePage = () => {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* 3. Review Submission Form centered */}
                     <div className="max-w-2xl mx-auto">

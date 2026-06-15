@@ -24,8 +24,16 @@ const createDeliveryArea = async (req, res) => {
     try {
         const parsedCharge = parseFloat(charge);
         const safeCharge = isNaN(parsedCharge) ? 0 : parsedCharge;
-        console.log(`Creating delivery area: ${name}, charge: ${safeCharge} (raw: ${charge})`);
-        const newArea = await DeliveryArea.create({ name: name.trim(), charge: safeCharge });
+        if (safeCharge < 0 || safeCharge > 5000) {
+            return res.status(400).json({ success: false, message: 'Delivery charge must be between 0 and 5000' });
+        }
+        const trimmedName = name.trim();
+        const exists = await DeliveryArea.findOne({ name: { $regex: new RegExp(`^${trimmedName}$`, 'i') } });
+        if (exists) {
+            return res.status(400).json({ success: false, message: 'Delivery area already exists' });
+        }
+        console.log(`Creating delivery area: ${trimmedName}, charge: ${safeCharge} (raw: ${charge})`);
+        const newArea = await DeliveryArea.create({ name: trimmedName, charge: safeCharge });
         res.status(201).json({ success: true, message: 'Delivery area added', data: newArea });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -41,9 +49,20 @@ const updateDeliveryArea = async (req, res) => {
     try {
         const parsedCharge = parseFloat(charge);
         const safeCharge = isNaN(parsedCharge) ? 0 : parsedCharge;
-        console.log(`Updating delivery area ${req.params.id}: ${name}, charge: ${safeCharge} (raw: ${charge})`);
+        if (safeCharge < 0 || safeCharge > 5000) {
+            return res.status(400).json({ success: false, message: 'Delivery charge must be between 0 and 5000' });
+        }
+        const trimmedName = name.trim();
+        const exists = await DeliveryArea.findOne({
+            name: { $regex: new RegExp(`^${trimmedName}$`, 'i') },
+            _id: { $ne: req.params.id }
+        });
+        if (exists) {
+            return res.status(400).json({ success: false, message: 'Delivery area already exists' });
+        }
+        console.log(`Updating delivery area ${req.params.id}: ${trimmedName}, charge: ${safeCharge} (raw: ${charge})`);
         const result = await DeliveryArea.findByIdAndUpdate(req.params.id, {
-            name: name.trim(),
+            name: trimmedName,
             charge: safeCharge
         }, { new: true });
         if (!result) {

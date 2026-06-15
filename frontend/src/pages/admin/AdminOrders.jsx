@@ -188,15 +188,22 @@ const AdminOrders = () => {
                                     {order.customer?.phone}
                                 </p>
                             </div>
-                            <span
-                                className="px-2.5 py-1 rounded-[7px] text-xs font-semibold capitalize shrink-0"
-                                style={{
-                                    background: `${STATUS_COLORS[order.status]}20`,
-                                    color: STATUS_COLORS[order.status],
-                                }}
-                            >
-                                {order.status?.replace(/_/g, ' ')}
-                            </span>
+                            <div className="text-right">
+                                <span
+                                    className="px-2.5 py-1 rounded-[7px] text-xs font-semibold capitalize shrink-0"
+                                    style={{
+                                        background: `${STATUS_COLORS[order.status]}20`,
+                                        color: STATUS_COLORS[order.status],
+                                    }}
+                                >
+                                    {order.status?.replace(/_/g, ' ')}
+                                </span>
+                                {order.status === 'cancelled' && order.cancel_reason && (
+                                    <p className="text-[10px] text-red-500 font-semibold mt-1 max-w-[120px] ml-auto truncate" title={order.cancel_reason}>
+                                        Reason: {order.cancel_reason}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                         <div className="flex items-center justify-between flex-wrap gap-2" onClick={(e) => e.stopPropagation()}>
                             <div>
@@ -391,6 +398,11 @@ const AdminOrders = () => {
                                         >
                                             {order.status?.replace(/_/g, ' ')}
                                         </span>
+                                        {order.status === 'cancelled' && order.cancel_reason && (
+                                            <div className="text-[10px] mt-1 text-red-500 font-semibold truncate max-w-[120px]" title={order.cancel_reason}>
+                                                Reason: {order.cancel_reason}
+                                            </div>
+                                        )}
                                     </td>
                                     <td style={{ padding: '12px 16px', fontSize: '12px', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
                                         {formatDateTime(order.created_at)}
@@ -557,6 +569,18 @@ const AdminOrders = () => {
                                         </h5>
                                         <p className="text-xs font-medium italic">
                                             "{selectedOrder.notes}"
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Cancellation Reason Box */}
+                                {selectedOrder.status === 'cancelled' && selectedOrder.cancel_reason && (
+                                    <div className="p-3.5 rounded-[7px] border border-red-200/40 bg-red-500/5 text-red-600 dark:text-red-400">
+                                        <h5 className="text-xs font-bold uppercase tracking-wide flex items-center gap-1.5 mb-1">
+                                            Cancellation Reason:
+                                        </h5>
+                                        <p className="text-xs font-semibold">
+                                            "{selectedOrder.cancel_reason}"
                                         </p>
                                     </div>
                                 )}
