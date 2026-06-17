@@ -14,7 +14,7 @@ const Footer = () => {
     }, []);
 
     return (
-        <footer style={{ background: 'var(--bg-deep)', borderTop: '1px solid var(--border)' }}>
+        <footer style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--border)' }}>
             {/* Main Footer */}
             <div className="max-w-7xl mx-auto px-4 py-4 sm:py-6">
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
