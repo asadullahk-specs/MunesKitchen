@@ -309,7 +309,7 @@ const HomePage = () => {
                                 Explore Menu <FiArrowRight size={15} />
                             </Link>
                             <a
-                                href="https://wa.me/923032683689"
+                                href="https://wa.me/923715813257"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 font-semibold transition-all"

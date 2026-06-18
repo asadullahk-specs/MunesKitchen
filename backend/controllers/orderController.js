@@ -94,7 +94,7 @@ const trackOrder = async (req, res) => {
         const searchInput = orderNumber ? orderNumber.trim() : '';
 
         const isObjectId = mongoose.Types.ObjectId.isValid(searchInput);
-        const query = isObjectId 
+        const query = isObjectId
             ? { $or: [{ order_number: searchInput }, { _id: searchInput }] }
             : { order_number: searchInput };
 

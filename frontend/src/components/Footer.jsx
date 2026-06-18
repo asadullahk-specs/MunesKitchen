@@ -112,10 +112,10 @@ const Footer = () => {
                         <ul className="space-y-3">
                             <li className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                                 <FiPhone className="mt-0.5 flex-shrink-0" style={{ color: 'var(--primary)' }} />
-                                <a href="tel:+923032683689" className="transition-colors"
+                                <a href="tel:+923715813257" className="transition-colors"
                                     onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
                                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
-                                >+92 303 2683689</a>
+                                >+92 371 5813257</a>
                             </li>
                             <li className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-muted)' }}>
                                 <FiMail className="mt-0.5 flex-shrink-0" style={{ color: 'var(--primary)' }} />
