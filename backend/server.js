@@ -47,8 +47,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Connect to DB before handling any API requests
 app.use(async (req, res, next) => {
-    await connectDB();
-    next();
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('❌ DB connection error on request:', err.message);
+        res.status(503).json({ success: false, message: 'Database unavailable. Please try again later.' });
+    }
 });
 
 // ========================
